@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyecto Green Force - IE Barro Blanco</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .image-hover:hover { transform: scale(1.05); transition: transform 0.3s ease; }
+    details summary { cursor: pointer; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; }
+    .modal-content { background-color: white; margin: 5% auto; padding: 20px; width: 90%; max-width: 800px; height: 80%; border-radius: 8px; position: relative; }
+    .close { position: absolute; top: 10px; right: 20px; font-size: 24px; cursor: pointer; }
+    .gallery-image { width: 100%; height: 250px; object-fit: cover; object-position: center; }
+  </style>
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+        }
+
+        nav {
+            background-color: #388E3C;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        nav ul li {
+            margin: 0 1rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #C8E6C9;
+        }
+
+        section {
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section h2 {
+            font-size: 2rem;
+            color: #2E7D32;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        section p {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .gallery-item {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .gallery-item p {
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .video-container, .carousel {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            max-width: 560px;
+            height: 315px;
+            border: none;
+        }
+
+        .document-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .document-list li {
+            margin: 0.5rem 0;
+        }
+
+        .document-list a {
+            color: #388E3C;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .document-list a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .contact-list li {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+        }
+
+        footer {
+            background-color: #2E7D32;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Estilos para el carrusel y modal */
+        .carousel {
+            position: relative;
+            width: 80%;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+
+        .carousel-container {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .carousel-slide {
+            min-width: 20%; /* 5 slides visibles */
+            box-sizing: border-box;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: auto;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .carousel-slide p {
+            font-size: 14px;
+            margin: 5px 0;
+            color: #333;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .prev {
+            left: 0;
+        }
+
+        .next {
+            right: 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .close {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav ul li {
+                margin: 0.5rem 0;
+            }
+
+            section {
+                padding: 2rem 1rem;
+            }
+
+            .carousel-slide {
+                min-width: 33.33%; /* 3 slides visibles en pantallas pequeñas */
+            }
+        }
+    </style>
+</head>
+<body class="bg-green-50 font-sans">
+  <header class="bg-green-700 text-white py-6 shadow-lg">
+    <div class="container mx-auto grid grid-cols-3 items-center">
+      <img src="1. logo 2.jpg" alt="Logo Green Force" class="w-16 h-16">
+      <div class="text-center">
+        <h1 class="text-4xl font-bold">Proyecto Green Force</h1>
+        <p class="text-xl mt-2">Fomentando la Conciencia Ambiental en la Institución Educativa Barro Blanco</p>
+      </div>
+      <div></div> <!-- Columna vacía para equilibrar -->
+    </div>
+    <nav class="mt-4">
+      <ul class="flex justify-center space-x-6">
+        <li><a href="#sobre" class="hover:underline">Sobre el Proyecto</a></li>
+        <li><a href="#galeria" class="hover:underline">Galería</a></li>
+        <li><a href="#video" class="hover:underline">Presentación</a></li>
+        <li><a href="#videos" class="hover:underline">Videos</a></li>
+        <li><a href="#documentos" class="hover:underline">Documentos</a></li>
+        <li><a href="#contacto" class="hover:underline">Contacto</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section id="sobre" class="container mx-auto py-12">
+    <h2 class="text-3xl font-semibold mb-6 text-center text-green-800">Sobre el Proyecto</h2>
+    <p class="text-gray-700 mb-4 text-lg">
+      El proyecto "Fomentando la Conciencia Ambiental y el Desarrollo Sostenible a través de la Creación del Grupo Ambiental Green Force y la Huerta Escolar" es una iniciativa liderada por estudiantes de la Institución Educativa Barro Blanco, Rionegro, Antioquia. Con un enfoque inclusivo, promovemos la sostenibilidad mediante la educación experiencial, la reforestación, el compostaje y la agricultura sostenible, beneficiando a 938 estudiantes, 54 docentes y 1,000 residentes de la comunidad local.
+    </p>
+    <p class="text-gray-700 mb-4 text-lg">
+      En 2024, el grupo Green Force ha crecido, incorporando nuevos integrantes y egresados en actividades como la visita a AGROSAVIA para aprender sobre la zanahoria. Convertimos la huerta escolar en un vivero con un sistema de recolección de agua lluvia, cultivando frijol, lechuga, tomate, zuccini, pepino, pimentón, zanahoria, maíz, romero y hierbas medicinales. También implementamos un área de compostaje y reciclamos tapas plásticas para crear canastas de basura, promoviendo la economía circular.
+    </p>
+    <p class="text-gray-700 text-lg">
+      Inspirados por los valores de tolerancia, sostenibilidad y desarrollo humano del jeque Zayed, nuestro proyecto empodera a los estudiantes, incluyendo aquellos con discapacidades auditivas, para convertirse en líderes ambientales. A través de talleres, jornadas de reforestación con más de 50 árboles nativos y campañas de sensibilización, fortalecemos la conciencia ambiental y creamos un modelo replicable para otras escuelas.
+    </p>
+  </section>
+
+  <section id="galeria" class="container mx-auto py-12 bg-white rounded-lg shadow-lg">
+    <h2 class="text-3xl font-semibold mb-6 text-center text-green-800">Galería</h2>
+    <div class="space-y-6">
+      <details open class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Creación de la huerta (2023)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="2. Inicio marzo 2023 - 1.jpg" alt="Creación de la huerta 2023 1" class="gallery-image rounded image-hover">
+          <img src="2. Inicio marzo 2023 - 2.jpg" alt="Creación de la huerta 2023 2" class="gallery-image rounded image-hover">
+          <img src="2. Inicio marzo 2023 - 3.jpg" alt="Creación de la huerta 2023 3" class="gallery-image rounded image-hover">
+          <img src="2. Inicio marzo 2023 - 4.jpg" alt="Creación de la huerta 2023 4" class="gallery-image rounded image-hover">
+          <img src="2. Inicio marzo 2023 - 5.jpg" alt="Creación de la huerta 2023 5" class="gallery-image rounded image-hover">
+          <img src="2. Inicio marzo 2023 - 6.jpg" alt="Creación de la huerta 2023 6" class="gallery-image rounded image-hover">
+          <img src="2. Inicio marzo 2023 - 7.jpg" alt="Creación de la huerta 2023 7" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Entrega de plántulas para reforestación (2023)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="3. Plántulas reforestación 2023 - 1.jpg" alt="Entrega de plántulas 2023 1" class="gallery-image rounded image-hover">
+          <img src="3. Plántulas reforestación 2023 - 2.jpg" alt="Entrega de plántulas 2023 2" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Visita centro de investigación la selva Agrosavia (2024)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="4. Visita agrosavia octubre 2024 - 1.jpg" alt="Visita Agrosavia 2024 1" class="gallery-image rounded image-hover">
+          <img src="4. Visita agrosavia octubre 2024 - 2.jpg" alt="Visita Agrosavia 2024 2" class="gallery-image rounded image-hover">
+          <img src="4. Visita agrosavia octubre 2024 - 3.jpg" alt="Visita Agrosavia 2024 3" class="gallery-image rounded image-hover">
+          <img src="4. Visita agrosavia octubre 2024 - 4.jpg" alt="Visita Agrosavia 2024 4" class="gallery-image rounded image-hover">
+          <img src="4. Visita agrosavia octubre 2024 - 5.jpg" alt="Visita Agrosavia 2024 5" class="gallery-image rounded image-hover">
+          <img src="4. Visita agrosavia octubre 2024 - 6.jpg" alt="Visita Agrosavia 2024 6" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Limpieza de zonas aledañas a la institución Barro Blanco (2024)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="5. Limpieza de zonas 2024 - 1.jpg" alt="Limpieza Barro Blanco 2024 1" class="gallery-image rounded image-hover">
+          <img src="5. Limpieza de zonas 2024 - 2.jpg" alt="Limpieza Barro Blanco 2024 2" class="gallery-image rounded image-hover">
+          <img src="5. Limpieza de zonas 2024 - 3.jpg" alt="Limpieza Barro Blanco 2024 3" class="gallery-image rounded image-hover">
+          <img src="5. Limpieza de zonas 2024 - 4.jpg" alt="Limpieza Barro Blanco 2024 4" class="gallery-image rounded image-hover">
+          <img src="5. Limpieza de zonas 2024 - 5.jpg" alt="Limpieza Barro Blanco 2024 5" class="gallery-image rounded image-hover">
+          <img src="5. Limpieza de zonas 2024 - 6.jpg" alt="Limpieza Barro Blanco 2024 6" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Riego y mantenimiento de la Huerta orgánica (2024)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="6. Riego y mantenimiento 2024 - 1.jpg" alt="Riego Huerta 2024 1" class="gallery-image rounded image-hover">
+          <img src="6. Riego y mantenimiento 2024 - 2.jpg" alt="Riego Huerta 2024 2" class="gallery-image rounded image-hover">
+          <img src="6. Riego y mantenimiento 2024 - 3.jpg" alt="Riego Huerta 2024 3" class="gallery-image rounded image-hover">
+          <img src="6. Riego y mantenimiento 2024 - 4.jpg" alt="Riego Huerta 2024 4" class="gallery-image rounded image-hover">
+          <img src="6. Riego y mantenimiento 2024 - 5.jpg" alt="Riego Huerta 2024 5" class="gallery-image rounded image-hover">
+          <img src="6. Riego y mantenimiento 2024 - 6.jpg" alt="Riego Huerta 2024 6" class="gallery-image rounded image-hover">
+          <img src="6. Riego y mantenimiento 2024 - 7.jpg" alt="Riego Huerta 2024 7" class="gallery-image rounded image-hover">
+          <img src="6. Riego y mantenimiento 2024 - 8.jpg" alt="Riego Huerta 2024 8" class="gallery-image rounded image-hover">
+          <img src="6. Riego y mantenimiento 2024 - 9.jpg" alt="Riego Huerta 2024 9" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Compostaje (2024)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="/images/greenforce/compostaje_2024_1.jpg" alt="Compostaje 2024 1" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/compostaje_2024_2.jpg" alt="Compostaje 2024 2" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/compostaje_2024_3.jpg" alt="Compostaje 2024 3" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Reciclaje de tapas plásticas (2024)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="8. Reciclaje Tapas 2024 - 1.jpg" alt="Reciclaje Tapas 2024 1" class="gallery-image rounded image-hover">
+          <img src="8. Reciclaje Tapas 2024 - 2.jpg" alt="Reciclaje Tapas 2024 2" class="gallery-image rounded image-hover">
+          <img src="8. Reciclaje Tapas 2024 - 3.jpg" alt="Reciclaje Tapas 2024 3" class="gallery-image rounded image-hover">
+          <img src="8. Reciclaje Tapas 2024 - 4.jpg" alt="Reciclaje Tapas 2024 4" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Donación de árboles para reforestación</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="9. Reforestación 2024 - 1.jpg" alt="Donación Árboles 1" class="gallery-image rounded image-hover">
+          <img src="9. Reforestación 2024 - 2.jpg" alt="Donación Árboles 2" class="gallery-image rounded image-hover">
+          <img src="9. Reforestación 2024 - 3.jpg" alt="Donación Árboles 3" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Encuentro regional de semilleros de investigación (2025)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="10. Encuentro Regional 2025 - 1.jpg" alt="Encuentro Regional 2025 1" class="gallery-image rounded image-hover">
+          <img src="10. Encuentro Regional 2025 - 2.jpg" alt="Encuentro Regional 2025 2" class="gallery-image rounded image-hover">
+          <img src="10. Encuentro Regional 2025 - 3.jpg" alt="Encuentro Regional 2025 3" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Encuentro departamental de semilleros de investigación (2025)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="11. Encuentro Departamental 2025 - 1.jpg" alt="Encuentro Departamental 2025 1" class="gallery-image rounded image-hover">
+          <img src="11. Encuentro Departamental 2025 - 2.jpg" alt="Encuentro Departamental 2025 2" class="gallery-image rounded image-hover">
+          <img src="11. Encuentro Departamental 2025 - 3.jpg" alt="Encuentro Departamental 2025 3" class="gallery-image rounded image-hover">
+          <img src="11. Encuentro Departamental 2025 - 4.jpg" alt="Encuentro Departamental 2025 4" class="gallery-image rounded image-hover"> 
+          <img src="11. Encuentro Departamental 2025 - 5.jpg" alt="Encuentro Departamental 2025 5" class="gallery-image rounded image-hover">
+          <img src="11. Encuentro Departamental 2025 - 6.jpg" alt="Encuentro Departamental 2025 6" class="gallery-image rounded image-hover">
+          <img src="11. Encuentro Departamental 2025 - 7.jpg" alt="Encuentro Departamental 2025 7" class="gallery-image rounded image-hover">
+          <img src="11. Encuentro Departamental 2025 - 8.jpg" alt="Encuentro Departamental 2025 8" class="gallery-image rounded image-hover">
+          <img src="11. Encuentro Departamental 2025 - 9.jpg" alt="Encuentro Departamental 2025 9" class="gallery-image rounded image-hover">
+          <img src="11. Encuentro Departamental 2025 - 10.jpg" alt="Encuentro Departamental 2025 10" class="gallery-image rounded image-hover">
+          <img src="11. Encuentro Departamental 2025 - 11.jpg" alt="Encuentro Departamental 2025 11" class="gallery-image rounded image-hover">
+          <img src="11. Encuentro Departamental 2025 - 12.jpg" alt="Encuentro Departamental 2025 12" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Visita Centro de investigación la selva Agrosavia (Zanahoria 2025)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="12. Visita Agrosavia 2025 - 1.jpg" alt="Visita Agrosavia Zanahoria 2025 1" class="gallery-image rounded image-hover">
+          <img src="12. Visita agrosavia 2025 - 2.jpg" alt="Visita Agrosavia Zanahoria 2025 2" class="gallery-image rounded image-hover">
+          <img src="12. Visita agrosavia 2025 - 3.jpg" alt="Visita Agrosavia Zanahoria 2025 3" class="gallery-image rounded image-hover">
+          <img src="12. Visita agrosavia 2025 - 4.jpg" alt="Visita Agrosavia Zanahoria 2025 4" class="gallery-image rounded image-hover">
+          <img src="12. Visita agrosavia 2025 - 5.jpg" alt="Visita Agrosavia Zanahoria 2025 5" class="gallery-image rounded image-hover">
+          <img src="12. Visita agrosavia 2025 - 6.jpg" alt="Visita Agrosavia Zanahoria 2025 6" class="gallery-image rounded image-hover">
+          <img src="12. Visita agrosavia 2025 - 7.jpg" alt="Visita Agrosavia Zanahoria 2025 7" class="gallery-image rounded image-hover">
+          <img src="12. Visita agrosavia 2025 - 8.jpg" alt="Visita Agrosavia Zanahoria 2025 8" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Campañas del cuidado del medio ambiente (2025)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="/images/greenforce/campanas_2025_1.jpg" alt="Campañas Medio Ambiente 2025 1" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/campanas_2025_2.jpg" alt="Campañas Medio Ambiente 2025 2" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/campanas_2025_3.jpg" alt="Campañas Medio Ambiente 2025 3" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/campanas_2025_4.jpg" alt="Campañas Medio Ambiente 2025 4" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/campanas_2025_5.jpg" alt="Campañas Medio Ambiente 2025 5" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/campanas_2025_6.jpg" alt="Campañas Medio Ambiente 2025 6" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Otras actividades del grupo ambiental</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="/images/greenforce/otras_actividades_1.jpg" alt="Otras Actividades 1" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/otras_actividades_2.jpg" alt="Otras Actividades 2" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/otras_actividades_3.jpg" alt="Otras Actividades 3" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/otras_actividades_4.jpg" alt="Otras Actividades 4" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/otras_actividades_5.jpg" alt="Otras Actividades 5" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/otras_actividades_6.jpg" alt="Otras Actividades 6" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/otras_actividades_7.jpg" alt="Otras Actividades 7" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/otras_actividades_8.jpg" alt="Otras Actividades 8" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/otras_actividades_9.jpg" alt="Otras Actividades 9" class="gallery-image rounded image-hover">
+          <img src="/images/greenforce/otras_actividades_10.jpg" alt="Otras Actividades 10" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+      <details class="p-4 bg-green-100 rounded-lg">
+        <summary class="text-xl font-semibold text-green-700">Estado actual de la huerta orgánica (2025)</summary>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+          <img src="14. Vivero actual 2025 - 1.jpg" alt="Huerta Orgánica 2025 1" class="gallery-image rounded image-hover">
+          <img src="14. Vivero actual 2025 - 2.jpg" alt="Huerta Orgánica 2025 2" class="gallery-image rounded image-hover">
+          <img src="14. Vivero actual 2025 - 3.jpg" alt="Huerta Orgánica 2025 3" class="gallery-image rounded image-hover">
+          <img src="14. Vivero actual 2025 - 4.jpg" alt="Huerta Orgánica 2025 4" class="gallery-image rounded image-hover">
+          <img src="14. Vivero actual 2025 - 5.jpg" alt="Huerta Orgánica 2025 5" class="gallery-image rounded image-hover">
+          <img src="14. Vivero actual 2025 - 6.jpg" alt="Huerta Orgánica 2025 6" class="gallery-image rounded image-hover">
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section id="video" class="container mx-auto py-12">
+    <h2 class="text-3xl font-semibold mb-6 text-center text-green-800">Video de Presentación</h2>
+    <div class="flex justify-center">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/9StDvt-2Nbs" title="Video Proyecto Green Force" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <section id="documentos" class="container mx-auto py-12">
+    <h2 class="text-3xl font-semibold mb-6 text-center text-green-800">Documentos</h2>
+    <p class="text-gray-700 text-lg text-center mb-4">Haz clic en un documento para visualizarlo:</p>
+    <ul class="list-disc list-inside text-gray-700 max-w-md mx-auto">
+      <li><a href="#" class="text-green-600 hover:underline document-link" data-src="1.1. Reconocimiento Oficial del Grupo Ambiental 2024.pdf">Reconocimiento Oficial del Grupo Ambiental 2024</a></li>
+      <li><a href="#" class="text-green-600 hover:underline document-link" data-src="1.2. Informe 1 - Evaluación del Proyecto Ambiental Escolar (GREEN FORCE).pdf">Informe 1 - Actividades de GREEN FORCE</a></li>
+      <li><a href="#" class="text-green-600 hover:underline document-link" data-src="1.3. Solicitud de Autorización para Actividades Extracurriculares del Grupo Ambiental “Green Force” – Segundo Semestre 2024.pdf">Solicitud de Autorización para Actividades Extracurriculares del Grupo Ambiental “Green Force” – Segundo Semestre 2024</a></li>
+      <li><a href="#" class="text-green-600 hover:underline document-link" data-src="1.4. Informe 2 de Actividades del Grupo Ambiental (2024).pdf">Informe 2 de Actividades del Grupo Ambiental (2024)</a></li>
+      <li><a href="#" class="text-green-600 hover:underline document-link" data-src="1.5. Poster 1 Fomento de la conciencia ambiental y desarrollo sostenible a través de la creación del grupo.pdf">Poster 1 Encuentro regional de semilleros de investigación</a></li>
+      <li><a href="#" class="text-green-600 hover:underline document-link" data-src="1.6. Poster 2 Semillero IE Barro Blanco Green Force 2025.pdf">Poster 2 Encuentro departamental de semilleros de investigación</a></li>
+      <li><a href="#" class="text-green-600 hover:underline document-link" data-src="1.7. Propuesta educativa Fortaleciendo la Conciencia Ambiental a través de la Educación Experiencial en la Institución Educativa Barroblanco.pdf">Propuesta educativa Fortaleciendo la Conciencia Ambiental (GREEN FORCE)</a></li>
+    </ul>
+    <div id="documentModal" class="modal">
+      <div class="modal-content">
+        <span class="close">×</span>
+        <iframe id="documentViewer" src="" style="width: 100%; height: 90%; border: none;"></iframe>
+      </div>
+    </div>
+  </section>
+  <section id="videos">
+        <h2>Videos</h2>
+        <p>Explora nuestros videos sobre las actividades del proyecto:</p>
+        <div class="carousel">
+            <button class="carousel-btn prev" onclick="moveCarousel(-1)">❮</button>
+            <div class="carousel-container" id="carousel-container">
+                <div class="carousel-slide">
+                    <img src="https://img.youtube.com/vi/5qap5aO4i9A/hqdefault.jpg" alt="Video 1" onclick="openModal('https://www.youtube.com/watch?v=XeIvLfG3K3A&ab_channel=GreenForce')">
+                    <p>Creación de la Huerta</p>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://img.youtube.com/vi/5qap5aO4i9A/hqdefault.jpg" alt="Video 2" onclick="openModal('https://www.youtube.com/embed/5qap5aO4i9A')">
+                    <p>Reforestación 2024</p>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://img.youtube.com/vi/5qap5aO4i9A/hqdefault.jpg" alt="Video 3" onclick="openModal('https://www.youtube.com/embed/xk4_1tD8tuQ')">
+                    <p>Visita a AGROSAVIA</p>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://img.youtube.com/vi/5qap5aO4i9A/hqdefault.jpg" alt="Video 4" onclick="openModal('https://www.youtube.com/embed/9bZkp7q19f0')">
+                    <p>Compostaje en Acción</p>
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://img.youtube.com/vi/5qap5aO4i9A/hqdefault.jpg" alt="Video 5" onclick="openModal('https://www.youtube.com/embed/oHg5SJYRHA0')">
+                    <p>Campañas Ambientales</p>
+                </div>
+            </div>
+            <button class="carousel-btn next" onclick="moveCarousel(1)">❯</button>
+        </div>
+
+        <div id="videoModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">×</span>
+                <iframe id="videoFrame" width="560" height="315" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section id="documents">
+        <h2>Documentos</h2>
+        <p>Haz clic en un documento para visualizarlo:</p>
+        <ul class="document-list">
+            <li><a href="#">Reconocimiento Oficial del Grupo Ambiental 2024</a></li>
+            <li><a href="#">Informe 1 - Actividades de GREEN FORCE</a></li>
+            <li><a href="#">Solicitud de Autorización para Actividades Extracurriculares del Grupo Ambiental “Green Force” – Segundo Semestre 2024</a></li>
+            <li><a href="#">Informe 2 de Actividades del Grupo Ambiental (2024)</a></li>
+            <li><a href="#">Poster 1 Encuentro regional de semilleros de investigación</a></li>
+            <li><a href="#">Poster 2 Encuentro departamental de semilleros de investigación</a></li>
+            <li><a href="#">Propuesta educativa Fortaleciendo la Conciencia Ambiental (GREEN FORCE)</a></li>
+        </ul>
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">×</span>
+                <iframe id="docFrame" width="100%" height="500px"></iframe>
+            </div>
+        </div>
+    </section>
+  <section id="contacto" class="container mx-auto py-12">
+    <h2 class="text-3xl font-semibold mb-6 text-center text-green-800">Contacto</h2>
+    <p class="text-gray-700 text-lg text-center">Para más información, contáctenos:</p>
+    <ul class="list-disc list-inside text-gray-700 max-w-md mx-auto">
+      <li>Rectora: Barbarita Gómez Echeverry, <a href="mailto:barro.blanco.rectoria@ser.edu.co" class="text-green-600 hover:underline">barro.blanco.rectoria@ser.edu.co</a>, +57 320 7078720</li>
+      <li>Titular del Proyecto: Luis Fernando Alzate López, <a href="mailto:luis.alzate@barroblanco.edu.co" class="text-green-600 hover:underline">luis.alzate@barroblanco.edu.co</a>, +57 310 460 4592</li>
+    </ul>
+  </section>
+
+  <footer class="bg-green-700 text-white py-6 text-center">
+    <p>Institución Educativa Barro Blanco © 2025</p>
+  </footer>
+
+  <script>
+    let slideIndex = 0;
+
+        function moveCarousel(direction) {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const totalSlides = slides.length;
+            slideIndex += direction;
+
+            // Ajuste para bucle infinito
+            if (slideIndex >= totalSlides) slideIndex = 0;
+            if (slideIndex < 0) slideIndex = totalSlides - 1;
+
+            const container = document.getElementById('carousel-container');
+            container.style.transform = `translateX(-${slideIndex * (100 / 5)}%)`; // 5 es el número de slides visibles
+        }
+        
+    const modal = document.getElementById('documentModal');
+    const viewer = document.getElementById('documentViewer');
+    const closeBtn = document.getElementsByClassName('close')[0];
+    const links = document.getElementsByClassName('document-link');
+
+    for (let link of links) {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const src = link.getAttribute('data-src');
+        console.log('Cargando PDF en iframe:', src); // Depuración
+        viewer.src = src;
+        modal.style.display = 'block';
+      });
+    }
+
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+      viewer.src = '';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+        viewer.src = '';
+      }
+    });
+  </script>
+</body>
+</html>
