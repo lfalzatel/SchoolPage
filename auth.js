@@ -66,6 +66,25 @@ const logout = async () => {
     }
 };
 
+// Role Management
+window.checkUserRole = async (uid) => {
+    try {
+        const userRef = doc(db, 'users', uid);
+        const docSnap = await getDoc(userRef);
+
+        if (docSnap.exists() && docSnap.data().role) {
+            return docSnap.data().role;
+        } else {
+            // If user doc doesn't exist or has no role, default to member
+            // We could also set it here if we wanted to enforce it in DB
+            return 'member';
+        }
+    } catch (error) {
+        console.error("Error fetching user role:", error);
+        return 'member'; // Default to member on error
+    }
+};
+
 // Global Auth Action Handler (for Dropdown)
 window.handleAuthAction = () => {
     if (auth.currentUser) {
@@ -76,7 +95,7 @@ window.handleAuthAction = () => {
 };
 
 // Update UI based on User State
-const updateUI = (user) => {
+const updateUI = async (user) => {
     // 1. Mobile Bottom Nav
     const mobBtn = getEl(uiIds.mobileAuthBtn);
     if (mobBtn) {
@@ -111,12 +130,27 @@ const updateUI = (user) => {
             menuBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>';
             // onclick is handled by handleAuthAction global
         }
+
+        // Determine Role
+        const role = await window.checkUserRole(user.uid);
+        window.currentUserRole = role;
+
+        // Trigger Admin UI Update
+        if (typeof window.updateAdminUI === 'function') {
+            window.updateAdminUI();
+        }
+
     } else {
         if (avatar) avatar.src = 'assets/icons/icon-192.png'; // Default
         if (menuName) menuName.textContent = 'Invitado';
         if (menuEmail) menuEmail.textContent = 'Inicia sesión para acceder';
         if (menuBtn) {
             menuBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Iniciar Sesión</span>';
+        }
+        window.currentUserRole = 'guest';
+        // Trigger Admin UI Update (Hide controls)
+        if (typeof window.updateAdminUI === 'function') {
+            window.updateAdminUI();
         }
     }
 
@@ -126,7 +160,17 @@ const updateUI = (user) => {
         if (el) el.style.display = user ? 'none' : 'flex';
     });
 
-    // 4. Legacy/Desktop Nav
+    // 4. Secure Data Loading Integration
+    // If user is logged in, trigger data load if functions exist
+    if (user) {
+        if (typeof window.loadSecureContent === 'function') {
+            window.loadSecureContent();
+        }
+    } else {
+        // Clear content if needed or just hide via overlays (already handled)
+    }
+
+    // 5. Legacy/Desktop Nav
     const lBtn = getEl(uiIds.loginBtn);
     const loBtn = getEl(uiIds.logoutBtn);
     const uProf = getEl(uiIds.userProfile);

@@ -527,6 +527,36 @@ section h2::after {
   background: #ff0000;
 }
 
+/* Delete Button (Admin) */
+.delete-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 20;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.activity-card:hover .delete-btn,
+.video-card:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  background: var(--danger-hover);
+  transform: scale(1.1);
+}
+
 /* Document Cards */
 .document-card {
   background: linear-gradient(135deg, #f0fdf4, #dcfce7);
@@ -1074,6 +1104,174 @@ footer {
 .view-section {
   display: none;
   animation: fadeIn 0.3s ease-in-out;
+}
+
+/* TIMELINE STYLES */
+.timeline {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.timeline::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  background-color: #e5e7eb;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  margin-left: -2px;
+}
+
+.timeline-item {
+  padding: 10px 40px;
+  position: relative;
+  background-color: inherit;
+  width: 50%;
+  box-sizing: border-box;
+}
+
+.timeline-item.left {
+  left: 0;
+}
+
+.timeline-item.right {
+  left: 50%;
+}
+
+.timeline-item::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  right: -10px;
+  background-color: white;
+  border: 4px solid var(--primary);
+  top: 15px;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.timeline-item.right::after {
+  left: -10px;
+}
+
+.timeline-content {
+  padding: 20px;
+  background-color: white;
+  position: relative;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid var(--primary);
+  transition: transform 0.3s ease;
+}
+
+.timeline-item:hover .timeline-content {
+  transform: translateY(-5px);
+}
+
+.timeline-badge {
+  position: absolute;
+  top: -10px;
+  right: 50px;
+  background: var(--primary);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  z-index: 2;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-item.right .timeline-badge {
+  left: 50px;
+  right: auto;
+}
+
+.timeline-status {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.status-done .timeline-status {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-upcoming .timeline-status {
+  background-color: #fff7ed;
+  color: #9a3412;
+}
+
+.timeline-content h3 {
+  margin-top: 5px;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  color: #1f2937;
+}
+
+.btn-timeline-gallery {
+  margin-top: 10px;
+  background: none;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  padding: 5px 15px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.btn-timeline-gallery:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.timeline-author {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 5px;
+}
+
+/* Mobile Timeline */
+@media screen and (max-width: 768px) {
+  .timeline::after {
+    left: 20px;
+  }
+
+  .timeline-item {
+    width: 100%;
+    padding-left: 50px;
+    padding-right: 15px;
+  }
+
+  .timeline-item.left,
+  .timeline-item.right {
+    left: 0;
+  }
+
+  .timeline-item::after {
+    left: 10px !important;
+  }
+
+  .timeline-badge {
+    position: relative;
+    top: 0;
+    right: auto;
+    left: 0 !important;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
 }
 
 .view-section.active {

@@ -112,6 +112,7 @@
 
         <ul class="nav-menu" id="navMenu">
           <li><a href="#sobre"><i class="fas fa-leaf"></i> Sobre el Proyecto</a></li>
+          <li><a href="#cronograma"><i class="fas fa-calendar-alt"></i> Cronograma</a></li>
           <li><a href="#galeria"><i class="fas fa-images"></i> Galería</a></li>
           <li><a href="#video"><i class="fas fa-play-circle"></i> Videos</a></li>
           <li><a href="#siguenos"><i class="fab fa-youtube"></i> Síguenos</a></li>
@@ -164,10 +165,24 @@
       </section>
     </div>
 
+    <!-- SECTION: Cronograma -->
+    <div id="view-cronograma" class="view-section">
+      <section id="cronograma" class="relative-section">
+        <h2><i class="fas fa-calendar-alt"></i> Cronograma de Actividades</h2>
+        <div id="timeline-container"></div>
+      </section>
+    </div>
+
     <!-- PROTECTED SECTION: Galería -->
     <div id="view-galeria" class="view-section">
       <section id="galeria" class="relative-section">
         <h2><i class="fas fa-camera"></i> Galería de Actividades</h2>
+
+        <div class="admin-controls" style="display: none; text-align: center; margin-bottom: 2rem;">
+          <button class="cta-button" onclick="openUploadModal('activity')">
+            <i class="fas fa-plus"></i> Nueva Actividad
+          </button>
+        </div>
 
         <div id="galleryOverlay" class="protected-overlay">
           <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
@@ -183,6 +198,12 @@
     <div id="view-video" class="view-section">
       <section id="video" class="relative-section">
         <h2><i class="fas fa-video"></i> Videos del Proyecto</h2>
+
+        <div class="admin-controls" style="display: none; text-align: center; margin-bottom: 2rem;">
+          <button class="cta-button" onclick="openUploadModal('video')">
+            <i class="fas fa-plus"></i> Nuevo Video
+          </button>
+        </div>
 
         <div id="videoOverlay" class="protected-overlay">
           <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
@@ -347,6 +368,30 @@
           <i class="fas fa-times"></i>
         </button>
       </div>
+      <div class="gallery-modal-info">
+        <h3 id="galleryModalTitle">Titulo</h3>
+        <p id="galleryModalDescription">Descripción</p>
+        <div id="galleryModalDate" class="gallery-date">Fecha</div>
+
+        <!-- Social Interaction Section -->
+        <div class="social-actions">
+          <button id="btnLike" class="btn-like" onclick="toggleLike()">
+            <i class="far fa-heart"></i> <span id="likeCount">0</span> Me gusta
+          </button>
+        </div>
+
+        <div class="comments-section">
+          <h4>Comentarios</h4>
+          <div id="commentsList" class="comments-list">
+            <!-- Comments will be loaded here -->
+            <p class="no-comments">Sé el primero en comentar.</p>
+          </div>
+          <form id="commentForm" class="comment-form" onsubmit="handleCommentSubmit(event)">
+            <input type="text" id="commentInput" placeholder="Escribe un comentario..." required autocomplete="off">
+            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+          </form>
+        </div>
+      </div>
       <div class="gallery-modal-body" id="galleryModalBody"></div>
     </div>
   </div>
@@ -380,6 +425,73 @@
     </div>
   </div>
 
+  <!-- Upload Modal (Admin) -->
+  <div id="uploadModal" class="modal" style="z-index: 4000;">
+    <div class="modal-content" style="max-width: 500px; background: #1a1a1a; color: white;">
+      <div class="gallery-modal-header">
+        <h3 id="uploadModalTitle"><i class="fas fa-cloud-upload-alt"></i> Subir Contenido</h3>
+        <button class="gallery-modal-close" onclick="closeUploadModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="padding: 2rem; overflow-y: auto; max-height: 80vh;">
+        <form id="uploadForm">
+          <input type="hidden" id="uploadType">
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Título</label>
+            <input type="text" id="uploadTitle" required
+              style="width: 100%; padding: 0.8rem; border-radius: 5px; border: none; background: #333; color: white;">
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Descripción</label>
+            <textarea id="uploadDescription" required
+              style="width: 100%; padding: 0.8rem; border-radius: 5px; border: none; background: #333; color: white;"
+              rows="3"></textarea>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Año / Fecha</label>
+            <input type="text" id="uploadYear" placeholder="Ej: 2025"
+              style="width: 100%; padding: 0.8rem; border-radius: 5px; border: none; background: #333; color: white;">
+          </div>
+
+          <!-- Dynamic Fields based on Type -->
+          <div id="activityFields" style="display: none;">
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Miniatura</label>
+              <input type="file" id="uploadThumbnail" accept="image/*"
+                style="width: 100%; padding: 0.8rem; border-radius: 5px; border: none; background: #333; color: white;">
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Imágenes de Galería</label>
+              <input type="file" id="uploadImages" accept="image/*" multiple
+                style="width: 100%; padding: 0.8rem; border-radius: 5px; border: none; background: #333; color: white;">
+            </div>
+          </div>
+
+          <div id="videoFields" style="display: none;">
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">ID de YouTube</label>
+              <input type="text" id="uploadVideoId" placeholder="Ej: dQw4w9WgXcQ"
+                style="width: 100%; padding: 0.8rem; border-radius: 5px; border: none; background: #333; color: white;">
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Miniatura (Opcional)</label>
+              <input type="file" id="uploadVideoThumbnail" accept="image/*"
+                style="width: 100%; padding: 0.8rem; border-radius: 5px; border: none; background: #333; color: white;">
+            </div>
+          </div>
+
+          <button type="submit" class="cta-button" style="width: 100%; justify-content: center; margin-top: 1rem;">
+            <i class="fas fa-save"></i> Guardar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div class="fab" onclick="scrollToSection('sobre')">
     <i class="fas fa-arrow-up"></i>
   </div>
@@ -388,6 +500,10 @@
     <a href="#sobre" class="nav-item active">
       <i class="fas fa-leaf"></i>
       <span>Inicio</span>
+    </a>
+    <a href="#cronograma" class="nav-item">
+      <i class="fas fa-calendar-alt"></i>
+      <span>Agenda</span>
     </a>
     <a href="#galeria" class="nav-item">
       <i class="fas fa-images"></i>
@@ -434,37 +550,45 @@
       console.log('PWA was installed');
     });
 
+  </script>
+  <script type="module">
+    // --- IMPORTS ---
+    import { loadActivities, loadVideos } from './gallery.js';
+    import { loadTimeline } from './timeline.js';
+    import { auth } from './auth.js';
+
+    // --- GLOBAL VARIABLES ---
+    // Moved gallery variables to gallery.js
+
     // --- SPA Navigation & UI Logic ---
 
     // Toggle Profile Dropdown
-    function toggleProfileMenu() {
+    window.toggleProfileMenu = function () {
       const menu = document.getElementById('profileDropdown');
-      menu.classList.toggle('active');
+      if (menu) menu.classList.toggle('active');
     }
 
     // Toggle Dark Mode
-    function toggleDarkMode() {
+    window.toggleDarkMode = function () {
       document.body.classList.toggle('dark-mode');
-      // Optional: Save to localStorage
     }
 
     // Close menus on outside click
     window.addEventListener('click', (e) => {
       // Close Profile Dropdown
       if (!e.target.closest('.profile-menu-container')) {
-        document.getElementById('profileDropdown').classList.remove('active');
+        const menu = document.getElementById('profileDropdown');
+        if (menu) menu.classList.remove('active');
       }
-      // Close Mobile Nav Menu (existing) should be handled if click is outside nav
     });
 
     // View Switcher Function
-    function showView(viewId) {
+    window.showView = function (viewId) {
       // 1. Hide all View Sections
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
 
       // 2. Show Target View
       if (viewId === 'home' || viewId === 'sobre') {
-        // 'home' view is spread across multiple sections with class .view-home
         document.querySelectorAll('.view-home').forEach(el => el.classList.add('active'));
         window.history.replaceState(null, null, '#sobre');
       } else {
@@ -498,192 +622,71 @@
     }
 
     // Toggle Mobile Menu
-    document.getElementById('hamburgerBtn').addEventListener('click', () => {
-      document.getElementById('navMenu').classList.toggle('active');
-    });
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener('click', () => {
+        const navMenu = document.getElementById('navMenu');
+        if (navMenu) navMenu.classList.toggle('active');
+      });
+    }
 
     // Close menu when clicking a link
     document.querySelectorAll('.nav-menu a').forEach(link => {
       link.addEventListener('click', () => {
-        document.getElementById('navMenu').classList.remove('active');
+        const navMenu = document.getElementById('navMenu');
+        if (navMenu) navMenu.classList.remove('active');
       });
     });
 
-    const activitiesData = [
-      { title: 'Creación de la huerta y primera siembra', description: 'Iniciamos nuestro proyecto en marzo de 2023 con la construcción de nuestra huerta escolar, involucrando a estudiantes y docentes.', year: '2023', thumbnail: 'assets/images/2. Inicio marzo 2023 - 1.jpg', images: ['assets/images/2. Inicio marzo 2023 - 0.jpg', 'assets/images/2. Inicio marzo 2023 - 1.jpg', 'assets/images/2. Inicio marzo 2023 - 2.jpg', 'assets/images/2. Inicio marzo 2023 - 3.jpg', 'assets/images/2. Inicio marzo 2023 - 4.jpg', 'assets/images/2. Inicio marzo 2023 - 5.jpg', 'assets/images/2. Inicio marzo 2023 - 6.jpg', 'assets/images/2. Inicio marzo 2023 - 7.jpg', 'assets/images/2. Inicio marzo 2023 - 8.jpg', 'assets/images/2. Inicio marzo 2023 - 9.jpg'] },
-      { title: 'Entrega de plántulas para huerta casera - 20 de sep', description: 'Recibimos y distribuimos plántulas de árboles nativos para reforestación y huertas caseras', year: '2023', thumbnail: 'assets/images/3. Plántulas reforestación 2023 - 1.jpg', images: ['assets/images/3. Plántulas reforestación 2023 - 1.jpg', 'assets/images/3. Plántulas reforestación 2023 - 2.jpg', 'assets/images/3. Plántulas reforestación 2023 - 3.jpg', 'assets/images/3. Plántulas reforestación 2023 - 4.jpg', 'assets/images/3. Plántulas reforestación 2023 - 5.jpg', 'assets/images/3. Plántulas reforestación 2023 - 6.jpg', 'assets/images/3. Plántulas reforestación 2023 - 7.jpg', 'assets/images/3. Plántulas reforestación 2023 - 8.jpg', 'assets/images/3. Plántulas reforestación 2023 - 9.jpg', 'assets/images/3. Plántulas reforestación 2023 - 10.jpg', 'assets/images/3. Plántulas reforestación 2023 - 11.jpg'] },
-      { title: 'Mantenimiento y puesta de estacas - 4 de marzo', description: 'Jornada de mantenimiento y adecuaciones de la huerta', year: '2024', thumbnail: 'assets/images/4. 4 marzo 2024 Estacas - 1.jpg', images: ['assets/images/4. 4 marzo 2024 Estacas - 1.jpg', 'assets/images/4. 4 marzo 2024 Estacas - 2.jpg', 'assets/images/4. 4 marzo 2024 Estacas - 3.jpg', 'assets/images/4. 4 marzo 2024 Estacas - 4.jpg', 'assets/images/4. 4 marzo 2024 Estacas - 5.jpg'] },
-      { title: 'Limpieza de zonas aledañas - 19 de marzo', description: 'Jornada de limpieza en las áreas cercanas a nuestra institución.', year: '2024', thumbnail: 'assets/images/5. Limpieza de zonas 2024 - 5.jpg', images: ['assets/images/5. Limpieza de zonas 2024 - 1.jpg', 'assets/images/5. Limpieza de zonas 2024 - 2.jpg', 'assets/images/5. Limpieza de zonas 2024 - 3.jpg', 'assets/images/5. Limpieza de zonas 2024 - 4.jpg', 'assets/images/5. Limpieza de zonas 2024 - 5.jpg', 'assets/images/5. Limpieza de zonas 2024 - 6.jpg', 'assets/images/5. Limpieza de zonas 2024 - 7.jpg'] },
-      { title: 'Mantenimiento, plástico y riego - Todo abril', description: 'Actividades diarias de cuidado de nuestra huerta orgánica.', year: '2024', thumbnail: 'assets/images/6. Riego y mantenimiento 2024 - 1.jpg', images: ['assets/images/6. Riego y mantenimiento 2024 - 1.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 2.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 3.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 4.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 5.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 6.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 7.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 8.jpg'] },
-      { title: 'Segunda jornada de limpieza - 30 abril', description: 'Segunda jornada de limpieza de zonas aledañas', year: '2024', thumbnail: 'assets/images/6. Segunda limpieza 2024 - 1.jpg', images: ['assets/images/6. Segunda limpieza 2024 - 1.jpg', 'assets/images/6. Segunda limpieza 2024 - 2.jpg', 'assets/images/6. Segunda limpieza 2024 - 3.jpg', 'assets/images/6. Segunda limpieza 2024 - 4.jpg', 'assets/images/6. Segunda limpieza 2024 - 5.jpg'] },
-      { title: 'Embellecimiento de la Huerta - Todo mayo', description: 'Transformando la imagen y el espacio de la huerta orgánica', year: '2024', thumbnail: 'assets/images/6. Embellecimiento 2024 - 10.jpg', images: ['assets/images/6. Embellecimiento 2024 - 1.jpg', 'assets/images/6. Embellecimiento 2024 - 2.jpg', 'assets/images/6. Embellecimiento 2024 - 3.jpg', 'assets/images/6. Embellecimiento 2024 - 4.jpg', 'assets/images/6. Embellecimiento 2024 - 5.jpg', 'assets/images/6. Embellecimiento 2024 - 6.jpg', 'assets/images/6. Embellecimiento 2024 - 7.jpg', 'assets/images/6. Embellecimiento 2024 - 8.jpg', 'assets/images/6. Embellecimiento 2024 - 9.jpg', 'assets/images/6. Embellecimiento 2024 - 10.jpg'] },
-      { title: 'Reciclaje de tapas - 19 de Julio', description: 'Convirtiendo tapas en canecas para basuras. Proyecto de economía circular transformando tapas plásticas.', year: '2024', thumbnail: 'assets/images/7. Reciclaje de tapas 2024 - 3.jpg', images: ['assets/images/7. Reciclaje de tapas 2024 - 1.jpg', 'assets/images/7. Reciclaje de tapas 2024 - 2.jpg', 'assets/images/7. Reciclaje de tapas 2024 - 3.jpg', 'assets/images/7. Reciclaje de tapas 2024 - 4.jpg', 'assets/images/7. Reciclaje de tapas 2024 - 5.jpg'] },
-      { title: 'Matenimiento - 9 de septiembre', description: 'Nuevas labores de mejora y adecuación', year: '2024', thumbnail: 'assets/images/8. sep 2024 mantenimiento - 5.jpg', images: ['assets/images/8. sep 2024 mantenimiento - 1.jpg', 'assets/images/8. sep 2024 mantenimiento - 2.jpg', 'assets/images/8. sep 2024 mantenimiento - 3.jpg', 'assets/images/8. sep 2024 mantenimiento - 4.jpg', 'assets/images/8. sep 2024 mantenimiento - 5.jpg', 'assets/images/8. sep 2024 mantenimiento - 6.jpg', 'assets/images/8. sep 2024 mantenimiento - 7.jpg', 'assets/images/8. sep 2024 mantenimiento - 8.jpg', 'assets/images/8. sep 2024 mantenimiento - 9.jpg', 'assets/images/8. sep 2024 mantenimiento - 10.jpg', 'assets/images/8. sep 2024 mantenimiento - 11.jpg'] },
-      { title: 'Visita académica Agrosavia - 13 de septiembre', description: 'Visita educativa al Centro de Investigación La Selva de Agrosavia.', year: '2024', thumbnail: 'assets/images/4. Visita agrosavia octubre 2024 - 1.jpg', images: ['assets/images/4. Visita agrosavia octubre 2024 - 1.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 2.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 3.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 4.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 5.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 6.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 7.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 8.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 9.jpg'] },
-      { title: 'Segundo Reciclaje de tapas - 27 de sep', description: 'Proyecto de economía circular transformando tapas plásticas.', year: '2024', thumbnail: 'assets/images/9. Reciclaje tapas 2024 - 1.jpg', images: ['assets/images/9. Reciclaje tapas 2024 - 1.jpg', 'assets/images/9. Reciclaje tapas 2024 - 2.jpg', 'assets/images/9. Reciclaje tapas 2024 - 3.jpg', 'assets/images/9. Reciclaje tapas 2024 - 4.jpg', 'assets/images/9. Reciclaje tapas 2024 - 5.jpg', 'assets/images/9. Reciclaje tapas 2024 - 6.jpg'] },
-      { title: 'Donación y siembra de árboles - 3 de octubre', description: 'Recibimos más de 50 árboles nativos para reforestación.', year: '2024', thumbnail: 'assets/images/9. Reforestación 2024 - 5.jpg', images: ['assets/images/9. Reforestación 2024 - 1.jpg', 'assets/images/9. Reforestación 2024 - 2.jpg', 'assets/images/9. Reforestación 2024 - 3.jpg', 'assets/images/9. Reforestación 2024 - 4.jpg', 'assets/images/9. Reforestación 2024 - 5.jpg', 'assets/images/9. Reforestación 2024 - 6.jpg', 'assets/images/9. Reforestación 2024 - 7.jpg'] },
-      { title: 'Capacitación CORNARE - 17 Febrero', description: 'Capacitación hortalizas y compost', year: '2025', thumbnail: 'assets/images/10. Capacitación CORNARE - 1.jpg', images: ['assets/images/10. Capacitación CORNARE - 1.jpg', 'assets/images/10. Capacitación CORNARE - 2.jpg', 'assets/images/10. Capacitación CORNARE - 3.jpg', 'assets/images/10. Capacitación CORNARE - 4.jpg', 'assets/images/10. Capacitación CORNARE - 5.jpg'] },
-      { title: 'Reforestación Institucional - 4 de Marzo', description: 'Embelleciendo Barro Blanco', year: '2025', thumbnail: 'assets/images/10. Reforestación institucional - 4.jpg', images: ['assets/images/10. Reforestación institucional - 1.jpg', 'assets/images/10. Reforestación institucional - 2.jpg', 'assets/images/10. Reforestación institucional - 3.jpg', 'assets/images/10. Reforestación institucional - 4.jpg', 'assets/images/10. Reforestación institucional - 5.jpg'] },
-      { title: 'Encuentro regional de semilleros - 7 de Marzo', description: 'Participación en encuentro regional de semilleros.', year: '2025', thumbnail: 'assets/images/10. Encuentro regional 2025 - 1.jpg', images: ['assets/images/10. Encuentro regional 2025 - 1.jpg', 'assets/images/10. Encuentro regional 2025 - 2.jpg', 'assets/images/10. Encuentro regional 2025 - 3.jpg', 'assets/images/10. Encuentro regional 2025 - 4.jpg', 'assets/images/10. Encuentro regional 2025 - 5.jpg', 'assets/images/10. Encuentro regional 2025 - 6.jpg', 'assets/images/10. Encuentro regional 2025 - 7.jpg', 'assets/images/10. Encuentro regional 2025 - 8.jpg', 'assets/images/10. Encuentro regional 2025 - 9.jpg', 'assets/images/10. Encuentro regional 2025 - 10.jpg'] },
-      { title: 'Campaña ambiental 21 - 25 de Abril', description: 'Cuidado del medio ambiente en la institución', year: '2025', thumbnail: 'assets/images/11. Campaña ambiental - 7.jpg', images: ['assets/images/11. Campaña ambiental - 1.jpg', 'assets/images/11. Campaña ambiental - 2.jpg', 'assets/images/11. Campaña ambiental - 3.jpg', 'assets/images/11. Campaña ambiental - 4.jpg', 'assets/images/11. Campaña ambiental - 5.jpg', 'assets/images/11. Campaña ambiental - 6.jpg', 'assets/images/11. Campaña ambiental - 7.jpg',] },
-      {
-        title: 'Encuentro departamental de semilleros - 7 de Mayo', description: 'Representación en encuentro departamental de investigación.', year: '2025', thumbnail: 'assets/images/11. Encuentro departamental 2025 - 1.jpg', images: ['assets/images/11. Encuentro departamental 2025 - 1.jpg', 'assets/images/11. Encuentro departamental 2025 - 2.jpg', 'assets/images/11. Encuentro departamental 2025 - 3.jpg', 'assets/images/11. Encuentro departamental 2025 - 4.jpg', 'assets/images/11. Encuentro departamental 2025 - 5.jpg', 'assets/images/11. Encuentro departamental 2025 - 6.jpg', 'assets/images/11. Encuentro departamental 2025 - 7.jpg', 'assets/images/11. Encuentro departamental 2025 - 8.jpg', 'assets/images/11. Encuentro departamental 2025 - 9.jpg', 'assets/images/11. Encuentro departamental 2025 - 10.jpg', 'assets/images/11. Encuentro departamental 2025 - 11.jpg', 'assets/images/11. Encuentro departamental 2025 - 12.jpg',
-          'assets/images/11. Encuentro departamental 2025 - 13.jpg', 'assets/images/11. Encuentro departamental 2025 - 14.jpg', 'assets/images/11. Encuentro departamental 2025 - 15.jpg', 'assets/images/11. Encuentro departamental 2025 - 16.jpg', 'assets/images/11. Encuentro departamental 2025 - 17.jpg', '11. Encuentro departamental 2025 - 18 - copia.pdf']
-      },
-      { title: 'Visita Agrosavia - Zanahoria - 13 de Mayo', description: 'Segunda visita enfocada en cultivo de zanahoria.', year: '2025', thumbnail: 'assets/images/12. Visita agrosavia 2025 - 1.jpg', images: ['assets/images/12. Visita agrosavia 2025 - 1.jpg', 'assets/images/12. Visita agrosavia 2025 - 2.jpg', 'assets/images/12. Visita agrosavia 2025 - 3.jpg', 'assets/images/12. Visita agrosavia 2025 - 4.jpg', 'assets/images/12. Visita agrosavia 2025 - 5.jpg', 'assets/images/12. Visita agrosavia 2025 - 6.jpg', 'assets/images/12. Visita agrosavia 2025 - 7.jpg', 'assets/images/12. Visita agrosavia 2025 - 8.jpg'] },
-      { title: 'Segunda siembra - 21 de Mayo', description: 'Segunda siembra del año en El vivero institucional', year: '2025', thumbnail: 'assets/images/13. Segunda siembra - 3.jpg', images: ['assets/images/13. Segunda siembra - 1.jpg', 'assets/images/13. Segunda siembra - 2.jpg', 'assets/images/13. Segunda siembra - 3.jpg', 'assets/images/13. Segunda siembra - 4.jpg', 'assets/images/13. Segunda siembra - 5.jpg', 'assets/images/13. Segunda siembra - 6.jpg', 'assets/images/13. Segunda siembra - 7.jpg', 'assets/images/13. Segunda siembra - 8.jpg', 'assets/images/13. Segunda siembra - 9.jpg',] },
-      { title: 'Segunda Capacitación CORNARE - 27 de Mayo', description: 'CORNARE fortaleciendo la eduación ambiental ', year: '2025', thumbnail: 'assets/images/13. Segunda capacitación CORNARE - 1.jpg', images: ['assets/images/13. Segunda capacitación CORNARE - 1.jpg', 'assets/images/13. Segunda capacitación CORNARE - 2.jpg', 'assets/images/13. Segunda capacitación CORNARE - 3.jpg', 'assets/images/13. Segunda capacitación CORNARE - 4.jpg', 'assets/images/13. Segunda capacitación CORNARE - 5.jpg', 'assets/images/13. Segunda capacitación CORNARE - 6.jpg', 'assets/images/13. Segunda capacitación CORNARE - 7.jpg', 'assets/images/13. Segunda capacitación CORNARE - 8.jpg', 'assets/images/13. Segunda capacitación CORNARE - 9.jpg'] },
-      { title: 'Preparación de compostaje - 3 de junio', description: 'Gracias a la capacitación del coordinador Jaime y CORNARE', year: '2025', thumbnail: 'assets/images/13. Preparación compostaje 2025 - 3.jpg', images: ['assets/images/13. Preparación compostaje 2025 - 1.jpg', 'assets/images/13. Preparación compostaje 2025 - 2.jpg', 'assets/images/13. Preparación compostaje 2025 - 3.jpg', 'assets/images/13. Preparación compostaje 2025 - 4.jpg', 'assets/images/13. Preparación compostaje 2025 - 5.jpg', 'assets/images/13. Preparación compostaje 2025 - 6.jpg', 'assets/images/13. Preparación compostaje 2025 - 7.jpg', 'assets/images/13. Preparación compostaje 2025 - 8.jpg'] },
-      {
-        title: 'Sembratón 1000 árboles 5 JUNIO', description: 'Sembratón en el lago de corazón y cumpleaños del líder ambiental', year: '2025', thumbnail: 'assets/images/14. Sembraton de 1000 árboles - 16.jpg', images: ['assets/images/14. Sembraton de 1000 árboles - 1.jpg', 'assets/images/14. Sembraton de 1000 árboles - 2.jpg', 'assets/images/14. Sembraton de 1000 árboles - 3.jpg', 'assets/images/14. Sembraton de 1000 árboles - 4.jpg', 'assets/images/14. Sembraton de 1000 árboles - 5.jpg', 'assets/images/14. Sembraton de 1000 árboles - 6.jpg', 'assets/images/14. Sembraton de 1000 árboles - 7.jpg', 'assets/images/14. Sembraton de 1000 árboles - 8.jpg', 'assets/images/14. Sembraton de 1000 árboles - 9.jpg', 'assets/images/14. Sembraton de 1000 árboles - 10.jpg', 'assets/images/14. Sembraton de 1000 árboles - 11.jpg', 'assets/images/14. Sembraton de 1000 árboles - 12.jpg', 'assets/images/14. Sembraton de 1000 árboles - 13.jpg',
-          'assets/images/14. Sembraton de 1000 árboles - 14.jpg', 'assets/images/14. Sembraton de 1000 árboles - 15.jpg', 'assets/images/14. Sembraton de 1000 árboles - 16.jpg', 'assets/images/14. Sembraton de 1000 árboles - 17.jpg', 'assets/images/14. Sembraton de 1000 árboles - 18.jpg']
-      },
-      { title: 'Mantenimiento y siembra - 15 de Julio', description: 'Cuidando y sembrando en el vívero', year: '2025', thumbnail: 'assets/images/15. Siembra y mantenimiento 3.jpg', images: ['assets/images/15. Siembra y mantenimiento - 1.jpg', 'assets/images/15. Siembra y mantenimiento 2.jpg', 'assets/images/15. Siembra y mantenimiento 3.jpg', 'assets/images/15. Siembra y mantenimiento 4.jpg', 'assets/images/15. Siembra y mantenimiento 5.jpg', 'assets/images/15. Siembra y mantenimiento 6.jpg'] },
-      { title: 'Microorganismos del suelo - 12 de Agosto', description: 'Se destapó el cultivo de microorganismos', year: '2025', thumbnail: 'assets/images/16. Miroorganismos del suelo - 1.jpg', images: ['assets/images/16. Miroorganismos del suelo - 1.jpg', 'assets/images/16. Miroorganismos del suelo - 2.jpg', 'assets/images/16. Miroorganismos del suelo - 3.jpg', 'assets/images/16. Miroorganismos del suelo - 4.jpg', 'assets/images/16. Miroorganismos del suelo - 5.jpg', 'assets/images/16. Miroorganismos del suelo - 6.jpg', 'assets/images/16. Miroorganismos del suelo - 7.jpg'] },
-      {
-        title: 'Visita microcuenca ARSA - 29 de Agosto', description: 'Planata de tratamiento y enseñanza de los procesos de purificación de agua', year: '2025', thumbnail: 'assets/images/17. Visita Microcuenca ARSA - 3.jpg', images: ['assets/images/17. Visita Microcuenca ARSA - 1.jpg', 'assets/images/17. Visita Microcuenca ARSA - 2.jpg', 'assets/images/17. Visita Microcuenca ARSA - 3.jpg', 'assets/images/17. Visita Microcuenca ARSA - 4.jpg', 'assets/images/17. Visita Microcuenca ARSA - 5.jpg', 'assets/images/17. Visita Microcuenca ARSA - 6.jpg', 'assets/images/17. Visita Microcuenca ARSA - 7.jpg', 'assets/images/17. Visita Microcuenca ARSA - 8.jpg', 'assets/images/17. Visita Microcuenca ARSA - 9.jpg', 'assets/images/17. Visita Microcuenca ARSA - 10.jpg', 'assets/images/17. Visita Microcuenca ARSA - 11.jpg',
-          'assets/images/17. Visita Microcuenca ARSA - 12.jpg', 'assets/images/17. Visita Microcuenca ARSA - 13.jpg', 'assets/images/17. Visita Microcuenca ARSA - 14.jpg', 'assets/images/17. Visita Microcuenca ARSA - 15.jpg']
-      },
-      {
-        title: 'Encuentro de semilleros IEBB 12 de Septiembre', description: 'Segundo conversatorio zonal de juventudes', year: '2025', thumbnail: 'assets/images/18. Encuentro semilleros IEBB - 4.jpg', images: ['assets/images/18. Encuentro semilleros IEBB - 1.jpg', 'assets/images/18. Encuentro semilleros IEBB - 2.jpg', 'assets/images/18. Encuentro semilleros IEBB - 3.jpg', 'assets/images/18. Encuentro semilleros IEBB - 4.jpg', 'assets/images/18. Encuentro semilleros IEBB - 5.jpg', 'assets/images/18. Encuentro semilleros IEBB - 6.jpg', 'assets/images/18. Encuentro semilleros IEBB - 7.jpg', 'assets/images/18. Encuentro semilleros IEBB - 8.jpg', 'assets/images/18. Encuentro semilleros IEBB - 9.jpg',
-          'assets/images/18. Encuentro semilleros IEBB - 10.jpg', 'assets/images/18. Encuentro semilleros IEBB - 11.jpg', 'assets/images/18. Encuentro semilleros IEBB - 12.jpg', 'assets/images/18. Encuentro semilleros IEBB - 13.jpg', 'assets/images/18. Encuentro semilleros IEBB - 14.jpg', 'assets/images/18. Encuentro semilleros IEBB - 15.jpg', 'assets/images/18. Encuentro semilleros IEBB - 16.jpg']
-      },
-      { title: 'Décimo tercer (XIII) encuentro de ciencia, innovación e investigación formativa – ECIF 2025', description: 'Evento entre el 22 y 26 de septiembre en la Universidad Católica de Oriente (UCO).', year: '2025', thumbnail: 'assets/images/19. Encuentro UCO - 4.jpg', images: ['assets/images/19. Encuentro UCO - 1.jpg', 'assets/images/19. Encuentro UCO - 2.jpg', 'assets/images/19. Encuentro UCO - 3.jpg', 'assets/images/19. Encuentro UCO - 4.jpg', 'assets/images/19. Encuentro UCO - 5.jpg', 'assets/images/19. Encuentro UCO - 6.jpg', 'assets/images/19. Encuentro UCO - 7.jpg', 'assets/images/19. Encuentro UCO - 8.jpg', 'assets/images/19. Encuentro UCO - 9.jpg', 'assets/images/19. Encuentro UCO - 10.jpg', 'assets/images/19. Encuentro UCO - 11.jpg', 'assets/images/19. Encuentro UCO - 12.jpg'] },
-      { title: 'Estado Actual de la huerta septiembre', description: 'Ahora la huerta escolar convertida en un vivero', year: '2025', thumbnail: 'assets/images/19. Vivero actual 2025 - 1.jpg', images: ['assets/images/19. Vivero actual 2025 - 1.jpg', 'assets/images/19. Vivero actual 2025 - 2.jpg', 'assets/images/19. Vivero actual 2025 - 3.jpg', 'assets/images/19. Vivero actual 2025 - 4.jpg', 'assets/images/19. Vivero actual 2025 - 5.jpg', 'assets/images/19. Vivero actual 2025 - 6.jpg'] },
-      {
-        title: 'Encuentro Nacional de semilleros de investigación', description: 'Participación en encuentro nacional de semilleros de investigación -Bogotá 7 - 10 de octubre 2025', year: '2025', thumbnail: 'assets/images/20. Encuentro Nacional 2025 - 8.jpg', images: ['assets/images/20. Encuentro Nacional 2025 - 1.jpg', 'assets/images/20. Encuentro Nacional 2025 - 2.jpg', 'assets/images/20. Encuentro Nacional 2025 - 3.jpg', 'assets/images/20. Encuentro Nacional 2025 - 4.jpg', 'assets/images/20. Encuentro Nacional 2025 - 5.jpg', 'assets/images/20. Encuentro Nacional 2025 - 6.jpg', 'assets/images/20. Encuentro Nacional 2025 - 7.jpg', 'assets/images/20. Encuentro Nacional 2025 - 8.jpg',
-          'assets/images/20. Encuentro Nacional 2025 - 9.jpg', 'assets/images/20. Encuentro Nacional 2025 - 10.jpg', 'assets/images/20. Encuentro Nacional 2025 - 11.jpg']
+    // --- DOCS & PDF LOGIC (Kept here for now) ---
+    window.openDocument = (src) => {
+      const viewer = document.getElementById('documentViewer');
+      const modal = document.getElementById('documentModal');
+      if (viewer && modal) {
+        viewer.src = src;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
       }
-    ];
-
-    const videosData = [
-      { title: 'Green Force: Nace un Movimiento Ambiental', description: 'Presentación inicial de nuestro proyecto Green Force, mostrando cómo nació esta iniciativa ambiental en la IE Barro Blanco.', videoId: '9StDvt-2Nbs', thumbnail: 'https://img.youtube.com/vi/9StDvt-2Nbs/hqdefault.jpg' },
-      { title: 'Reforestación - 1000 Árboles para el Premio Zayed 2025', description: 'Jornada de reforestación donde plantamos más de 1000 árboles nativos como parte de nuestra postulación al Premio Zayed de Sostenibilidad.', videoId: 'QUC-DD5WTRI', thumbnail: 'https://img.youtube.com/vi/QUC-DD5WTRI/hqdefault.jpg' },
-      { title: 'Planting a Sustainable Future', description: 'Documental completo sobre nuestro proyecto Green Force y nuestra postulación al Premio Zayed 2025, mostrando todas nuestras actividades ambientales.', videoId: 'H_0aTsx8C-w', thumbnail: 'https://img.youtube.com/vi/H_0aTsx8C-w/hqdefault.jpg' }
-    ];
-
-    let currentGalleryImages = [];
-    let currentImageIndex = 0;
-
-    function generateActivityCards() {
-      document.getElementById('activitiesGrid').innerHTML = activitiesData.map((a, i) => `
-        <div class="activity-card" onclick="openGalleryModal(${i})">
-          <div class="activity-card-image">
-            <img src="${a.thumbnail}" alt="${a.title}">
-            <div class="image-count"><i class="fas fa-images"></i> ${a.images.length}</div>
-          </div>
-          <div class="activity-card-content">
-            <h3>${a.title}</h3>
-            <p>${a.description}</p>
-            <div class="activity-card-footer">
-              <span class="activity-year"><i class="fas fa-calendar-alt"></i> ${a.year}</span>
-              <button class="view-gallery-btn">Ver Galería <i class="fas fa-arrow-right"></i></button>
-            </div>
-          </div>
-        </div>
-      `).join('');
     }
 
-    function generateVideoCards() {
-      document.getElementById('videosGrid').innerHTML = videosData.map((v, i) => `
-        <div class="video-card" onclick="openVideoModal(${i})">
-          <div class="video-card-thumbnail">
-            <img src="${v.thumbnail}" alt="${v.title}">
-            <div class="play-icon"><i class="fab fa-youtube"></i></div>
-          </div>
-          <div class="video-card-content">
-            <h3>${v.title}</h3>
-            <p>${v.description}</p>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function openGalleryModal(i) {
-      currentGalleryImages = activitiesData[i].images;
-      document.getElementById('galleryModalTitle').innerHTML = `<i class="fas fa-images"></i> ${activitiesData[i].title}`;
-      document.getElementById('galleryModalBody').innerHTML = currentGalleryImages.map((img, idx) =>
-        `<div class="gallery-modal-item" onclick="openLightbox(${idx})"><img src="${img}" alt="${activitiesData[i].title}"></div>`
-      ).join('');
-      document.getElementById('galleryModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeGalleryModal() {
-      document.getElementById('galleryModal').classList.remove('active');
+    window.closeDocumentModal = () => {
+      const viewer = document.getElementById('documentViewer');
+      const modal = document.getElementById('documentModal');
+      if (modal) modal.classList.remove('active');
+      if (viewer) viewer.src = '';
       document.body.style.overflow = 'auto';
     }
 
-    function openLightbox(i) {
-      currentImageIndex = i;
-      document.getElementById('lightboxImage').src = currentGalleryImages[i];
-      document.getElementById('lightboxModal').classList.add('active');
-    }
-
-    function closeLightbox() {
-      document.getElementById('lightboxModal').classList.remove('active');
-    }
-
-    function navigateLightbox(dir) {
-      currentImageIndex += dir;
-      if (currentImageIndex < 0) currentImageIndex = currentGalleryImages.length - 1;
-      if (currentImageIndex >= currentGalleryImages.length) currentImageIndex = 0;
-      document.getElementById('lightboxImage').src = currentGalleryImages[currentImageIndex];
-    }
-
-    function openVideoModal(i) {
-      document.getElementById('videoModalTitle').innerHTML = `<i class="fab fa-youtube"></i> ${videosData[i].title}`;
-      document.getElementById('videoModalIframe').src = `https://www.youtube.com/embed/${videosData[i].videoId}?autoplay=1`;
-      document.getElementById('videoModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeVideoModal() {
-      document.getElementById('videoModal').classList.remove('active');
-      document.getElementById('videoModalIframe').src = '';
-      document.body.style.overflow = 'auto';
-    }
-
-    function openDocument(src) {
-      document.getElementById('documentViewer').src = src;
-      document.getElementById('documentModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeDocumentModal() {
-      document.getElementById('documentModal').classList.remove('active');
-      document.getElementById('documentViewer').src = '';
-      document.body.style.overflow = 'auto';
-    }
-
-    function scrollToSection(id) {
+    window.scrollToSection = (id) => {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // Cerrar modales al hacer clic fuera del contenido
+    // --- EVENT LISTENERS FOR MODALS ---
     window.addEventListener('click', (e) => {
-      if (e.target.id === 'videoModal') closeVideoModal();
-      if (e.target.id === 'galleryModal') closeGalleryModal();
-      if (e.target.id === 'lightboxModal') closeLightbox();
-      if (e.target.id === 'documentModal') closeDocumentModal();
+      // Use global functions from gallery.js
+      if (e.target.id === 'videoModal') window.closeVideoModal();
+      if (e.target.id === 'galleryModal') window.closeGalleryModal();
+      if (e.target.id === 'lightboxModal') window.closeLightbox();
+      if (e.target.id === 'documentModal') window.closeDocumentModal();
     });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        closeGalleryModal();
-        closeLightbox();
-        closeDocumentModal();
-        closeVideoModal();
+        if (window.closeGalleryModal) window.closeGalleryModal();
+        if (window.closeLightbox) window.closeLightbox();
+        if (window.closeDocumentModal) window.closeDocumentModal();
+        if (window.closeVideoModal) window.closeVideoModal();
       }
-      if (e.key === 'ArrowLeft') navigateLightbox(-1);
-      if (e.key === 'ArrowRight') navigateLightbox(1);
+      if (e.key === 'ArrowLeft' && window.navigateLightbox) window.navigateLightbox(-1);
+      if (e.key === 'ArrowRight' && window.navigateLightbox) window.navigateLightbox(1);
     });
 
     window.addEventListener('scroll', () => {
-      document.querySelector('.fab').style.opacity = window.scrollY > 100 ? '1' : '0';
+      const fab = document.querySelector('.fab');
+      if (fab) fab.style.opacity = window.scrollY > 100 ? '1' : '0';
     });
 
-    document.getElementById('downloadPdfBtn').addEventListener('click', async function () {
+    document.getElementById('downloadPdfBtn')?.addEventListener('click', async function () {
       const btn = this;
       const originalText = btn.innerHTML;
       btn.disabled = true;
@@ -692,7 +695,7 @@
       try {
         const element = document.getElementById('content-to-pdf');
 
-        // Ocultar imágenes de YouTube temporalmente (causan error CORS)
+        // Hide YouTube images temporarily (CORS)
         const youtubeImages = element.querySelectorAll('.video-card-thumbnail img');
         const originalSrcs = [];
         youtubeImages.forEach((img, i) => {
@@ -793,9 +796,21 @@
       }
     });
 
+    // --- Secure Data Loading ---
+    window.loadSecureContent = async () => {
+      console.log("Loading secure content from Firestore...");
+      // Timeline is public or private? Prompt says section in Nav, so likely public.
+      // But prompt also says "Admins can add...", implying it's dynamic.
+      // Let's load it always, or just when view is shown. 
+      // Current architecture loads everything at start.
+      await loadTimeline();
+      await loadActivities();
+      await loadVideos();
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
-      generateActivityCards();
-      generateVideoCards();
+      // Initial public content loading if any
+      // Secure content is now loaded via auth.js -> window.loadSecureContent()
     });
   </script>
 </body>
