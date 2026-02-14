@@ -18,7 +18,8 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/images/background.jpg');
+            /* Using a valid image from assets, encoded for URL compatibility */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/images/10.%20Reforestación%20institucional%20-%201.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -190,6 +191,36 @@
         .dark-mode .back-link {
             color: #aaa;
         }
+
+        /* Fix: Dropdown hereda color blanco del header verde */
+        .profile-dropdown .dropdown-item {
+            color: #4b5563 !important;
+        }
+
+        .profile-dropdown .dropdown-item.text-red {
+            color: #ef4444 !important;
+        }
+
+        .profile-dropdown .dropdown-item i {
+            color: #9ca3af !important;
+        }
+
+        .profile-dropdown .dropdown-item:hover {
+            color: #111827 !important;
+            background-color: #f9fafb;
+        }
+
+        .profile-dropdown .dropdown-item:hover i {
+            color: #059669 !important;
+        }
+
+        #menuProfileName {
+            color: #111827 !important;
+        }
+
+        .profile-dropdown .text-gray {
+            color: #6b7280 !important;
+        }
     </style>
 </head>
 
@@ -277,7 +308,8 @@
     </script>
 
     <script type="module">
-        import { loginWithEmail, loginWithGoogle, registerWithEmail, auth } from './auth.js';
+        import { auth } from './firebase-config.js';
+        import { loginWithEmail, loginWithGoogle, registerWithEmail, logout } from './auth.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
         // Auth Guard: If already logged in, redirect to index
