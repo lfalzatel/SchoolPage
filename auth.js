@@ -9,6 +9,11 @@ import {
     doc,
     setDoc,
     serverTimestamp
+    doc,
+    getDoc,
+    setDoc,
+    serverTimestamp,
+    getDoc
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const provider = new GoogleAuthProvider();
@@ -206,3 +211,6 @@ const lgOutBtn = getEl(uiIds.logoutBtn);
 if (lgOutBtn) lgOutBtn.addEventListener('click', logout);
 
 console.log("Auth module loaded");
+
+// Export auth for other modules
+export { auth, login, logout, updateUI };
