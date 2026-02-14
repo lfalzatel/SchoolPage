@@ -1,4 +1,4 @@
-const CACHE_NAME = 'green-force-v1';
+const CACHE_NAME = 'green-force-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,10 +8,10 @@ const ASSETS_TO_CACHE = [
   './firebase-config.js',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap'
-  // Add local images here if needed, but be careful with cache size
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting(); // Force new SW to take over
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -29,7 +29,7 @@ self.addEventListener('activate', (event) => {
             return caches.delete(cacheName);
           }
         })
-      );
+      ).then(() => self.clients.claim()); // Take control of all clients immediately
     })
   );
 });
@@ -49,12 +49,12 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request)
       .then((response) => {
         return response || fetch(event.request).then((fetchResponse) => {
-            return caches.open(CACHE_NAME).then((cache) => {
-                if(event.request.method === 'GET') {
-                    cache.put(event.request, fetchResponse.clone());
-                }
-                return fetchResponse;
-            });
+          return caches.open(CACHE_NAME).then((cache) => {
+            if (event.request.method === 'GET') {
+              cache.put(event.request, fetchResponse.clone());
+            }
+            return fetchResponse;
+          });
         });
       })
   );
