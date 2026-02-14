@@ -5,15 +5,10 @@ import {
     signOut,
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import {
-    doc,
-    setDoc,
-    serverTimestamp
-    doc,
+doc,
     getDoc,
     setDoc,
-    serverTimestamp,
-    getDoc
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const provider = new GoogleAuthProvider();
