@@ -61,6 +61,15 @@
   <!-- Firebase Scripts (Loaded as modules) -->
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="auth.js"></script>
+  <script type="module">
+    import { loadTimeline } from './timeline.js';
+    import { loadActivities, loadVideos } from './gallery.js';
+
+    // Expose to window for global access if needed (or use in module scope)
+    window.loadTimeline = loadTimeline;
+    window.loadActivities = loadActivities;
+    window.loadVideos = loadVideos;
+  </script>
 </head>
 
 <body>
@@ -797,6 +806,56 @@
       }
     });
 
+    // --- Navigation Logic ---
+    function showView(viewName) {
+      console.log("Showing view:", viewName);
+
+      // Hide all views
+      document.querySelectorAll('.view-section').forEach(el => {
+        el.classList.remove('active');
+        el.style.display = 'none'; // Ensure hidden
+      });
+
+      // Show target view
+      const targetId = viewName === 'home' ? 'view-home' : `view-${viewName}`;
+      // Note: 'view-home' is a class in my reading, but let's check structure.
+      // Structure: <div class="view-section view-home active">...</div>
+      // Structure: <div id="view-galeria" class="view-section">...</div>
+
+      let target;
+      if (viewName === 'home') {
+        // Show all sections that are part of home
+        document.querySelectorAll('.view-home').forEach(el => {
+          el.classList.add('active');
+          el.style.display = 'block';
+        });
+        return;
+      } else {
+        target = document.getElementById(`view-${viewName}`);
+      }
+
+      if (target) {
+        target.classList.add('active');
+        target.style.display = 'block';
+        window.scrollTo(0, 0);
+      } else {
+        console.warn("View not found:", viewName);
+        // Fallback to home
+        showView('home');
+      }
+    }
+
+    function scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Expose to window
+    window.showView = showView;
+    window.scrollToSection = scrollToSection;
+
     // Enhanced Navigation Handler (Mobile + Desktop)
     document.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', function (e) {
@@ -804,7 +863,7 @@
         const href = this.getAttribute('href').substring(1);
 
         // Map specific sections to Views
-        if (['galeria', 'video', 'documentos'].includes(href)) {
+        if (['galeria', 'video', 'documentos', 'cronograma'].includes(href)) {
           showView(href);
         } else if (href === 'sobre') {
           showView('home');
