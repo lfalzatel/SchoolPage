@@ -31,35 +31,71 @@
 </head>
 
 <body>
-  <div id="content-to-pdf">
-    <header class="header-hero">
-      <div class="hero-content">
-        <div class="logo-hero">
-          <img src="assets/images/1. logo 3.jpg" alt="Logo Green Force">
-        </div>
-        <h1>Proyecto Green Force</h1>
-        <p class="hero-tagline">Fomentando la Conciencia Ambiental en la Institución Educativa Barro Blanco</p>
-
-        <div class="hero-message">
-          <p>
-            Nuestro proyecto es <strong>inclusivo, transformador y sostenible</strong>.<br>
-            Somos <strong>GREEN FORCE</strong> y estamos <strong>sembrando futuro</strong>.
-          </p>
+  <!-- Fixed App Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <img src="assets/images/1. logo 3.jpg" alt="Logo" class="header-logo">
+      <span class="header-title">Green Force</span>
+    </div>
+    <div class="header-right">
+      <div class="profile-menu-container">
+        <!-- Default Avatar (will be updated by JS) -->
+        <div class="header-avatar-container" onclick="toggleProfileMenu()">
+          <img src="assets/icons/icon-192.png" alt="Profile" id="headerProfileAvatar" class="header-avatar">
         </div>
 
-        <div class="hero-buttons">
-          <a href="#sobre" class="cta-button">
-            <i class="fas fa-leaf"></i> Conocer Más
-          </a>
-          <a href="#galeria" class="cta-button secondary">
-            <i class="fas fa-images"></i> Ver Galería
-          </a>
+        <div id="profileDropdown" class="profile-dropdown">
+          <div class="dropdown-header">
+            <span id="menuProfileName">Invitado</span>
+            <span id="menuProfileEmail" class="text-sm text-gray">Inicia sesión para más</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" onclick="toggleDarkMode()">
+            <i class="fas fa-moon"></i> <span>Modo Oscuro</span>
+          </div>
+          <div class="dropdown-item" onclick="alert('Modo escritorio proximamente')">
+            <i class="fas fa-desktop"></i> <span>Modo Escritorio</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item text-red" id="menuLoginBtn" onclick="handleAuthAction()">
+            <i class="fas fa-sign-in-alt"></i> <span>Iniciar Sesión</span>
+          </div>
         </div>
       </div>
-      <div class="scroll-indicator" onclick="scrollToSection('sobre')">
-        <i class="fas fa-chevron-down"></i>
-      </div>
-    </header>
+    </div>
+  </header>
+
+  <div id="content-to-pdf" class="main-content-wrapper">
+    <div class="view-section view-home active">
+      <header class="header-hero">
+        <div class="hero-content">
+          <div class="logo-hero">
+            <img src="assets/images/1. logo 3.jpg" alt="Logo Green Force">
+          </div>
+          <h1>Proyecto Green Force</h1>
+          <p class="hero-tagline">Fomentando la Conciencia Ambiental en la Institución Educativa Barro Blanco</p>
+
+          <div class="hero-message">
+            <p>
+              Nuestro proyecto es <strong>inclusivo, transformador y sostenible</strong>.<br>
+              Somos <strong>GREEN FORCE</strong> y estamos <strong>sembrando futuro</strong>.
+            </p>
+          </div>
+
+          <div class="hero-buttons">
+            <a href="#sobre" class="cta-button">
+              <i class="fas fa-leaf"></i> Conocer Más
+            </a>
+            <a href="#galeria" class="cta-button secondary">
+              <i class="fas fa-images"></i> Ver Galería
+            </a>
+          </div>
+        </div>
+        <div class="scroll-indicator" onclick="scrollToSection('sobre')">
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </header>
+    </div>
 
     <nav id="navbar">
       <div class="nav-container">
@@ -98,185 +134,199 @@
       </div>
     </nav>
 
-    <section id="sobre">
-      <h2><i class="fas fa-seedling"></i> Sobre el Proyecto</h2>
-      <p style="text-align: justify; line-height: 1.8; margin-bottom: 1rem; font-size: 1.05rem;">
-        El proyecto "Fomentando la Conciencia Ambiental y el Desarrollo Sostenible a través de la Creación del Grupo
-        Ambiental Green Force y la Huerta Escolar" es una iniciativa liderada por estudiantes de la Institución
-        Educativa Barro Blanco, Rionegro, Antioquia. Con un enfoque inclusivo, promovemos la sostenibilidad mediante la
-        educación experiencial, la reforestación, el compostaje y la agricultura sostenible, beneficiando a 938
-        estudiantes, 54 docentes y 1,000 residentes de la comunidad local.
-      </p>
-      <p style="text-align: justify; line-height: 1.8; margin-bottom: 1rem; font-size: 1.05rem;">
-        En 2024, el grupo Green Force ha crecido, incorporando nuevos integrantes y egresados en actividades como la
-        visita a AGROSAVIA para aprender sobre la zanahoria. Convertimos la huerta escolar en un vivero con un sistema
-        de recolección de agua lluvia, cultivando frijol, lechuga, tomate, zuccini, pepino, pimentón, zanahoria, maíz,
-        romero y hierbas medicinales. También implementamos un área de compostaje y reciclamos tapas plásticas para
-        crear canastas de basura, promoviendo la economía circular.
-      </p>
-      <p style="text-align: justify; line-height: 1.8; font-size: 1.05rem;">
-        Inspirados por los valores de tolerancia, sostenibilidad y desarrollo humano del jeque Zayed, nuestro proyecto
-        empodera a los estudiantes, incluyendo aquellos con discapacidades auditivas, para convertirse en líderes
-        ambientales. A través de talleres, jornadas de reforestación con más de 50 árboles nativos y campañas de
-        sensibilización, fortalecemos la conciencia ambiental y creamos un modelo replicable para otras escuelas.
-      </p>
-    </section>
+    <div class="view-section view-home active">
+      <section id="sobre">
+        <h2><i class="fas fa-seedling"></i> Sobre el Proyecto</h2>
+        <p style="text-align: justify; line-height: 1.8; margin-bottom: 1rem; font-size: 1.05rem;">
+          El proyecto "Fomentando la Conciencia Ambiental y el Desarrollo Sostenible a través de la Creación del Grupo
+          Ambiental Green Force y la Huerta Escolar" es una iniciativa liderada por estudiantes de la Institución
+          Educativa Barro Blanco, Rionegro, Antioquia. Con un enfoque inclusivo, promovemos la sostenibilidad mediante
+          la
+          educación experiencial, la reforestación, el compostaje y la agricultura sostenible, beneficiando a 938
+          estudiantes, 54 docentes y 1,000 residentes de la comunidad local.
+        </p>
+        <p style="text-align: justify; line-height: 1.8; margin-bottom: 1rem; font-size: 1.05rem;">
+          En 2024, el grupo Green Force ha crecido, incorporando nuevos integrantes y egresados en actividades como la
+          visita a AGROSAVIA para aprender sobre la zanahoria. Convertimos la huerta escolar en un vivero con un sistema
+          de recolección de agua lluvia, cultivando frijol, lechuga, tomate, zuccini, pepino, pimentón, zanahoria, maíz,
+          romero y hierbas medicinales. También implementamos un área de compostaje y reciclamos tapas plásticas para
+          crear canastas de basura, promoviendo la economía circular.
+        </p>
+        <p style="text-align: justify; line-height: 1.8; font-size: 1.05rem;">
+          Inspirados por los valores de tolerancia, sostenibilidad y desarrollo humano del jeque Zayed, nuestro proyecto
+          empodera a los estudiantes, incluyendo aquellos con discapacidades auditivas, para convertirse en líderes
+          ambientales. A través de talleres, jornadas de reforestación con más de 50 árboles nativos y campañas de
+          sensibilización, fortalecemos la conciencia ambiental y creamos un modelo replicable para otras escuelas.
+        </p>
+      </section>
+    </div>
 
     <!-- PROTECTED SECTION: Galería -->
-    <section id="galeria" class="relative-section">
-      <h2><i class="fas fa-camera"></i> Galería de Actividades</h2>
+    <div id="view-galeria" class="view-section">
+      <section id="galeria" class="relative-section">
+        <h2><i class="fas fa-camera"></i> Galería de Actividades</h2>
 
-      <div id="galleryOverlay" class="protected-overlay">
-        <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
-        <p>Inicia sesión con tu cuenta de Google para ver nuestra galería fotográfica completa.</p>
-        <button class="btn-login overlay-login-btn"><i class="fab fa-google"></i> Iniciar Sesión</button>
-      </div>
+        <div id="galleryOverlay" class="protected-overlay">
+          <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
+          <p>Inicia sesión con tu cuenta de Google para ver nuestra galería fotográfica completa.</p>
+          <button class="btn-login overlay-login-btn"><i class="fab fa-google"></i> Iniciar Sesión</button>
+        </div>
 
-      <div class="activities-grid" id="activitiesGrid"></div>
-    </section>
+        <div class="activities-grid" id="activitiesGrid"></div>
+      </section>
+    </div>
 
     <!-- PROTECTED SECTION: Videos -->
-    <section id="video" class="relative-section">
-      <h2><i class="fas fa-video"></i> Videos del Proyecto</h2>
+    <div id="view-video" class="view-section">
+      <section id="video" class="relative-section">
+        <h2><i class="fas fa-video"></i> Videos del Proyecto</h2>
 
-      <div id="videoOverlay" class="protected-overlay">
-        <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
-        <p>Inicia sesión para ver los videos exclusivos del proyecto.</p>
-        <button class="btn-login overlay-login-btn"><i class="fab fa-google"></i> Iniciar Sesión</button>
-      </div>
+        <div id="videoOverlay" class="protected-overlay">
+          <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
+          <p>Inicia sesión para ver los videos exclusivos del proyecto.</p>
+          <button class="btn-login overlay-login-btn"><i class="fab fa-google"></i> Iniciar Sesión</button>
+        </div>
 
-      <div class="videos-grid" id="videosGrid"></div>
-    </section>
+        <div class="videos-grid" id="videosGrid"></div>
+      </section>
+    </div>
 
-    <section id="siguenos" class="social-section">
-      <div class="social-content">
-        <h2><i class="fab fa-youtube"></i> Síguenos en YouTube</h2>
-        <p>Suscríbete a nuestro canal para ver más contenido ambiental</p>
-        <a href="https://www.youtube.com/@GreenForce-r8k" target="_blank" class="youtube-link">
-          <i class="fab fa-youtube"></i>
-          Green Force Official
-        </a>
-      </div>
-    </section>
+    <div class="view-section view-home active">
+      <section id="siguenos" class="social-section">
+        <div class="social-content">
+          <h2><i class="fab fa-youtube"></i> Síguenos en YouTube</h2>
+          <p>Suscríbete a nuestro canal para ver más contenido ambiental</p>
+          <a href="https://www.youtube.com/@GreenForce-r8k" target="_blank" class="youtube-link">
+            <i class="fab fa-youtube"></i>
+            Green Force Official
+          </a>
+        </div>
+      </section>
+    </div>
 
     <!-- PROTECTED SECTION: Documentos -->
-    <section id="documentos" class="relative-section">
-      <h2><i class="fas fa-folder-open"></i> Documentos del Proyecto</h2>
-      <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">Haz clic en un documento para visualizarlo</p>
+    <div id="view-docs" class="view-section">
+      <section id="documentos" class="relative-section">
+        <h2><i class="fas fa-folder-open"></i> Documentos del Proyecto</h2>
+        <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">Haz clic en un documento para visualizarlo
+        </p>
 
-      <div id="docsOverlay" class="protected-overlay">
-        <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
-        <p>Solo los miembros registrados pueden acceder a la documentación oficial.</p>
-        <button class="btn-login overlay-login-btn"><i class="fab fa-google"></i> Iniciar Sesión</button>
-      </div>
-
-      <div class="documents-grid" id="documentsGrid">
-        <!-- Document cards will be populated here naturally, but are hidden/blurred via JS/CSS if not auth -->
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf')">
-          <i class="fas fa-certificate"></i>
-          <h4>Reconocimiento Oficial del grupo ambiental (GREEN FORCE) 2024</h4>
-        </div>
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.3. Solicitud de Autorización para Actividades Extracurriculares del Grupo Ambiental “Green Force” – Segundo Semestre 2024.pdf')">
-          <i class="fas fa-file-signature"></i>
-          <h4>Solicitud Autorización actividades Extracurriculares 2024</h4>
-        </div>
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.2. Informe 1 - Evaluación del Proyecto Ambiental Escolar (GREEN FORCE).pdf')">
-          <i class="fas fa-file-alt"></i>
-          <h4>Informe 1 - Actividades GREEN FORCE 2024</h4>
-        </div>
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.4. Informe 2 de Actividades del Grupo Ambiental.pdf')">
-          <i class="fas fa-file-alt"></i>
-          <h4>Informe 2 - Actividades GREEN FORCE 2024</h4>
-        </div>
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.8. Reconocimiento Oficial del Grupo Ambiental 2025.pdf')">
-          <i class="fas fa-image"></i>
-          <h4>Reconocimiento Oficial del Grupo Ambiental 2025</h4>
-        </div>
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.7. Propuesta educativa Fortaleciendo la Conciencia Ambiental a través de la Educación Experiencial en la Institución Educativa Barroblanco.pdf')">
-          <i class="fas fa-image"></i>
-          <h4>Propuesta educativa para el 2025</h4>
-        </div>
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.5. Poster 1 Fomento de la conciencia ambiental y desarrollo sostenible a través de la creación del grupo.pdf')">
-          <i class="fas fa-image"></i>
-          <h4>Poster Encuentro Regional marzo 2025</h4>
-        </div>
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.6. Poster 2 Semillero IE Barro Blanco Green Force 2025.pdf')">
-          <i class="fas fa-image"></i>
-          <h4>Poster Encuentro Departamental 7 mayo 2025</h4>
-        </div>
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.9. Carta Solicitud de Visita Educativa AGROSAVIA para la Semana del 12 al 16 de mayo de 2025.pdf')">
-          <i class="fas fa-image"></i>
-          <h4>Carta Solicitud de Visita Educativa AGROSAVIA mayo 2025</h4>
-        </div>
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.10. 6. Carta Solicitud de vinculación a prácticas ambientales y visitas pedagógicas CAM CORNARE.pdf')">
-          <i class="fas fa-image"></i>
-          <h4>Carta Solicitud de vinculación a prácticas ambientales junio 2025</h4>
-        </div>
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.11. 11. Carta Solicitud de pedagógica a la planta de tratamiento y participación en jornada de siembra de árboles.pdf')">
-          <i class="fas fa-image"></i>
-          <h4>Carta Solicitud de pedagógica a la planta de tratamiento ARSA agosto 2025</h4>
-        </div>
-        <div class="document-card"
-          onclick="openDocument('assets/documents/1.12. 12. Carta Solicitud de permiso para participación en evento académico de 22 al 26 de septiembre de 2025 en la UCO.pdf')">
-          <i class="fas fa-image"></i>
-          <h4>Carta Solicitud de permiso para participación evento UCO septiembre 2025</h4>
-        </div>
-        <div class="document-card" onclick="openDocument('assets/documents/1.13. Poster 3 Green force - ENISIS.pdf')">
-          <i class="fas fa-image"></i>
-          <h4>Poster 3 Encuentro Nacional de Investigación de Semilleros octubre 2025</h4>
-        </div>
-      </div>
-    </section>
-
-    <section id="contacto">
-      <h2><i class="fas fa-address-book"></i> Contacto</h2>
-      <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">Para más información sobre el proyecto</p>
-
-      <div class="contact-grid">
-        <div class="contact-card">
-          <i class="fas fa-chalkboard-teacher"></i>
-          <h3>Titular del Proyecto</h3>
-          <p><strong>Luis Fernando Alzate López</strong></p>
-          <p><a href="mailto:luis.alzate@barroblanco.edu.co">luis.alzate@barroblanco.edu.co</a></p>
-          <p><i class="fas fa-phone"></i> +57 310 460 4592</p>
+        <div id="docsOverlay" class="protected-overlay">
+          <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
+          <p>Solo los miembros registrados pueden acceder a la documentación oficial.</p>
+          <button class="btn-login overlay-login-btn"><i class="fab fa-google"></i> Iniciar Sesión</button>
         </div>
 
-        <div class="contact-card">
-          <i class="fas fa-user-graduate"></i>
-          <h3>Líder Green Force</h3>
-          <p><strong>Nicolas Gañan Bedoya</strong></p>
-          <p><a href="mailto:nicolasgananb@barroblanco.edu.co">nicolasgananb@barroblanco.edu.co</a></p>
-          <p><i class="fas fa-phone"></i> +57 301 2625799</p>
+        <div class="documents-grid" id="documentsGrid">
+          <!-- Document cards will be populated here naturally, but are hidden/blurred via JS/CSS if not auth -->
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf')">
+            <i class="fas fa-certificate"></i>
+            <h4>Reconocimiento Oficial del grupo ambiental (GREEN FORCE) 2024</h4>
+          </div>
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.3. Solicitud de Autorización para Actividades Extracurriculares del Grupo Ambiental “Green Force” – Segundo Semestre 2024.pdf')">
+            <i class="fas fa-file-signature"></i>
+            <h4>Solicitud Autorización actividades Extracurriculares 2024</h4>
+          </div>
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.2. Informe 1 - Evaluación del Proyecto Ambiental Escolar (GREEN FORCE).pdf')">
+            <i class="fas fa-file-alt"></i>
+            <h4>Informe 1 - Actividades GREEN FORCE 2024</h4>
+          </div>
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.4. Informe 2 de Actividades del Grupo Ambiental.pdf')">
+            <i class="fas fa-file-alt"></i>
+            <h4>Informe 2 - Actividades GREEN FORCE 2024</h4>
+          </div>
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.8. Reconocimiento Oficial del Grupo Ambiental 2025.pdf')">
+            <i class="fas fa-image"></i>
+            <h4>Reconocimiento Oficial del Grupo Ambiental 2025</h4>
+          </div>
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.7. Propuesta educativa Fortaleciendo la Conciencia Ambiental a través de la Educación Experiencial en la Institución Educativa Barroblanco.pdf')">
+            <i class="fas fa-image"></i>
+            <h4>Propuesta educativa para el 2025</h4>
+          </div>
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.5. Poster 1 Fomento de la conciencia ambiental y desarrollo sostenible a través de la creación del grupo.pdf')">
+            <i class="fas fa-image"></i>
+            <h4>Poster Encuentro Regional marzo 2025</h4>
+          </div>
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.6. Poster 2 Semillero IE Barro Blanco Green Force 2025.pdf')">
+            <i class="fas fa-image"></i>
+            <h4>Poster Encuentro Departamental 7 mayo 2025</h4>
+          </div>
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.9. Carta Solicitud de Visita Educativa AGROSAVIA para la Semana del 12 al 16 de mayo de 2025.pdf')">
+            <i class="fas fa-image"></i>
+            <h4>Carta Solicitud de Visita Educativa AGROSAVIA mayo 2025</h4>
+          </div>
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.10. 6. Carta Solicitud de vinculación a prácticas ambientales y visitas pedagógicas CAM CORNARE.pdf')">
+            <i class="fas fa-image"></i>
+            <h4>Carta Solicitud de vinculación a prácticas ambientales junio 2025</h4>
+          </div>
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.11. 11. Carta Solicitud de pedagógica a la planta de tratamiento y participación en jornada de siembra de árboles.pdf')">
+            <i class="fas fa-image"></i>
+            <h4>Carta Solicitud de pedagógica a la planta de tratamiento ARSA agosto 2025</h4>
+          </div>
+          <div class="document-card"
+            onclick="openDocument('assets/documents/1.12. 12. Carta Solicitud de permiso para participación en evento académico de 22 al 26 de septiembre de 2025 en la UCO.pdf')">
+            <i class="fas fa-image"></i>
+            <h4>Carta Solicitud de permiso para participación evento UCO septiembre 2025</h4>
+          </div>
+          <div class="document-card" onclick="openDocument('assets/documents/1.13. Poster 3 Green force - ENISIS.pdf')">
+            <i class="fas fa-image"></i>
+            <h4>Poster 3 Encuentro Nacional de Investigación de Semilleros octubre 2025</h4>
+          </div>
         </div>
+      </section>
+    </div>
 
-        <div class="contact-card">
-          <i class="fas fa-user-graduate"></i>
-          <h3>Colíder Green Force</h3>
-          <p><strong>Melissa Vargas Franco</strong></p>
-          <p><a href="mailto:melissavargasf@barroblanco.edu.co">melissavargasf@barroblanco.edu.co</a></p>
-          <p><i class="fas fa-phone"></i> +57 323 3990232</p>
+    <div class="view-section view-home active">
+      <section id="contacto">
+        <h2><i class="fas fa-address-book"></i> Contacto</h2>
+        <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">Para más información sobre el proyecto</p>
+
+        <div class="contact-grid">
+          <div class="contact-card">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h3>Titular del Proyecto</h3>
+            <p><strong>Luis Fernando Alzate López</strong></p>
+            <p><a href="mailto:luis.alzate@barroblanco.edu.co">luis.alzate@barroblanco.edu.co</a></p>
+            <p><i class="fas fa-phone"></i> +57 310 460 4592</p>
+          </div>
+
+          <div class="contact-card">
+            <i class="fas fa-user-graduate"></i>
+            <h3>Líder Green Force</h3>
+            <p><strong>Nicolas Gañan Bedoya</strong></p>
+            <p><a href="mailto:nicolasgananb@barroblanco.edu.co">nicolasgananb@barroblanco.edu.co</a></p>
+            <p><i class="fas fa-phone"></i> +57 301 2625799</p>
+          </div>
+
+          <div class="contact-card">
+            <i class="fas fa-user-graduate"></i>
+            <h3>Colíder Green Force</h3>
+            <p><strong>Melissa Vargas Franco</strong></p>
+            <p><a href="mailto:melissavargasf@barroblanco.edu.co">melissavargasf@barroblanco.edu.co</a></p>
+            <p><i class="fas fa-phone"></i> +57 323 3990232</p>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <footer>
-      <p style="font-size: 1.2rem;"><i class="fas fa-school"></i> Institución Educativa Barro Blanco © 2025</p>
-      <p>Rionegro, Antioquia - Colombia</p>
-      <p style="margin-top: 1rem;">Somos GREEN FORCE - Sembrando futuro</p>
-      <p><a href="mailto:greenforce2485@gmail.com" style="color: white;">greenforce2485@gmail.com</a></p>
-      <p><a href="mailto:green.force@barroblanco.edu.co" style="color: white;">green.force@barroblanco.edu.co</a></p>
-    </footer>
+      <footer>
+        <p style="font-size: 1.2rem;"><i class="fas fa-school"></i> Institución Educativa Barro Blanco © 2025</p>
+        <p>Rionegro, Antioquia - Colombia</p>
+        <p style="margin-top: 1rem;">Somos GREEN FORCE - Sembrando futuro</p>
+        <p><a href="mailto:greenforce2485@gmail.com" style="color: white;">greenforce2485@gmail.com</a></p>
+        <p><a href="mailto:green.force@barroblanco.edu.co" style="color: white;">green.force@barroblanco.edu.co</a></p>
+      </footer>
+    </div>
   </div>
 
   <div id="documentModal" class="modal">
@@ -355,6 +405,60 @@
   </nav>
 
   <script>
+    // --- SPA Navigation & UI Logic ---
+
+    // Toggle Profile Dropdown
+    function toggleProfileMenu() {
+      const menu = document.getElementById('profileDropdown');
+      menu.classList.toggle('active');
+    }
+
+    // Toggle Dark Mode
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      // Optional: Save to localStorage
+    }
+
+    // Close menus on outside click
+    window.addEventListener('click', (e) => {
+      // Close Profile Dropdown
+      if (!e.target.closest('.profile-menu-container')) {
+        document.getElementById('profileDropdown').classList.remove('active');
+      }
+      // Close Mobile Nav Menu (existing) should be handled if click is outside nav
+    });
+
+    // View Switcher Function
+    function showView(viewId) {
+      // 1. Hide all View Sections
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+
+      // 2. Show Target View
+      if (viewId === 'home' || viewId === 'sobre') {
+        // 'home' view is spread across multiple sections with class .view-home
+        document.querySelectorAll('.view-home').forEach(el => el.classList.add('active'));
+        window.history.replaceState(null, null, '#sobre');
+      } else {
+        const target = document.getElementById('view-' + viewId);
+        if (target) {
+          target.classList.add('active');
+          window.history.replaceState(null, null, '#' + viewId);
+        }
+      }
+
+      // 3. Update Bottom Nav State
+      document.querySelectorAll('.bottom-nav .nav-item').forEach(el => {
+        el.classList.remove('active');
+        const href = el.getAttribute('href').substring(1);
+        if (href === viewId || (viewId === 'home' && href === 'sobre')) {
+          el.classList.add('active');
+        }
+      });
+
+      // 4. Scroll to Top
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
     // Register Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -628,11 +732,36 @@
       }
     });
 
+    // Enhanced Navigation Handler (Mobile + Desktop)
     document.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', function (e) {
         e.preventDefault();
-        scrollToSection(this.getAttribute('href').substring(1));
+        const href = this.getAttribute('href').substring(1);
+
+        // Map specific sections to Views
+        if (['galeria', 'video', 'documentos'].includes(href)) {
+          showView(href);
+        } else if (href === 'sobre') {
+          showView('home');
+        } else {
+          // For sections inside Home (e.g., #contacto, #siguenos)
+          if (!document.querySelector('.view-home.active')) {
+            showView('home');
+            // Wait for view to activate then scroll
+            setTimeout(() => scrollToSection(href), 100);
+          } else {
+            scrollToSection(href);
+          }
+        }
       });
+    });
+
+    // Handle Deep Links on Load
+    window.addEventListener('load', () => {
+      const hash = window.location.hash.substring(1);
+      if (['galeria', 'video', 'documentos'].includes(hash)) {
+        showView(hash);
+      }
     });
 
     document.addEventListener('DOMContentLoaded', () => {
