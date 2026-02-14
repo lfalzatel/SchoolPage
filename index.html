@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Proyecto Green Force - IE Barro Blanco</title>
-  
+
   <!-- PWA Meta Tags -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2E7D32">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="Green Force">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
 
   <!-- Fonts & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
 
@@ -26,6 +29,7 @@
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="auth.js"></script>
 </head>
+
 <body>
   <div id="content-to-pdf">
     <header class="header-hero">
@@ -35,7 +39,7 @@
         </div>
         <h1>Proyecto Green Force</h1>
         <p class="hero-tagline">Fomentando la Conciencia Ambiental en la Institución Educativa Barro Blanco</p>
-        
+
         <div class="hero-message">
           <p>
             Nuestro proyecto es <strong>inclusivo, transformador y sostenible</strong>.<br>
@@ -58,59 +62,70 @@
     </header>
 
     <nav id="navbar">
-        <div class="nav-container">
-            <a href="#" class="nav-logo">
-                <img src="assets/images/1. logo 3.jpg" alt="Logo"> Green Force
-            </a>
-            
-            <button class="hamburger" id="hamburgerBtn">
-                <i class="fas fa-bars"></i>
+      <div class="nav-container">
+        <a href="#" class="nav-logo">
+          <img src="assets/images/1. logo 3.jpg" alt="Logo"> Green Force
+        </a>
+
+        <button class="hamburger" id="hamburgerBtn">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="#sobre"><i class="fas fa-leaf"></i> Sobre el Proyecto</a></li>
+          <li><a href="#galeria"><i class="fas fa-images"></i> Galería</a></li>
+          <li><a href="#video"><i class="fas fa-play-circle"></i> Videos</a></li>
+          <li><a href="#siguenos"><i class="fab fa-youtube"></i> Síguenos</a></li>
+          <li><a href="#documentos"><i class="fas fa-file-pdf"></i> Documentos</a></li>
+          <li><a href="#contacto"><i class="fas fa-envelope"></i> Contacto</a></li>
+
+          <!-- Auth UI -->
+          <li id="authContainer">
+            <button id="loginBtn" class="btn-login"><i class="fab fa-google"></i> Acceder</button>
+            <div id="userProfile" class="user-profile" style="display: none;">
+              <img src="" alt="User" id="userAvatar" class="user-avatar">
+              <span id="userName" class="user-name">Usuario</span>
+              <button id="logoutBtn" class="btn-logout">Salir</button>
+            </div>
+          </li>
+
+          <li>
+            <button id="downloadPdfBtn" class="btn-pdf">
+              <i class="fas fa-download"></i> PDF
             </button>
-
-            <ul class="nav-menu" id="navMenu">
-                <li><a href="#sobre"><i class="fas fa-leaf"></i> Sobre el Proyecto</a></li>
-                <li><a href="#galeria"><i class="fas fa-images"></i> Galería</a></li>
-                <li><a href="#video"><i class="fas fa-play-circle"></i> Videos</a></li>
-                <li><a href="#siguenos"><i class="fab fa-youtube"></i> Síguenos</a></li>
-                <li><a href="#documentos"><i class="fas fa-file-pdf"></i> Documentos</a></li>
-                <li><a href="#contacto"><i class="fas fa-envelope"></i> Contacto</a></li>
-                
-                <!-- Auth UI -->
-                <li id="authContainer">
-                    <button id="loginBtn" class="btn-login"><i class="fab fa-google"></i> Acceder</button>
-                    <div id="userProfile" class="user-profile" style="display: none;">
-                        <img src="" alt="User" id="userAvatar" class="user-avatar">
-                        <span id="userName" class="user-name">Usuario</span>
-                        <button id="logoutBtn" class="btn-logout">Salir</button>
-                    </div>
-                </li>
-
-                <li>
-                  <button id="downloadPdfBtn" class="btn-pdf">
-                    <i class="fas fa-download"></i> PDF
-                  </button>
-                </li>
-            </ul>
-        </div>
+          </li>
+        </ul>
+      </div>
     </nav>
 
     <section id="sobre">
       <h2><i class="fas fa-seedling"></i> Sobre el Proyecto</h2>
       <p style="text-align: justify; line-height: 1.8; margin-bottom: 1rem; font-size: 1.05rem;">
-        El proyecto "Fomentando la Conciencia Ambiental y el Desarrollo Sostenible a través de la Creación del Grupo Ambiental Green Force y la Huerta Escolar" es una iniciativa liderada por estudiantes de la Institución Educativa Barro Blanco, Rionegro, Antioquia. Con un enfoque inclusivo, promovemos la sostenibilidad mediante la educación experiencial, la reforestación, el compostaje y la agricultura sostenible, beneficiando a 938 estudiantes, 54 docentes y 1,000 residentes de la comunidad local.
+        El proyecto "Fomentando la Conciencia Ambiental y el Desarrollo Sostenible a través de la Creación del Grupo
+        Ambiental Green Force y la Huerta Escolar" es una iniciativa liderada por estudiantes de la Institución
+        Educativa Barro Blanco, Rionegro, Antioquia. Con un enfoque inclusivo, promovemos la sostenibilidad mediante la
+        educación experiencial, la reforestación, el compostaje y la agricultura sostenible, beneficiando a 938
+        estudiantes, 54 docentes y 1,000 residentes de la comunidad local.
       </p>
       <p style="text-align: justify; line-height: 1.8; margin-bottom: 1rem; font-size: 1.05rem;">
-        En 2024, el grupo Green Force ha crecido, incorporando nuevos integrantes y egresados en actividades como la visita a AGROSAVIA para aprender sobre la zanahoria. Convertimos la huerta escolar en un vivero con un sistema de recolección de agua lluvia, cultivando frijol, lechuga, tomate, zuccini, pepino, pimentón, zanahoria, maíz, romero y hierbas medicinales. También implementamos un área de compostaje y reciclamos tapas plásticas para crear canastas de basura, promoviendo la economía circular.
+        En 2024, el grupo Green Force ha crecido, incorporando nuevos integrantes y egresados en actividades como la
+        visita a AGROSAVIA para aprender sobre la zanahoria. Convertimos la huerta escolar en un vivero con un sistema
+        de recolección de agua lluvia, cultivando frijol, lechuga, tomate, zuccini, pepino, pimentón, zanahoria, maíz,
+        romero y hierbas medicinales. También implementamos un área de compostaje y reciclamos tapas plásticas para
+        crear canastas de basura, promoviendo la economía circular.
       </p>
       <p style="text-align: justify; line-height: 1.8; font-size: 1.05rem;">
-        Inspirados por los valores de tolerancia, sostenibilidad y desarrollo humano del jeque Zayed, nuestro proyecto empodera a los estudiantes, incluyendo aquellos con discapacidades auditivas, para convertirse en líderes ambientales. A través de talleres, jornadas de reforestación con más de 50 árboles nativos y campañas de sensibilización, fortalecemos la conciencia ambiental y creamos un modelo replicable para otras escuelas.
+        Inspirados por los valores de tolerancia, sostenibilidad y desarrollo humano del jeque Zayed, nuestro proyecto
+        empodera a los estudiantes, incluyendo aquellos con discapacidades auditivas, para convertirse en líderes
+        ambientales. A través de talleres, jornadas de reforestación con más de 50 árboles nativos y campañas de
+        sensibilización, fortalecemos la conciencia ambiental y creamos un modelo replicable para otras escuelas.
       </p>
     </section>
 
     <!-- PROTECTED SECTION: Galería -->
     <section id="galeria" class="relative-section">
       <h2><i class="fas fa-camera"></i> Galería de Actividades</h2>
-      
+
       <div id="galleryOverlay" class="protected-overlay">
         <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
         <p>Inicia sesión con tu cuenta de Google para ver nuestra galería fotográfica completa.</p>
@@ -123,7 +138,7 @@
     <!-- PROTECTED SECTION: Videos -->
     <section id="video" class="relative-section">
       <h2><i class="fas fa-video"></i> Videos del Proyecto</h2>
-      
+
       <div id="videoOverlay" class="protected-overlay">
         <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
         <p>Inicia sesión para ver los videos exclusivos del proyecto.</p>
@@ -148,7 +163,7 @@
     <section id="documentos" class="relative-section">
       <h2><i class="fas fa-folder-open"></i> Documentos del Proyecto</h2>
       <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">Haz clic en un documento para visualizarlo</p>
-      
+
       <div id="docsOverlay" class="protected-overlay">
         <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
         <p>Solo los miembros registrados pueden acceder a la documentación oficial.</p>
@@ -157,51 +172,63 @@
 
       <div class="documents-grid" id="documentsGrid">
         <!-- Document cards will be populated here naturally, but are hidden/blurred via JS/CSS if not auth -->
-        <div class="document-card" onclick="openDocument('assets/documents/1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf')">
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf')">
           <i class="fas fa-certificate"></i>
           <h4>Reconocimiento Oficial del grupo ambiental (GREEN FORCE) 2024</h4>
         </div>
-        <div class="document-card" onclick="openDocument('assets/documents/1.3. Solicitud de Autorización para Actividades Extracurriculares del Grupo Ambiental “Green Force” – Segundo Semestre 2024.pdf')">
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.3. Solicitud de Autorización para Actividades Extracurriculares del Grupo Ambiental “Green Force” – Segundo Semestre 2024.pdf')">
           <i class="fas fa-file-signature"></i>
           <h4>Solicitud Autorización actividades Extracurriculares 2024</h4>
-        </div>        
-        <div class="document-card" onclick="openDocument('assets/documents/1.2. Informe 1 - Evaluación del Proyecto Ambiental Escolar (GREEN FORCE).pdf')">
+        </div>
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.2. Informe 1 - Evaluación del Proyecto Ambiental Escolar (GREEN FORCE).pdf')">
           <i class="fas fa-file-alt"></i>
           <h4>Informe 1 - Actividades GREEN FORCE 2024</h4>
-        </div>        
-        <div class="document-card" onclick="openDocument('assets/documents/1.4. Informe 2 de Actividades del Grupo Ambiental.pdf')">
+        </div>
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.4. Informe 2 de Actividades del Grupo Ambiental.pdf')">
           <i class="fas fa-file-alt"></i>
           <h4>Informe 2 - Actividades GREEN FORCE 2024</h4>
         </div>
-        <div class="document-card" onclick="openDocument('assets/documents/1.8. Reconocimiento Oficial del Grupo Ambiental 2025.pdf')">
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.8. Reconocimiento Oficial del Grupo Ambiental 2025.pdf')">
           <i class="fas fa-image"></i>
-          <h4>Reconocimiento Oficial del Grupo Ambiental  2025</h4>
+          <h4>Reconocimiento Oficial del Grupo Ambiental 2025</h4>
         </div>
-        <div class="document-card" onclick="openDocument('assets/documents/1.7. Propuesta educativa Fortaleciendo la Conciencia Ambiental a través de la Educación Experiencial en la Institución Educativa Barroblanco.pdf')">
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.7. Propuesta educativa Fortaleciendo la Conciencia Ambiental a través de la Educación Experiencial en la Institución Educativa Barroblanco.pdf')">
           <i class="fas fa-image"></i>
           <h4>Propuesta educativa para el 2025</h4>
         </div>
-        <div class="document-card" onclick="openDocument('assets/documents/1.5. Poster 1 Fomento de la conciencia ambiental y desarrollo sostenible a través de la creación del grupo.pdf')">
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.5. Poster 1 Fomento de la conciencia ambiental y desarrollo sostenible a través de la creación del grupo.pdf')">
           <i class="fas fa-image"></i>
           <h4>Poster Encuentro Regional marzo 2025</h4>
         </div>
-        <div class="document-card" onclick="openDocument('assets/documents/1.6. Poster 2 Semillero IE Barro Blanco Green Force 2025.pdf')">
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.6. Poster 2 Semillero IE Barro Blanco Green Force 2025.pdf')">
           <i class="fas fa-image"></i>
           <h4>Poster Encuentro Departamental 7 mayo 2025</h4>
-        </div>        
-        <div class="document-card" onclick="openDocument('assets/documents/1.9. Carta Solicitud de Visita Educativa AGROSAVIA para la Semana del 12 al 16 de mayo de 2025.pdf')">
+        </div>
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.9. Carta Solicitud de Visita Educativa AGROSAVIA para la Semana del 12 al 16 de mayo de 2025.pdf')">
           <i class="fas fa-image"></i>
           <h4>Carta Solicitud de Visita Educativa AGROSAVIA mayo 2025</h4>
         </div>
-        <div class="document-card" onclick="openDocument('assets/documents/1.10. 6. Carta Solicitud de vinculación a prácticas ambientales y visitas pedagógicas CAM CORNARE.pdf')">
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.10. 6. Carta Solicitud de vinculación a prácticas ambientales y visitas pedagógicas CAM CORNARE.pdf')">
           <i class="fas fa-image"></i>
           <h4>Carta Solicitud de vinculación a prácticas ambientales junio 2025</h4>
         </div>
-        <div class="document-card" onclick="openDocument('assets/documents/1.11. 11. Carta Solicitud de pedagógica a la planta de tratamiento y participación en jornada de siembra de árboles.pdf')">
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.11. 11. Carta Solicitud de pedagógica a la planta de tratamiento y participación en jornada de siembra de árboles.pdf')">
           <i class="fas fa-image"></i>
           <h4>Carta Solicitud de pedagógica a la planta de tratamiento ARSA agosto 2025</h4>
         </div>
-        <div class="document-card" onclick="openDocument('assets/documents/1.12. 12. Carta Solicitud de permiso para participación en evento académico de 22 al 26 de septiembre de 2025 en la UCO.pdf')">
+        <div class="document-card"
+          onclick="openDocument('assets/documents/1.12. 12. Carta Solicitud de permiso para participación en evento académico de 22 al 26 de septiembre de 2025 en la UCO.pdf')">
           <i class="fas fa-image"></i>
           <h4>Carta Solicitud de permiso para participación evento UCO septiembre 2025</h4>
         </div>
@@ -215,7 +242,7 @@
     <section id="contacto">
       <h2><i class="fas fa-address-book"></i> Contacto</h2>
       <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">Para más información sobre el proyecto</p>
-      
+
       <div class="contact-grid">
         <div class="contact-card">
           <i class="fas fa-chalkboard-teacher"></i>
@@ -224,7 +251,7 @@
           <p><a href="mailto:luis.alzate@barroblanco.edu.co">luis.alzate@barroblanco.edu.co</a></p>
           <p><i class="fas fa-phone"></i> +57 310 460 4592</p>
         </div>
-        
+
         <div class="contact-card">
           <i class="fas fa-user-graduate"></i>
           <h3>Líder Green Force</h3>
@@ -232,7 +259,7 @@
           <p><a href="mailto:nicolasgananb@barroblanco.edu.co">nicolasgananb@barroblanco.edu.co</a></p>
           <p><i class="fas fa-phone"></i> +57 301 2625799</p>
         </div>
-        
+
         <div class="contact-card">
           <i class="fas fa-user-graduate"></i>
           <h3>Colíder Green Force</h3>
@@ -304,69 +331,102 @@
     <i class="fas fa-arrow-up"></i>
   </div>
 
+  <nav class="bottom-nav">
+    <a href="#sobre" class="nav-item active">
+      <i class="fas fa-leaf"></i>
+      <span>Inicio</span>
+    </a>
+    <a href="#galeria" class="nav-item">
+      <i class="fas fa-images"></i>
+      <span>Galería</span>
+    </a>
+    <a href="#video" class="nav-item">
+      <i class="fas fa-play-circle"></i>
+      <span>Videos</span>
+    </a>
+    <a href="#documentos" class="nav-item">
+      <i class="fas fa-file-pdf"></i>
+      <span>Docs</span>
+    </a>
+    <a href="#" class="nav-item" id="mobileAuthBtn">
+      <i class="fas fa-user"></i>
+      <span>Perfil</span>
+    </a>
+  </nav>
+
   <script>
     // Register Service Worker
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker registered', reg))
-                .catch(err => console.log('Service Worker registration failed', err));
-        });
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker registered', reg))
+          .catch(err => console.log('Service Worker registration failed', err));
+      });
     }
 
     // Toggle Mobile Menu
     document.getElementById('hamburgerBtn').addEventListener('click', () => {
-        document.getElementById('navMenu').classList.toggle('active');
+      document.getElementById('navMenu').classList.toggle('active');
     });
 
     // Close menu when clicking a link
     document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-            document.getElementById('navMenu').classList.remove('active');
-        });
+      link.addEventListener('click', () => {
+        document.getElementById('navMenu').classList.remove('active');
+      });
     });
 
     const activitiesData = [
-      {title: 'Creación de la huerta y primera siembra', description: 'Iniciamos nuestro proyecto en marzo de 2023 con la construcción de nuestra huerta escolar, involucrando a estudiantes y docentes.', year: '2023', thumbnail: 'assets/images/2. Inicio marzo 2023 - 1.jpg', images: ['assets/images/2. Inicio marzo 2023 - 0.jpg','assets/images/2. Inicio marzo 2023 - 1.jpg','assets/images/2. Inicio marzo 2023 - 2.jpg','assets/images/2. Inicio marzo 2023 - 3.jpg','assets/images/2. Inicio marzo 2023 - 4.jpg','assets/images/2. Inicio marzo 2023 - 5.jpg','assets/images/2. Inicio marzo 2023 - 6.jpg','assets/images/2. Inicio marzo 2023 - 7.jpg','assets/images/2. Inicio marzo 2023 - 8.jpg','assets/images/2. Inicio marzo 2023 - 9.jpg']},     
-      {title: 'Entrega de plántulas para huerta casera - 20 de sep', description: 'Recibimos y distribuimos plántulas de árboles nativos para reforestación y huertas caseras', year: '2023', thumbnail: 'assets/images/3. Plántulas reforestación 2023 - 1.jpg', images: ['assets/images/3. Plántulas reforestación 2023 - 1.jpg','assets/images/3. Plántulas reforestación 2023 - 2.jpg', 'assets/images/3. Plántulas reforestación 2023 - 3.jpg','assets/images/3. Plántulas reforestación 2023 - 4.jpg','assets/images/3. Plántulas reforestación 2023 - 5.jpg','assets/images/3. Plántulas reforestación 2023 - 6.jpg','assets/images/3. Plántulas reforestación 2023 - 7.jpg','assets/images/3. Plántulas reforestación 2023 - 8.jpg','assets/images/3. Plántulas reforestación 2023 - 9.jpg','assets/images/3. Plántulas reforestación 2023 - 10.jpg','assets/images/3. Plántulas reforestación 2023 - 11.jpg']},
-      {title: 'Mantenimiento y puesta de estacas - 4 de marzo', description: 'Jornada de mantenimiento y adecuaciones de la huerta', year: '2024', thumbnail: 'assets/images/4. 4 marzo 2024 Estacas - 1.jpg', images: ['assets/images/4. 4 marzo 2024 Estacas - 1.jpg','assets/images/4. 4 marzo 2024 Estacas - 2.jpg','assets/images/4. 4 marzo 2024 Estacas - 3.jpg','assets/images/4. 4 marzo 2024 Estacas - 4.jpg', 'assets/images/4. 4 marzo 2024 Estacas - 5.jpg']},
-      {title: 'Limpieza de zonas aledañas - 19 de marzo', description: 'Jornada de limpieza en las áreas cercanas a nuestra institución.', year: '2024', thumbnail: 'assets/images/5. Limpieza de zonas 2024 - 5.jpg', images: ['assets/images/5. Limpieza de zonas 2024 - 1.jpg','assets/images/5. Limpieza de zonas 2024 - 2.jpg','assets/images/5. Limpieza de zonas 2024 - 3.jpg','assets/images/5. Limpieza de zonas 2024 - 4.jpg','assets/images/5. Limpieza de zonas 2024 - 5.jpg','assets/images/5. Limpieza de zonas 2024 - 6.jpg', 'assets/images/5. Limpieza de zonas 2024 - 7.jpg']},
-      {title: 'Mantenimiento, plástico y riego - Todo abril', description: 'Actividades diarias de cuidado de nuestra huerta orgánica.', year: '2024', thumbnail: 'assets/images/6. Riego y mantenimiento 2024 - 1.jpg', images: ['assets/images/6. Riego y mantenimiento 2024 - 1.jpg','assets/images/6. Riego y mantenimiento 2024 - 2.jpg','assets/images/6. Riego y mantenimiento 2024 - 3.jpg','assets/images/6. Riego y mantenimiento 2024 - 4.jpg','assets/images/6. Riego y mantenimiento 2024 - 5.jpg','assets/images/6. Riego y mantenimiento 2024 - 6.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 7.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 8.jpg']},
-      {title: 'Segunda jornada de limpieza - 30 abril', description: 'Segunda jornada de limpieza de zonas aledañas', year: '2024', thumbnail: 'assets/images/6. Segunda limpieza 2024 - 1.jpg', images: ['assets/images/6. Segunda limpieza 2024 - 1.jpg', 'assets/images/6. Segunda limpieza 2024 - 2.jpg', 'assets/images/6. Segunda limpieza 2024 - 3.jpg', 'assets/images/6. Segunda limpieza 2024 - 4.jpg', 'assets/images/6. Segunda limpieza 2024 - 5.jpg']},
-      {title: 'Embellecimiento de la Huerta - Todo mayo', description: 'Transformando la imagen y el espacio de la huerta orgánica', year: '2024', thumbnail: 'assets/images/6. Embellecimiento 2024 - 10.jpg', images: ['assets/images/6. Embellecimiento 2024 - 1.jpg','assets/images/6. Embellecimiento 2024 - 2.jpg','assets/images/6. Embellecimiento 2024 - 3.jpg','assets/images/6. Embellecimiento 2024 - 4.jpg','assets/images/6. Embellecimiento 2024 - 5.jpg','assets/images/6. Embellecimiento 2024 - 6.jpg', 'assets/images/6. Embellecimiento 2024 - 7.jpg', 'assets/images/6. Embellecimiento 2024 - 8.jpg', 'assets/images/6. Embellecimiento 2024 - 9.jpg', 'assets/images/6. Embellecimiento 2024 - 10.jpg']},
-      {title: 'Reciclaje de tapas - 19 de Julio', description: 'Convirtiendo tapas en canecas para basuras. Proyecto de economía circular transformando tapas plásticas.', year: '2024', thumbnail: 'assets/images/7. Reciclaje de tapas 2024 - 3.jpg', images: ['assets/images/7. Reciclaje de tapas 2024 - 1.jpg','assets/images/7. Reciclaje de tapas 2024 - 2.jpg','assets/images/7. Reciclaje de tapas 2024 - 3.jpg','assets/images/7. Reciclaje de tapas 2024 - 4.jpg','assets/images/7. Reciclaje de tapas 2024 - 5.jpg']},
-      {title: 'Matenimiento - 9 de septiembre', description: 'Nuevas labores de mejora y adecuación', year: '2024', thumbnail: 'assets/images/8. sep 2024 mantenimiento - 5.jpg', images: ['assets/images/8. sep 2024 mantenimiento - 1.jpg','assets/images/8. sep 2024 mantenimiento - 2.jpg','assets/images/8. sep 2024 mantenimiento - 3.jpg','assets/images/8. sep 2024 mantenimiento - 4.jpg','assets/images/8. sep 2024 mantenimiento - 5.jpg', 'assets/images/8. sep 2024 mantenimiento - 6.jpg', 'assets/images/8. sep 2024 mantenimiento - 7.jpg', 'assets/images/8. sep 2024 mantenimiento - 8.jpg', 'assets/images/8. sep 2024 mantenimiento - 9.jpg', 'assets/images/8. sep 2024 mantenimiento - 10.jpg', 'assets/images/8. sep 2024 mantenimiento - 11.jpg']},
-      {title: 'Visita académica Agrosavia - 13 de septiembre', description: 'Visita educativa al Centro de Investigación La Selva de Agrosavia.', year: '2024', thumbnail: 'assets/images/4. Visita agrosavia octubre 2024 - 1.jpg', images: ['assets/images/4. Visita agrosavia octubre 2024 - 1.jpg','assets/images/4. Visita agrosavia octubre 2024 - 2.jpg','assets/images/4. Visita agrosavia octubre 2024 - 3.jpg','assets/images/4. Visita agrosavia octubre 2024 - 4.jpg','assets/images/4. Visita agrosavia octubre 2024 - 5.jpg','assets/images/4. Visita agrosavia octubre 2024 - 6.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 7.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 8.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 9.jpg']},
-      {title: 'Segundo Reciclaje de tapas - 27 de sep', description: 'Proyecto de economía circular transformando tapas plásticas.', year: '2024', thumbnail: 'assets/images/9. Reciclaje tapas 2024 - 1.jpg', images: ['assets/images/9. Reciclaje tapas 2024 - 1.jpg','assets/images/9. Reciclaje tapas 2024 - 2.jpg','assets/images/9. Reciclaje tapas 2024 - 3.jpg','assets/images/9. Reciclaje tapas 2024 - 4.jpg', 'assets/images/9. Reciclaje tapas 2024 - 5.jpg', 'assets/images/9. Reciclaje tapas 2024 - 6.jpg']},
-      {title: 'Donación y siembra de árboles - 3 de octubre', description: 'Recibimos más de 50 árboles nativos para reforestación.', year: '2024', thumbnail: 'assets/images/9. Reforestación 2024 - 5.jpg', images: ['assets/images/9. Reforestación 2024 - 1.jpg','assets/images/9. Reforestación 2024 - 2.jpg','assets/images/9. Reforestación 2024 - 3.jpg','assets/images/9. Reforestación 2024 - 4.jpg', 'assets/images/9. Reforestación 2024 - 5.jpg', 'assets/images/9. Reforestación 2024 - 6.jpg', 'assets/images/9. Reforestación 2024 - 7.jpg']},
-      {title: 'Capacitación CORNARE - 17 Febrero', description: 'Capacitación hortalizas y compost', year: '2025', thumbnail: 'assets/images/10. Capacitación CORNARE - 1.jpg', images: ['assets/images/10. Capacitación CORNARE - 1.jpg','assets/images/10. Capacitación CORNARE - 2.jpg','assets/images/10. Capacitación CORNARE - 3.jpg','assets/images/10. Capacitación CORNARE - 4.jpg','assets/images/10. Capacitación CORNARE - 5.jpg']},
-      {title: 'Reforestación Institucional - 4 de Marzo', description: 'Embelleciendo Barro Blanco', year: '2025', thumbnail: 'assets/images/10. Reforestación institucional - 4.jpg', images: ['assets/images/10. Reforestación institucional - 1.jpg','assets/images/10. Reforestación institucional - 2.jpg','assets/images/10. Reforestación institucional - 3.jpg','assets/images/10. Reforestación institucional - 4.jpg','assets/images/10. Reforestación institucional - 5.jpg']},
-      {title: 'Encuentro regional de semilleros - 7 de Marzo', description: 'Participación en encuentro regional de semilleros.', year: '2025', thumbnail: 'assets/images/10. Encuentro regional 2025 - 1.jpg', images: ['assets/images/10. Encuentro regional 2025 - 1.jpg','assets/images/10. Encuentro regional 2025 - 2.jpg','assets/images/10. Encuentro regional 2025 - 3.jpg','assets/images/10. Encuentro regional 2025 - 4.jpg','assets/images/10. Encuentro regional 2025 - 5.jpg', 'assets/images/10. Encuentro regional 2025 - 6.jpg', 'assets/images/10. Encuentro regional 2025 - 7.jpg','assets/images/10. Encuentro regional 2025 - 8.jpg','assets/images/10. Encuentro regional 2025 - 9.jpg','assets/images/10. Encuentro regional 2025 - 10.jpg']},
-      {title: 'Campaña ambiental 21 - 25 de Abril', description: 'Cuidado del medio ambiente en la institución', year: '2025', thumbnail: 'assets/images/11. Campaña ambiental - 7.jpg', images: ['assets/images/11. Campaña ambiental - 1.jpg','assets/images/11. Campaña ambiental - 2.jpg','assets/images/11. Campaña ambiental - 3.jpg','assets/images/11. Campaña ambiental - 4.jpg','assets/images/11. Campaña ambiental - 5.jpg','assets/images/11. Campaña ambiental - 6.jpg','assets/images/11. Campaña ambiental - 7.jpg',]},
-      {title: 'Encuentro departamental de semilleros - 7 de Mayo', description: 'Representación en encuentro departamental de investigación.', year: '2025', thumbnail: 'assets/images/11. Encuentro departamental 2025 - 1.jpg', images: ['assets/images/11. Encuentro departamental 2025 - 1.jpg','assets/images/11. Encuentro departamental 2025 - 2.jpg','assets/images/11. Encuentro departamental 2025 - 3.jpg','assets/images/11. Encuentro departamental 2025 - 4.jpg','assets/images/11. Encuentro departamental 2025 - 5.jpg','assets/images/11. Encuentro departamental 2025 - 6.jpg','assets/images/11. Encuentro departamental 2025 - 7.jpg','assets/images/11. Encuentro departamental 2025 - 8.jpg','assets/images/11. Encuentro departamental 2025 - 9.jpg','assets/images/11. Encuentro departamental 2025 - 10.jpg','assets/images/11. Encuentro departamental 2025 - 11.jpg','assets/images/11. Encuentro departamental 2025 - 12.jpg',
-      'assets/images/11. Encuentro departamental 2025 - 13.jpg','assets/images/11. Encuentro departamental 2025 - 14.jpg','assets/images/11. Encuentro departamental 2025 - 15.jpg', 'assets/images/11. Encuentro departamental 2025 - 16.jpg', 'assets/images/11. Encuentro departamental 2025 - 17.jpg','11. Encuentro departamental 2025 - 18 - copia.pdf']},
-      {title: 'Visita Agrosavia - Zanahoria - 13 de Mayo', description: 'Segunda visita enfocada en cultivo de zanahoria.', year: '2025', thumbnail: 'assets/images/12. Visita agrosavia 2025 - 1.jpg', images: ['assets/images/12. Visita agrosavia 2025 - 1.jpg','assets/images/12. Visita agrosavia 2025 - 2.jpg','assets/images/12. Visita agrosavia 2025 - 3.jpg','assets/images/12. Visita agrosavia 2025 - 4.jpg','assets/images/12. Visita agrosavia 2025 - 5.jpg','assets/images/12. Visita agrosavia 2025 - 6.jpg','assets/images/12. Visita agrosavia 2025 - 7.jpg','assets/images/12. Visita agrosavia 2025 - 8.jpg']},
-      {title: 'Segunda siembra - 21 de Mayo', description: 'Segunda siembra del año en El vivero institucional', year: '2025', thumbnail: 'assets/images/13. Segunda siembra - 3.jpg', images: ['assets/images/13. Segunda siembra - 1.jpg','assets/images/13. Segunda siembra - 2.jpg','assets/images/13. Segunda siembra - 3.jpg','assets/images/13. Segunda siembra - 4.jpg','assets/images/13. Segunda siembra - 5.jpg','assets/images/13. Segunda siembra - 6.jpg','assets/images/13. Segunda siembra - 7.jpg','assets/images/13. Segunda siembra - 8.jpg','assets/images/13. Segunda siembra - 9.jpg',]},
-      {title: 'Segunda Capacitación CORNARE - 27 de Mayo', description: 'CORNARE fortaleciendo la eduación ambiental ', year: '2025', thumbnail: 'assets/images/13. Segunda capacitación CORNARE - 1.jpg', images: ['assets/images/13. Segunda capacitación CORNARE - 1.jpg','assets/images/13. Segunda capacitación CORNARE - 2.jpg','assets/images/13. Segunda capacitación CORNARE - 3.jpg','assets/images/13. Segunda capacitación CORNARE - 4.jpg','assets/images/13. Segunda capacitación CORNARE - 5.jpg','assets/images/13. Segunda capacitación CORNARE - 6.jpg','assets/images/13. Segunda capacitación CORNARE - 7.jpg','assets/images/13. Segunda capacitación CORNARE - 8.jpg','assets/images/13. Segunda capacitación CORNARE - 9.jpg']},
-      {title: 'Preparación de compostaje - 3 de junio', description: 'Gracias a la capacitación del coordinador Jaime y CORNARE', year: '2025', thumbnail: 'assets/images/13. Preparación compostaje 2025 - 3.jpg', images: ['assets/images/13. Preparación compostaje 2025 - 1.jpg', 'assets/images/13. Preparación compostaje 2025 - 2.jpg', 'assets/images/13. Preparación compostaje 2025 - 3.jpg', 'assets/images/13. Preparación compostaje 2025 - 4.jpg', 'assets/images/13. Preparación compostaje 2025 - 5.jpg', 'assets/images/13. Preparación compostaje 2025 - 6.jpg', 'assets/images/13. Preparación compostaje 2025 - 7.jpg','assets/images/13. Preparación compostaje 2025 - 8.jpg' ]},
-      {title: 'Sembratón 1000 árboles 5 JUNIO', description: 'Sembratón en el lago de corazón y cumpleaños del líder ambiental', year: '2025', thumbnail: 'assets/images/14. Sembraton de 1000 árboles - 16.jpg', images: ['assets/images/14. Sembraton de 1000 árboles - 1.jpg','assets/images/14. Sembraton de 1000 árboles - 2.jpg','assets/images/14. Sembraton de 1000 árboles - 3.jpg','assets/images/14. Sembraton de 1000 árboles - 4.jpg','assets/images/14. Sembraton de 1000 árboles - 5.jpg','assets/images/14. Sembraton de 1000 árboles - 6.jpg','assets/images/14. Sembraton de 1000 árboles - 7.jpg','assets/images/14. Sembraton de 1000 árboles - 8.jpg','assets/images/14. Sembraton de 1000 árboles - 9.jpg','assets/images/14. Sembraton de 1000 árboles - 10.jpg','assets/images/14. Sembraton de 1000 árboles - 11.jpg','assets/images/14. Sembraton de 1000 árboles - 12.jpg', 'assets/images/14. Sembraton de 1000 árboles - 13.jpg',
-        'assets/images/14. Sembraton de 1000 árboles - 14.jpg','assets/images/14. Sembraton de 1000 árboles - 15.jpg','assets/images/14. Sembraton de 1000 árboles - 16.jpg','assets/images/14. Sembraton de 1000 árboles - 17.jpg','assets/images/14. Sembraton de 1000 árboles - 18.jpg']},
-      {title: 'Mantenimiento y siembra - 15 de Julio', description: 'Cuidando y sembrando en el vívero', year: '2025', thumbnail: 'assets/images/15. Siembra y mantenimiento 3.jpg', images: ['assets/images/15. Siembra y mantenimiento - 1.jpg','assets/images/15. Siembra y mantenimiento 2.jpg','assets/images/15. Siembra y mantenimiento 3.jpg','assets/images/15. Siembra y mantenimiento 4.jpg','assets/images/15. Siembra y mantenimiento 5.jpg','assets/images/15. Siembra y mantenimiento 6.jpg']},
-      {title: 'Microorganismos del suelo - 12 de Agosto', description: 'Se destapó el cultivo de microorganismos', year: '2025', thumbnail: 'assets/images/16. Miroorganismos del suelo - 1.jpg', images: ['assets/images/16. Miroorganismos del suelo - 1.jpg','assets/images/16. Miroorganismos del suelo - 2.jpg','assets/images/16. Miroorganismos del suelo - 3.jpg','assets/images/16. Miroorganismos del suelo - 4.jpg','assets/images/16. Miroorganismos del suelo - 5.jpg','assets/images/16. Miroorganismos del suelo - 6.jpg','assets/images/16. Miroorganismos del suelo - 7.jpg']},
-      {title: 'Visita microcuenca ARSA - 29 de Agosto', description: 'Planata de tratamiento y enseñanza de los procesos de purificación de agua', year: '2025', thumbnail: 'assets/images/17. Visita Microcuenca ARSA - 3.jpg', images: ['assets/images/17. Visita Microcuenca ARSA - 1.jpg','assets/images/17. Visita Microcuenca ARSA - 2.jpg','assets/images/17. Visita Microcuenca ARSA - 3.jpg','assets/images/17. Visita Microcuenca ARSA - 4.jpg','assets/images/17. Visita Microcuenca ARSA - 5.jpg','assets/images/17. Visita Microcuenca ARSA - 6.jpg','assets/images/17. Visita Microcuenca ARSA - 7.jpg','assets/images/17. Visita Microcuenca ARSA - 8.jpg','assets/images/17. Visita Microcuenca ARSA - 9.jpg','assets/images/17. Visita Microcuenca ARSA - 10.jpg','assets/images/17. Visita Microcuenca ARSA - 11.jpg',
-        'assets/images/17. Visita Microcuenca ARSA - 12.jpg','assets/images/17. Visita Microcuenca ARSA - 13.jpg','assets/images/17. Visita Microcuenca ARSA - 14.jpg','assets/images/17. Visita Microcuenca ARSA - 15.jpg']},
-      {title: 'Encuentro de semilleros IEBB 12 de Septiembre', description: 'Segundo conversatorio zonal de juventudes', year: '2025', thumbnail: 'assets/images/18. Encuentro semilleros IEBB - 4.jpg', images: ['assets/images/18. Encuentro semilleros IEBB - 1.jpg', 'assets/images/18. Encuentro semilleros IEBB - 2.jpg', 'assets/images/18. Encuentro semilleros IEBB - 3.jpg', 'assets/images/18. Encuentro semilleros IEBB - 4.jpg', 'assets/images/18. Encuentro semilleros IEBB - 5.jpg', 'assets/images/18. Encuentro semilleros IEBB - 6.jpg', 'assets/images/18. Encuentro semilleros IEBB - 7.jpg', 'assets/images/18. Encuentro semilleros IEBB - 8.jpg', 'assets/images/18. Encuentro semilleros IEBB - 9.jpg',
-        'assets/images/18. Encuentro semilleros IEBB - 10.jpg', 'assets/images/18. Encuentro semilleros IEBB - 11.jpg', 'assets/images/18. Encuentro semilleros IEBB - 12.jpg', 'assets/images/18. Encuentro semilleros IEBB - 13.jpg', 'assets/images/18. Encuentro semilleros IEBB - 14.jpg', 'assets/images/18. Encuentro semilleros IEBB - 15.jpg', 'assets/images/18. Encuentro semilleros IEBB - 16.jpg']},
-      {title: 'Décimo tercer (XIII) encuentro de ciencia, innovación e investigación formativa – ECIF 2025', description: 'Evento entre el 22 y 26 de septiembre en la Universidad Católica de Oriente (UCO).', year: '2025', thumbnail: 'assets/images/19. Encuentro UCO - 4.jpg', images: ['assets/images/19. Encuentro UCO - 1.jpg','assets/images/19. Encuentro UCO - 2.jpg','assets/images/19. Encuentro UCO - 3.jpg','assets/images/19. Encuentro UCO - 4.jpg','assets/images/19. Encuentro UCO - 5.jpg','assets/images/19. Encuentro UCO - 6.jpg','assets/images/19. Encuentro UCO - 7.jpg','assets/images/19. Encuentro UCO - 8.jpg','assets/images/19. Encuentro UCO - 9.jpg','assets/images/19. Encuentro UCO - 10.jpg','assets/images/19. Encuentro UCO - 11.jpg','assets/images/19. Encuentro UCO - 12.jpg']},
-       {title: 'Estado Actual de la huerta septiembre', description: 'Ahora la huerta escolar convertida en un vivero', year: '2025', thumbnail: 'assets/images/19. Vivero actual 2025 - 1.jpg', images: ['assets/images/19. Vivero actual 2025 - 1.jpg','assets/images/19. Vivero actual 2025 - 2.jpg','assets/images/19. Vivero actual 2025 - 3.jpg','assets/images/19. Vivero actual 2025 - 4.jpg','assets/images/19. Vivero actual 2025 - 5.jpg','assets/images/19. Vivero actual 2025 - 6.jpg']},
-      {title: 'Encuentro Nacional de semilleros de investigación', description: 'Participación en encuentro nacional de semilleros de investigación -Bogotá 7 - 10 de octubre 2025', year: '2025', thumbnail: 'assets/images/20. Encuentro Nacional 2025 - 8.jpg', images: ['assets/images/20. Encuentro Nacional 2025 - 1.jpg','assets/images/20. Encuentro Nacional 2025 - 2.jpg','assets/images/20. Encuentro Nacional 2025 - 3.jpg','assets/images/20. Encuentro Nacional 2025 - 4.jpg','assets/images/20. Encuentro Nacional 2025 - 5.jpg','assets/images/20. Encuentro Nacional 2025 - 6.jpg','assets/images/20. Encuentro Nacional 2025 - 7.jpg','assets/images/20. Encuentro Nacional 2025 - 8.jpg',
-        'assets/images/20. Encuentro Nacional 2025 - 9.jpg','assets/images/20. Encuentro Nacional 2025 - 10.jpg','assets/images/20. Encuentro Nacional 2025 - 11.jpg']}
+      { title: 'Creación de la huerta y primera siembra', description: 'Iniciamos nuestro proyecto en marzo de 2023 con la construcción de nuestra huerta escolar, involucrando a estudiantes y docentes.', year: '2023', thumbnail: 'assets/images/2. Inicio marzo 2023 - 1.jpg', images: ['assets/images/2. Inicio marzo 2023 - 0.jpg', 'assets/images/2. Inicio marzo 2023 - 1.jpg', 'assets/images/2. Inicio marzo 2023 - 2.jpg', 'assets/images/2. Inicio marzo 2023 - 3.jpg', 'assets/images/2. Inicio marzo 2023 - 4.jpg', 'assets/images/2. Inicio marzo 2023 - 5.jpg', 'assets/images/2. Inicio marzo 2023 - 6.jpg', 'assets/images/2. Inicio marzo 2023 - 7.jpg', 'assets/images/2. Inicio marzo 2023 - 8.jpg', 'assets/images/2. Inicio marzo 2023 - 9.jpg'] },
+      { title: 'Entrega de plántulas para huerta casera - 20 de sep', description: 'Recibimos y distribuimos plántulas de árboles nativos para reforestación y huertas caseras', year: '2023', thumbnail: 'assets/images/3. Plántulas reforestación 2023 - 1.jpg', images: ['assets/images/3. Plántulas reforestación 2023 - 1.jpg', 'assets/images/3. Plántulas reforestación 2023 - 2.jpg', 'assets/images/3. Plántulas reforestación 2023 - 3.jpg', 'assets/images/3. Plántulas reforestación 2023 - 4.jpg', 'assets/images/3. Plántulas reforestación 2023 - 5.jpg', 'assets/images/3. Plántulas reforestación 2023 - 6.jpg', 'assets/images/3. Plántulas reforestación 2023 - 7.jpg', 'assets/images/3. Plántulas reforestación 2023 - 8.jpg', 'assets/images/3. Plántulas reforestación 2023 - 9.jpg', 'assets/images/3. Plántulas reforestación 2023 - 10.jpg', 'assets/images/3. Plántulas reforestación 2023 - 11.jpg'] },
+      { title: 'Mantenimiento y puesta de estacas - 4 de marzo', description: 'Jornada de mantenimiento y adecuaciones de la huerta', year: '2024', thumbnail: 'assets/images/4. 4 marzo 2024 Estacas - 1.jpg', images: ['assets/images/4. 4 marzo 2024 Estacas - 1.jpg', 'assets/images/4. 4 marzo 2024 Estacas - 2.jpg', 'assets/images/4. 4 marzo 2024 Estacas - 3.jpg', 'assets/images/4. 4 marzo 2024 Estacas - 4.jpg', 'assets/images/4. 4 marzo 2024 Estacas - 5.jpg'] },
+      { title: 'Limpieza de zonas aledañas - 19 de marzo', description: 'Jornada de limpieza en las áreas cercanas a nuestra institución.', year: '2024', thumbnail: 'assets/images/5. Limpieza de zonas 2024 - 5.jpg', images: ['assets/images/5. Limpieza de zonas 2024 - 1.jpg', 'assets/images/5. Limpieza de zonas 2024 - 2.jpg', 'assets/images/5. Limpieza de zonas 2024 - 3.jpg', 'assets/images/5. Limpieza de zonas 2024 - 4.jpg', 'assets/images/5. Limpieza de zonas 2024 - 5.jpg', 'assets/images/5. Limpieza de zonas 2024 - 6.jpg', 'assets/images/5. Limpieza de zonas 2024 - 7.jpg'] },
+      { title: 'Mantenimiento, plástico y riego - Todo abril', description: 'Actividades diarias de cuidado de nuestra huerta orgánica.', year: '2024', thumbnail: 'assets/images/6. Riego y mantenimiento 2024 - 1.jpg', images: ['assets/images/6. Riego y mantenimiento 2024 - 1.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 2.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 3.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 4.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 5.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 6.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 7.jpg', 'assets/images/6. Riego y mantenimiento 2024 - 8.jpg'] },
+      { title: 'Segunda jornada de limpieza - 30 abril', description: 'Segunda jornada de limpieza de zonas aledañas', year: '2024', thumbnail: 'assets/images/6. Segunda limpieza 2024 - 1.jpg', images: ['assets/images/6. Segunda limpieza 2024 - 1.jpg', 'assets/images/6. Segunda limpieza 2024 - 2.jpg', 'assets/images/6. Segunda limpieza 2024 - 3.jpg', 'assets/images/6. Segunda limpieza 2024 - 4.jpg', 'assets/images/6. Segunda limpieza 2024 - 5.jpg'] },
+      { title: 'Embellecimiento de la Huerta - Todo mayo', description: 'Transformando la imagen y el espacio de la huerta orgánica', year: '2024', thumbnail: 'assets/images/6. Embellecimiento 2024 - 10.jpg', images: ['assets/images/6. Embellecimiento 2024 - 1.jpg', 'assets/images/6. Embellecimiento 2024 - 2.jpg', 'assets/images/6. Embellecimiento 2024 - 3.jpg', 'assets/images/6. Embellecimiento 2024 - 4.jpg', 'assets/images/6. Embellecimiento 2024 - 5.jpg', 'assets/images/6. Embellecimiento 2024 - 6.jpg', 'assets/images/6. Embellecimiento 2024 - 7.jpg', 'assets/images/6. Embellecimiento 2024 - 8.jpg', 'assets/images/6. Embellecimiento 2024 - 9.jpg', 'assets/images/6. Embellecimiento 2024 - 10.jpg'] },
+      { title: 'Reciclaje de tapas - 19 de Julio', description: 'Convirtiendo tapas en canecas para basuras. Proyecto de economía circular transformando tapas plásticas.', year: '2024', thumbnail: 'assets/images/7. Reciclaje de tapas 2024 - 3.jpg', images: ['assets/images/7. Reciclaje de tapas 2024 - 1.jpg', 'assets/images/7. Reciclaje de tapas 2024 - 2.jpg', 'assets/images/7. Reciclaje de tapas 2024 - 3.jpg', 'assets/images/7. Reciclaje de tapas 2024 - 4.jpg', 'assets/images/7. Reciclaje de tapas 2024 - 5.jpg'] },
+      { title: 'Matenimiento - 9 de septiembre', description: 'Nuevas labores de mejora y adecuación', year: '2024', thumbnail: 'assets/images/8. sep 2024 mantenimiento - 5.jpg', images: ['assets/images/8. sep 2024 mantenimiento - 1.jpg', 'assets/images/8. sep 2024 mantenimiento - 2.jpg', 'assets/images/8. sep 2024 mantenimiento - 3.jpg', 'assets/images/8. sep 2024 mantenimiento - 4.jpg', 'assets/images/8. sep 2024 mantenimiento - 5.jpg', 'assets/images/8. sep 2024 mantenimiento - 6.jpg', 'assets/images/8. sep 2024 mantenimiento - 7.jpg', 'assets/images/8. sep 2024 mantenimiento - 8.jpg', 'assets/images/8. sep 2024 mantenimiento - 9.jpg', 'assets/images/8. sep 2024 mantenimiento - 10.jpg', 'assets/images/8. sep 2024 mantenimiento - 11.jpg'] },
+      { title: 'Visita académica Agrosavia - 13 de septiembre', description: 'Visita educativa al Centro de Investigación La Selva de Agrosavia.', year: '2024', thumbnail: 'assets/images/4. Visita agrosavia octubre 2024 - 1.jpg', images: ['assets/images/4. Visita agrosavia octubre 2024 - 1.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 2.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 3.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 4.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 5.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 6.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 7.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 8.jpg', 'assets/images/4. Visita agrosavia octubre 2024 - 9.jpg'] },
+      { title: 'Segundo Reciclaje de tapas - 27 de sep', description: 'Proyecto de economía circular transformando tapas plásticas.', year: '2024', thumbnail: 'assets/images/9. Reciclaje tapas 2024 - 1.jpg', images: ['assets/images/9. Reciclaje tapas 2024 - 1.jpg', 'assets/images/9. Reciclaje tapas 2024 - 2.jpg', 'assets/images/9. Reciclaje tapas 2024 - 3.jpg', 'assets/images/9. Reciclaje tapas 2024 - 4.jpg', 'assets/images/9. Reciclaje tapas 2024 - 5.jpg', 'assets/images/9. Reciclaje tapas 2024 - 6.jpg'] },
+      { title: 'Donación y siembra de árboles - 3 de octubre', description: 'Recibimos más de 50 árboles nativos para reforestación.', year: '2024', thumbnail: 'assets/images/9. Reforestación 2024 - 5.jpg', images: ['assets/images/9. Reforestación 2024 - 1.jpg', 'assets/images/9. Reforestación 2024 - 2.jpg', 'assets/images/9. Reforestación 2024 - 3.jpg', 'assets/images/9. Reforestación 2024 - 4.jpg', 'assets/images/9. Reforestación 2024 - 5.jpg', 'assets/images/9. Reforestación 2024 - 6.jpg', 'assets/images/9. Reforestación 2024 - 7.jpg'] },
+      { title: 'Capacitación CORNARE - 17 Febrero', description: 'Capacitación hortalizas y compost', year: '2025', thumbnail: 'assets/images/10. Capacitación CORNARE - 1.jpg', images: ['assets/images/10. Capacitación CORNARE - 1.jpg', 'assets/images/10. Capacitación CORNARE - 2.jpg', 'assets/images/10. Capacitación CORNARE - 3.jpg', 'assets/images/10. Capacitación CORNARE - 4.jpg', 'assets/images/10. Capacitación CORNARE - 5.jpg'] },
+      { title: 'Reforestación Institucional - 4 de Marzo', description: 'Embelleciendo Barro Blanco', year: '2025', thumbnail: 'assets/images/10. Reforestación institucional - 4.jpg', images: ['assets/images/10. Reforestación institucional - 1.jpg', 'assets/images/10. Reforestación institucional - 2.jpg', 'assets/images/10. Reforestación institucional - 3.jpg', 'assets/images/10. Reforestación institucional - 4.jpg', 'assets/images/10. Reforestación institucional - 5.jpg'] },
+      { title: 'Encuentro regional de semilleros - 7 de Marzo', description: 'Participación en encuentro regional de semilleros.', year: '2025', thumbnail: 'assets/images/10. Encuentro regional 2025 - 1.jpg', images: ['assets/images/10. Encuentro regional 2025 - 1.jpg', 'assets/images/10. Encuentro regional 2025 - 2.jpg', 'assets/images/10. Encuentro regional 2025 - 3.jpg', 'assets/images/10. Encuentro regional 2025 - 4.jpg', 'assets/images/10. Encuentro regional 2025 - 5.jpg', 'assets/images/10. Encuentro regional 2025 - 6.jpg', 'assets/images/10. Encuentro regional 2025 - 7.jpg', 'assets/images/10. Encuentro regional 2025 - 8.jpg', 'assets/images/10. Encuentro regional 2025 - 9.jpg', 'assets/images/10. Encuentro regional 2025 - 10.jpg'] },
+      { title: 'Campaña ambiental 21 - 25 de Abril', description: 'Cuidado del medio ambiente en la institución', year: '2025', thumbnail: 'assets/images/11. Campaña ambiental - 7.jpg', images: ['assets/images/11. Campaña ambiental - 1.jpg', 'assets/images/11. Campaña ambiental - 2.jpg', 'assets/images/11. Campaña ambiental - 3.jpg', 'assets/images/11. Campaña ambiental - 4.jpg', 'assets/images/11. Campaña ambiental - 5.jpg', 'assets/images/11. Campaña ambiental - 6.jpg', 'assets/images/11. Campaña ambiental - 7.jpg',] },
+      {
+        title: 'Encuentro departamental de semilleros - 7 de Mayo', description: 'Representación en encuentro departamental de investigación.', year: '2025', thumbnail: 'assets/images/11. Encuentro departamental 2025 - 1.jpg', images: ['assets/images/11. Encuentro departamental 2025 - 1.jpg', 'assets/images/11. Encuentro departamental 2025 - 2.jpg', 'assets/images/11. Encuentro departamental 2025 - 3.jpg', 'assets/images/11. Encuentro departamental 2025 - 4.jpg', 'assets/images/11. Encuentro departamental 2025 - 5.jpg', 'assets/images/11. Encuentro departamental 2025 - 6.jpg', 'assets/images/11. Encuentro departamental 2025 - 7.jpg', 'assets/images/11. Encuentro departamental 2025 - 8.jpg', 'assets/images/11. Encuentro departamental 2025 - 9.jpg', 'assets/images/11. Encuentro departamental 2025 - 10.jpg', 'assets/images/11. Encuentro departamental 2025 - 11.jpg', 'assets/images/11. Encuentro departamental 2025 - 12.jpg',
+          'assets/images/11. Encuentro departamental 2025 - 13.jpg', 'assets/images/11. Encuentro departamental 2025 - 14.jpg', 'assets/images/11. Encuentro departamental 2025 - 15.jpg', 'assets/images/11. Encuentro departamental 2025 - 16.jpg', 'assets/images/11. Encuentro departamental 2025 - 17.jpg', '11. Encuentro departamental 2025 - 18 - copia.pdf']
+      },
+      { title: 'Visita Agrosavia - Zanahoria - 13 de Mayo', description: 'Segunda visita enfocada en cultivo de zanahoria.', year: '2025', thumbnail: 'assets/images/12. Visita agrosavia 2025 - 1.jpg', images: ['assets/images/12. Visita agrosavia 2025 - 1.jpg', 'assets/images/12. Visita agrosavia 2025 - 2.jpg', 'assets/images/12. Visita agrosavia 2025 - 3.jpg', 'assets/images/12. Visita agrosavia 2025 - 4.jpg', 'assets/images/12. Visita agrosavia 2025 - 5.jpg', 'assets/images/12. Visita agrosavia 2025 - 6.jpg', 'assets/images/12. Visita agrosavia 2025 - 7.jpg', 'assets/images/12. Visita agrosavia 2025 - 8.jpg'] },
+      { title: 'Segunda siembra - 21 de Mayo', description: 'Segunda siembra del año en El vivero institucional', year: '2025', thumbnail: 'assets/images/13. Segunda siembra - 3.jpg', images: ['assets/images/13. Segunda siembra - 1.jpg', 'assets/images/13. Segunda siembra - 2.jpg', 'assets/images/13. Segunda siembra - 3.jpg', 'assets/images/13. Segunda siembra - 4.jpg', 'assets/images/13. Segunda siembra - 5.jpg', 'assets/images/13. Segunda siembra - 6.jpg', 'assets/images/13. Segunda siembra - 7.jpg', 'assets/images/13. Segunda siembra - 8.jpg', 'assets/images/13. Segunda siembra - 9.jpg',] },
+      { title: 'Segunda Capacitación CORNARE - 27 de Mayo', description: 'CORNARE fortaleciendo la eduación ambiental ', year: '2025', thumbnail: 'assets/images/13. Segunda capacitación CORNARE - 1.jpg', images: ['assets/images/13. Segunda capacitación CORNARE - 1.jpg', 'assets/images/13. Segunda capacitación CORNARE - 2.jpg', 'assets/images/13. Segunda capacitación CORNARE - 3.jpg', 'assets/images/13. Segunda capacitación CORNARE - 4.jpg', 'assets/images/13. Segunda capacitación CORNARE - 5.jpg', 'assets/images/13. Segunda capacitación CORNARE - 6.jpg', 'assets/images/13. Segunda capacitación CORNARE - 7.jpg', 'assets/images/13. Segunda capacitación CORNARE - 8.jpg', 'assets/images/13. Segunda capacitación CORNARE - 9.jpg'] },
+      { title: 'Preparación de compostaje - 3 de junio', description: 'Gracias a la capacitación del coordinador Jaime y CORNARE', year: '2025', thumbnail: 'assets/images/13. Preparación compostaje 2025 - 3.jpg', images: ['assets/images/13. Preparación compostaje 2025 - 1.jpg', 'assets/images/13. Preparación compostaje 2025 - 2.jpg', 'assets/images/13. Preparación compostaje 2025 - 3.jpg', 'assets/images/13. Preparación compostaje 2025 - 4.jpg', 'assets/images/13. Preparación compostaje 2025 - 5.jpg', 'assets/images/13. Preparación compostaje 2025 - 6.jpg', 'assets/images/13. Preparación compostaje 2025 - 7.jpg', 'assets/images/13. Preparación compostaje 2025 - 8.jpg'] },
+      {
+        title: 'Sembratón 1000 árboles 5 JUNIO', description: 'Sembratón en el lago de corazón y cumpleaños del líder ambiental', year: '2025', thumbnail: 'assets/images/14. Sembraton de 1000 árboles - 16.jpg', images: ['assets/images/14. Sembraton de 1000 árboles - 1.jpg', 'assets/images/14. Sembraton de 1000 árboles - 2.jpg', 'assets/images/14. Sembraton de 1000 árboles - 3.jpg', 'assets/images/14. Sembraton de 1000 árboles - 4.jpg', 'assets/images/14. Sembraton de 1000 árboles - 5.jpg', 'assets/images/14. Sembraton de 1000 árboles - 6.jpg', 'assets/images/14. Sembraton de 1000 árboles - 7.jpg', 'assets/images/14. Sembraton de 1000 árboles - 8.jpg', 'assets/images/14. Sembraton de 1000 árboles - 9.jpg', 'assets/images/14. Sembraton de 1000 árboles - 10.jpg', 'assets/images/14. Sembraton de 1000 árboles - 11.jpg', 'assets/images/14. Sembraton de 1000 árboles - 12.jpg', 'assets/images/14. Sembraton de 1000 árboles - 13.jpg',
+          'assets/images/14. Sembraton de 1000 árboles - 14.jpg', 'assets/images/14. Sembraton de 1000 árboles - 15.jpg', 'assets/images/14. Sembraton de 1000 árboles - 16.jpg', 'assets/images/14. Sembraton de 1000 árboles - 17.jpg', 'assets/images/14. Sembraton de 1000 árboles - 18.jpg']
+      },
+      { title: 'Mantenimiento y siembra - 15 de Julio', description: 'Cuidando y sembrando en el vívero', year: '2025', thumbnail: 'assets/images/15. Siembra y mantenimiento 3.jpg', images: ['assets/images/15. Siembra y mantenimiento - 1.jpg', 'assets/images/15. Siembra y mantenimiento 2.jpg', 'assets/images/15. Siembra y mantenimiento 3.jpg', 'assets/images/15. Siembra y mantenimiento 4.jpg', 'assets/images/15. Siembra y mantenimiento 5.jpg', 'assets/images/15. Siembra y mantenimiento 6.jpg'] },
+      { title: 'Microorganismos del suelo - 12 de Agosto', description: 'Se destapó el cultivo de microorganismos', year: '2025', thumbnail: 'assets/images/16. Miroorganismos del suelo - 1.jpg', images: ['assets/images/16. Miroorganismos del suelo - 1.jpg', 'assets/images/16. Miroorganismos del suelo - 2.jpg', 'assets/images/16. Miroorganismos del suelo - 3.jpg', 'assets/images/16. Miroorganismos del suelo - 4.jpg', 'assets/images/16. Miroorganismos del suelo - 5.jpg', 'assets/images/16. Miroorganismos del suelo - 6.jpg', 'assets/images/16. Miroorganismos del suelo - 7.jpg'] },
+      {
+        title: 'Visita microcuenca ARSA - 29 de Agosto', description: 'Planata de tratamiento y enseñanza de los procesos de purificación de agua', year: '2025', thumbnail: 'assets/images/17. Visita Microcuenca ARSA - 3.jpg', images: ['assets/images/17. Visita Microcuenca ARSA - 1.jpg', 'assets/images/17. Visita Microcuenca ARSA - 2.jpg', 'assets/images/17. Visita Microcuenca ARSA - 3.jpg', 'assets/images/17. Visita Microcuenca ARSA - 4.jpg', 'assets/images/17. Visita Microcuenca ARSA - 5.jpg', 'assets/images/17. Visita Microcuenca ARSA - 6.jpg', 'assets/images/17. Visita Microcuenca ARSA - 7.jpg', 'assets/images/17. Visita Microcuenca ARSA - 8.jpg', 'assets/images/17. Visita Microcuenca ARSA - 9.jpg', 'assets/images/17. Visita Microcuenca ARSA - 10.jpg', 'assets/images/17. Visita Microcuenca ARSA - 11.jpg',
+          'assets/images/17. Visita Microcuenca ARSA - 12.jpg', 'assets/images/17. Visita Microcuenca ARSA - 13.jpg', 'assets/images/17. Visita Microcuenca ARSA - 14.jpg', 'assets/images/17. Visita Microcuenca ARSA - 15.jpg']
+      },
+      {
+        title: 'Encuentro de semilleros IEBB 12 de Septiembre', description: 'Segundo conversatorio zonal de juventudes', year: '2025', thumbnail: 'assets/images/18. Encuentro semilleros IEBB - 4.jpg', images: ['assets/images/18. Encuentro semilleros IEBB - 1.jpg', 'assets/images/18. Encuentro semilleros IEBB - 2.jpg', 'assets/images/18. Encuentro semilleros IEBB - 3.jpg', 'assets/images/18. Encuentro semilleros IEBB - 4.jpg', 'assets/images/18. Encuentro semilleros IEBB - 5.jpg', 'assets/images/18. Encuentro semilleros IEBB - 6.jpg', 'assets/images/18. Encuentro semilleros IEBB - 7.jpg', 'assets/images/18. Encuentro semilleros IEBB - 8.jpg', 'assets/images/18. Encuentro semilleros IEBB - 9.jpg',
+          'assets/images/18. Encuentro semilleros IEBB - 10.jpg', 'assets/images/18. Encuentro semilleros IEBB - 11.jpg', 'assets/images/18. Encuentro semilleros IEBB - 12.jpg', 'assets/images/18. Encuentro semilleros IEBB - 13.jpg', 'assets/images/18. Encuentro semilleros IEBB - 14.jpg', 'assets/images/18. Encuentro semilleros IEBB - 15.jpg', 'assets/images/18. Encuentro semilleros IEBB - 16.jpg']
+      },
+      { title: 'Décimo tercer (XIII) encuentro de ciencia, innovación e investigación formativa – ECIF 2025', description: 'Evento entre el 22 y 26 de septiembre en la Universidad Católica de Oriente (UCO).', year: '2025', thumbnail: 'assets/images/19. Encuentro UCO - 4.jpg', images: ['assets/images/19. Encuentro UCO - 1.jpg', 'assets/images/19. Encuentro UCO - 2.jpg', 'assets/images/19. Encuentro UCO - 3.jpg', 'assets/images/19. Encuentro UCO - 4.jpg', 'assets/images/19. Encuentro UCO - 5.jpg', 'assets/images/19. Encuentro UCO - 6.jpg', 'assets/images/19. Encuentro UCO - 7.jpg', 'assets/images/19. Encuentro UCO - 8.jpg', 'assets/images/19. Encuentro UCO - 9.jpg', 'assets/images/19. Encuentro UCO - 10.jpg', 'assets/images/19. Encuentro UCO - 11.jpg', 'assets/images/19. Encuentro UCO - 12.jpg'] },
+      { title: 'Estado Actual de la huerta septiembre', description: 'Ahora la huerta escolar convertida en un vivero', year: '2025', thumbnail: 'assets/images/19. Vivero actual 2025 - 1.jpg', images: ['assets/images/19. Vivero actual 2025 - 1.jpg', 'assets/images/19. Vivero actual 2025 - 2.jpg', 'assets/images/19. Vivero actual 2025 - 3.jpg', 'assets/images/19. Vivero actual 2025 - 4.jpg', 'assets/images/19. Vivero actual 2025 - 5.jpg', 'assets/images/19. Vivero actual 2025 - 6.jpg'] },
+      {
+        title: 'Encuentro Nacional de semilleros de investigación', description: 'Participación en encuentro nacional de semilleros de investigación -Bogotá 7 - 10 de octubre 2025', year: '2025', thumbnail: 'assets/images/20. Encuentro Nacional 2025 - 8.jpg', images: ['assets/images/20. Encuentro Nacional 2025 - 1.jpg', 'assets/images/20. Encuentro Nacional 2025 - 2.jpg', 'assets/images/20. Encuentro Nacional 2025 - 3.jpg', 'assets/images/20. Encuentro Nacional 2025 - 4.jpg', 'assets/images/20. Encuentro Nacional 2025 - 5.jpg', 'assets/images/20. Encuentro Nacional 2025 - 6.jpg', 'assets/images/20. Encuentro Nacional 2025 - 7.jpg', 'assets/images/20. Encuentro Nacional 2025 - 8.jpg',
+          'assets/images/20. Encuentro Nacional 2025 - 9.jpg', 'assets/images/20. Encuentro Nacional 2025 - 10.jpg', 'assets/images/20. Encuentro Nacional 2025 - 11.jpg']
+      }
     ];
 
     const videosData = [
-      {title: 'Green Force: Nace un Movimiento Ambiental', description: 'Presentación inicial de nuestro proyecto Green Force, mostrando cómo nació esta iniciativa ambiental en la IE Barro Blanco.', videoId: '9StDvt-2Nbs', thumbnail: 'https://img.youtube.com/vi/9StDvt-2Nbs/hqdefault.jpg'},
-      {title: 'Reforestación - 1000 Árboles para el Premio Zayed 2025', description: 'Jornada de reforestación donde plantamos más de 1000 árboles nativos como parte de nuestra postulación al Premio Zayed de Sostenibilidad.', videoId: 'QUC-DD5WTRI', thumbnail: 'https://img.youtube.com/vi/QUC-DD5WTRI/hqdefault.jpg'},
-      {title: 'Planting a Sustainable Future', description: 'Documental completo sobre nuestro proyecto Green Force y nuestra postulación al Premio Zayed 2025, mostrando todas nuestras actividades ambientales.', videoId: 'H_0aTsx8C-w', thumbnail: 'https://img.youtube.com/vi/H_0aTsx8C-w/hqdefault.jpg'}
+      { title: 'Green Force: Nace un Movimiento Ambiental', description: 'Presentación inicial de nuestro proyecto Green Force, mostrando cómo nació esta iniciativa ambiental en la IE Barro Blanco.', videoId: '9StDvt-2Nbs', thumbnail: 'https://img.youtube.com/vi/9StDvt-2Nbs/hqdefault.jpg' },
+      { title: 'Reforestación - 1000 Árboles para el Premio Zayed 2025', description: 'Jornada de reforestación donde plantamos más de 1000 árboles nativos como parte de nuestra postulación al Premio Zayed de Sostenibilidad.', videoId: 'QUC-DD5WTRI', thumbnail: 'https://img.youtube.com/vi/QUC-DD5WTRI/hqdefault.jpg' },
+      { title: 'Planting a Sustainable Future', description: 'Documental completo sobre nuestro proyecto Green Force y nuestra postulación al Premio Zayed 2025, mostrando todas nuestras actividades ambientales.', videoId: 'H_0aTsx8C-w', thumbnail: 'https://img.youtube.com/vi/H_0aTsx8C-w/hqdefault.jpg' }
     ];
 
     let currentGalleryImages = [];
@@ -409,7 +469,7 @@
     function openGalleryModal(i) {
       currentGalleryImages = activitiesData[i].images;
       document.getElementById('galleryModalTitle').innerHTML = `<i class="fas fa-images"></i> ${activitiesData[i].title}`;
-      document.getElementById('galleryModalBody').innerHTML = currentGalleryImages.map((img, idx) => 
+      document.getElementById('galleryModalBody').innerHTML = currentGalleryImages.map((img, idx) =>
         `<div class="gallery-modal-item" onclick="openLightbox(${idx})"><img src="${img}" alt="${activitiesData[i].title}"></div>`
       ).join('');
       document.getElementById('galleryModal').classList.add('active');
@@ -464,7 +524,7 @@
     }
 
     function scrollToSection(id) {
-      document.getElementById(id)?.scrollIntoView({behavior: 'smooth', block: 'start'});
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     // Cerrar modales al hacer clic fuera del contenido
@@ -490,7 +550,7 @@
       document.querySelector('.fab').style.opacity = window.scrollY > 100 ? '1' : '0';
     });
 
-    document.getElementById('downloadPdfBtn').addEventListener('click', async function() {
+    document.getElementById('downloadPdfBtn').addEventListener('click', async function () {
       const btn = this;
       const originalText = btn.innerHTML;
       btn.disabled = true;
@@ -498,7 +558,7 @@
 
       try {
         const element = document.getElementById('content-to-pdf');
-        
+
         // Ocultar imágenes de YouTube temporalmente (causan error CORS)
         const youtubeImages = element.querySelectorAll('.video-card-thumbnail img');
         const originalSrcs = [];
@@ -506,13 +566,13 @@
           originalSrcs[i] = img.src;
           img.style.display = 'none';
         });
-        
+
         // Configuración mejorada para mejor compatibilidad
         const options = {
           margin: 10,
           filename: 'Proyecto_Green_Force_2025.pdf',
           image: { type: 'jpeg', quality: 0.95 },
-          html2canvas: { 
+          html2canvas: {
             scale: 2,
             useCORS: false,
             allowTaint: false,
@@ -523,13 +583,13 @@
             windowWidth: element.scrollWidth,
             windowHeight: element.scrollHeight
           },
-          jsPDF: { 
-            unit: 'mm', 
-            format: 'a4', 
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
             orientation: 'portrait',
             compress: true
           },
-          pagebreak: { 
+          pagebreak: {
             mode: ['avoid-all', 'css', 'legacy'],
             before: '.section'
           }
@@ -537,28 +597,28 @@
 
         // Generar y descargar el PDF
         await html2pdf().set(options).from(element).save();
-        
+
         // Restaurar imágenes de YouTube
         youtubeImages.forEach((img, i) => {
           img.style.display = '';
           img.src = originalSrcs[i];
         });
-        
+
         btn.innerHTML = '<i class="fas fa-check-circle"></i> ¡Descargado!';
         setTimeout(() => {
           btn.innerHTML = originalText;
           btn.disabled = false;
         }, 3000);
-        
+
       } catch (error) {
         console.error('Error al generar PDF:', error);
-        
+
         // Restaurar imágenes en caso de error
         const youtubeImages = document.querySelectorAll('.video-card-thumbnail img');
         youtubeImages.forEach(img => {
           img.style.display = '';
         });
-        
+
         alert('Hubo un error al generar el PDF. Por favor, intenta nuevamente.');
         btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
         setTimeout(() => {
@@ -569,7 +629,7 @@
     });
 
     document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', function(e) {
+      a.addEventListener('click', function (e) {
         e.preventDefault();
         scrollToSection(this.getAttribute('href').substring(1));
       });
@@ -581,4 +641,5 @@
     });
   </script>
 </body>
+
 </html>
