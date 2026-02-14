@@ -53,6 +53,9 @@
           <div class="dropdown-item" onclick="toggleDarkMode()">
             <i class="fas fa-moon"></i> <span>Modo Oscuro</span>
           </div>
+          <div class="dropdown-item" id="installAppBtn" style="display: none;" onclick="installPWA()">
+            <i class="fas fa-download"></i> <span>Instalar App</span>
+          </div>
           <div class="dropdown-item" onclick="alert('Modo escritorio proximamente')">
             <i class="fas fa-desktop"></i> <span>Modo Escritorio</span>
           </div>
@@ -405,6 +408,32 @@
   </nav>
 
   <script>
+    // --- PWA Installation Logic ---
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const installBtn = document.getElementById('installAppBtn');
+      if (installBtn) installBtn.style.display = 'flex';
+      console.log('beforeinstallprompt fired');
+    });
+
+    async function installPWA() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      deferredPrompt = null;
+      document.getElementById('installAppBtn').style.display = 'none';
+    }
+
+    window.addEventListener('appinstalled', () => {
+      document.getElementById('installAppBtn').style.display = 'none';
+      deferredPrompt = null;
+      console.log('PWA was installed');
+    });
+
     // --- SPA Navigation & UI Logic ---
 
     // Toggle Profile Dropdown
