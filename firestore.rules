@@ -11,22 +11,16 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Activities: Authenticated read, Admin write
+    // Activities: Public read, Admin write
     // --- ACTIVITIES Collection ---
     match /activities/{activityId} {
-      allow read: if request.auth != null;
-      // Allow update of likeCount by any authenticated user 
-      // (Ideally strictly validated via transaction rules but this is basic ref)
-      // Actually strictly, only admin can update. But for likes we need to allow updating only likeCount.
-      // Simplification: We will use Cloud Functions for strict counting OR allow update if only likeCount changes.
-      // For this project: We will allow auth users to update, assuming client behaves. 
-      // Better: check if diff is only likeCount and inc/dec by 1.
+      allow read: if true;
       allow create, delete: if isAdmin();
       allow update: if isAdmin() || (request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount']));
       
       // Comments Subcollection
       match /comments/{commentId} {
-        allow read: if request.auth != null;
+        allow read: if true;
         allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
         allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
       }
@@ -35,14 +29,13 @@ service cloud.firestore {
     // --- ACTIVITY LIKES Collection (Helper) ---
     match /activity_likes/{likeId} {
       allow read: if request.auth != null;
-      // Allow create/delete if userId matches auth.uid
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
     // --- VIDEOS Collection ---
     match /videos/{document=**} {
-      allow read: if request.auth != null;
+      allow read: if true; // Public videos
       allow create, update, delete: if isAdmin();
     }
   }
