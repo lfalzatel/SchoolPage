@@ -1,13 +1,15 @@
-const CACHE_NAME = 'green-force-v3';
+const CACHE_NAME = 'green-force-v4';
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './styles.css',
-  './manifest.json',
-  './auth.js',
-  './gallery.js',
-  './timeline.js',
-  './firebase-config.js',
+  '/',
+  '/index.html',
+  '/styles.css',
+  '/manifest.json',
+  '/auth.js',
+  '/gallery.js',
+  '/timeline.js',
+  '/firebase-config.js',
+  '/assets/icons/icon-192.png',
+  '/assets/icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap'
 ];
@@ -51,12 +53,22 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request)
       .then((response) => {
         return response || fetch(event.request).then((fetchResponse) => {
-          return caches.open(CACHE_NAME).then((cache) => {
-            if (event.request.method === 'GET') {
-              cache.put(event.request, fetchResponse.clone());
-            }
+          // Check if we received a valid response
+          if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
             return fetchResponse;
-          });
+          }
+
+          // Clone the response because it's a stream and can only be consumed once
+          var responseToCache = fetchResponse.clone();
+
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              if (event.request.method === 'GET') {
+                cache.put(event.request, responseToCache);
+              }
+            });
+
+          return fetchResponse;
         });
       })
   );
