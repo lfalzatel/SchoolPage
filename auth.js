@@ -5,7 +5,8 @@ import {
     signOut,
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-doc,
+import {
+    doc,
     getDoc,
     setDoc,
     serverTimestamp
