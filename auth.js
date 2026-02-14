@@ -1,78 +1,68 @@
+// ============================================================
+//  auth.js  —  Green Force PWA
+//  Usa signInWithRedirect en lugar de signInWithPopup para
+//  evitar bloqueos de popup en Edge, Chrome móvil y Vercel.
+// ============================================================
+
 import { auth, db } from './firebase-config.js';
 import {
     GoogleAuthProvider,
-    signInWithPopup,
-    signOut,
-    onAuthStateChanged,
+    signInWithRedirect,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    updateProfile
+    updateProfile,
+    getRedirectResult,
+    signOut,
+    onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import {
     doc,
-    getDoc,
     setDoc,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
 
-// UI Element IDs
-const uiIds = {
-    mobileAuthBtn: 'mobileAuthBtn',
-    headerProfileAvatar: 'headerProfileAvatar',
-    menuProfileName: 'menuProfileName',
-    menuProfileEmail: 'menuProfileEmail',
-    menuLoginBtn: 'menuLoginBtn',
-    // Legacy/Desktop
-    loginBtn: 'loginBtn',
-    logoutBtn: 'logoutBtn',
-    userProfile: 'userProfile',
-    userAvatar: 'userAvatar',
-    userName: 'userName',
-    // Overlays
-    galleryOverlay: 'galleryOverlay',
-    videoOverlay: 'videoOverlay',
-    docsOverlay: 'docsOverlay'
-};
-
-const getEl = (id) => document.getElementById(id);
-
-// --- Auth Functions ---
-
-const saveUserToDB = async (user) => {
+// -----------------------------------------------------------
+//  GUARDAR USUARIO EN FIRESTORE
+// -----------------------------------------------------------
+async function saveUserToFirestore(user) {
     try {
         const userRef = doc(db, 'users', user.uid);
         await setDoc(userRef, {
-            name: user.displayName || user.email.split('@')[0],
+            name: user.displayName,
             email: user.email,
-            photo: user.photoURL || 'assets/icons/icon-192.png',
+            photo: user.photoURL,
             lastLogin: serverTimestamp()
         }, { merge: true });
-    } catch (error) {
-        console.error("Error saving user to DB:", error);
+    } catch (e) {
+        console.warn('No se pudo guardar en Firestore:', e.message);
     }
-};
+}
 
-// 1. Google Login
-const loginWithGoogle = async () => {
+// -----------------------------------------------------------
+//  LOGIN CON GOOGLE (Redirect — sin popup)
+// -----------------------------------------------------------
+export const loginWithGoogle = async () => {
     try {
-        const result = await signInWithPopup(auth, provider);
-        await saveUserToDB(result.user);
-        console.log("User logged in via Google:", result.user.displayName);
-        return result.user;
+        // Guarda la URL actual para volver después del redirect
+        sessionStorage.setItem('authRedirectFrom', window.location.href);
+        await signInWithRedirect(auth, provider);
+        // El navegador redirige a Google, la función no sigue aquí
     } catch (error) {
         console.error("Google Login failed:", error);
         throw error;
     }
 };
 
-// 2. Email Login
-const loginWithEmail = async (email, password) => {
+// -----------------------------------------------------------
+//  LOGIN CON EMAIL/CONTRASEÑA
+// -----------------------------------------------------------
+export const loginWithEmail = async (email, password) => {
     try {
         const result = await signInWithEmailAndPassword(auth, email, password);
-        await saveUserToDB(result.user);
-        console.log("User logged in via Email:", result.user.email);
+        await saveUserToFirestore(result.user);
         return result.user;
     } catch (error) {
         console.error("Email Login failed:", error);
@@ -80,77 +70,94 @@ const loginWithEmail = async (email, password) => {
     }
 };
 
-// 3. Register with Email (for Test User / Future use)
-const registerWithEmail = async (email, password, name) => {
+// -----------------------------------------------------------
+//  REGISTRO CON EMAIL/CONTRASEÑA
+// -----------------------------------------------------------
+export const registerWithEmail = async (email, password, name) => {
     try {
         const result = await createUserWithEmailAndPassword(auth, email, password);
-        const user = result.user;
-
-        // Update Profile
-        await updateProfile(user, {
-            displayName: name,
-            photoURL: "https://ui-avatars.com/api/?name=" + encodeURIComponent(name) + "&background=059669&color=fff"
-        });
-
-        await saveUserToDB(user);
-        console.log("User registered:", user.email);
-        return user;
+        await updateProfile(result.user, { displayName: name });
+        await saveUserToFirestore(result.user);
+        return result.user;
     } catch (error) {
-        console.error("Registration failed:", error);
+        console.error("Register failed:", error);
         throw error;
     }
 };
 
-// Legacy Login Wrapper (Default to Redirect or Popup)
-const login = async () => {
-    // Redirect to login page instead of popup for main action
-    window.location.href = 'login.html';
-};
-
-// Logout Function
-const logout = async () => {
+// -----------------------------------------------------------
+//  LOGOUT
+// -----------------------------------------------------------
+export const logout = async () => {
     try {
         await signOut(auth);
-        console.log("User logged out");
-        // Close profile menu if open
-        const menu = getEl('profileDropdown');
+        const menu = document.getElementById('profileDropdown');
         if (menu) menu.classList.remove('active');
-        // Optional: Redirect to home
-        // window.location.href = 'index.html'; 
     } catch (error) {
         console.error("Logout failed:", error);
     }
 };
 
-// Role Management
-window.checkUserRole = async (uid) => {
+// -----------------------------------------------------------
+//  MANEJAR EL RESULTADO DEL REDIRECT DE GOOGLE
+//  Se ejecuta cuando el navegador vuelve de accounts.google.com
+// -----------------------------------------------------------
+async function handleRedirectResult() {
     try {
-        const userRef = doc(db, 'users', uid);
-        const docSnap = await getDoc(userRef);
-
-        if (docSnap.exists() && docSnap.data().role) {
-            return docSnap.data().role;
-        } else {
-            return 'member';
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+            console.log("User logged in via Google:", result.user.displayName);
+            await saveUserToFirestore(result.user);
+            // Si estamos en login.html, redirigir a index
+            if (window.location.pathname.includes('login')) {
+                window.location.href = 'index.html';
+            }
         }
     } catch (error) {
-        console.error("Error fetching user role:", error);
-        return 'member'; // Default to member on error
+        // auth/cancelled-popup-request puede aparecer aquí también — ignorar
+        if (error.code !== 'auth/cancelled-popup-request') {
+            console.error("Redirect result error:", error.code);
+        }
     }
-};
+}
 
-// Global Auth Action Handler (for Dropdown)
+// Llamar al cargar la página
+handleRedirectResult();
+
+// -----------------------------------------------------------
+//  ACCIÓN GLOBAL (Dropdown header)
+// -----------------------------------------------------------
 window.handleAuthAction = () => {
     if (auth.currentUser) {
         logout();
     } else {
-        login(); // Redirects to login.html
+        loginWithGoogle();
     }
 };
 
-// Update UI based on User State
-const updateUI = async (user) => {
-    // 1. Mobile Bottom Nav
+// -----------------------------------------------------------
+//  UI: Actualizar elementos según estado de sesión
+// -----------------------------------------------------------
+const uiIds = {
+    mobileAuthBtn:      'mobileAuthBtn',
+    headerProfileAvatar:'headerProfileAvatar',
+    menuProfileName:    'menuProfileName',
+    menuProfileEmail:   'menuProfileEmail',
+    menuLoginBtn:       'menuLoginBtn',
+    loginBtn:           'loginBtn',
+    logoutBtn:          'logoutBtn',
+    userProfile:        'userProfile',
+    userAvatar:         'userAvatar',
+    userName:           'userName',
+    galleryOverlay:     'galleryOverlay',
+    videoOverlay:       'videoOverlay',
+    docsOverlay:        'docsOverlay'
+};
+
+const getEl = (id) => document.getElementById(id);
+
+const updateUI = (user) => {
+    // 1. Botón móvil inferior
     const mobBtn = getEl(uiIds.mobileAuthBtn);
     if (mobBtn) {
         if (user) {
@@ -163,104 +170,74 @@ const updateUI = async (user) => {
             mobBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i><span>Login</span>';
             mobBtn.onclick = (e) => {
                 e.preventDefault();
-                login();
+                loginWithGoogle();
             };
         }
     }
 
-    // 2. Header & Profile Dropdown
-    const avatar = getEl(uiIds.headerProfileAvatar);
-    const menuName = getEl(uiIds.menuProfileName);
+    // 2. Header avatar y dropdown
+    const avatar   = getEl(uiIds.headerProfileAvatar);
+    const menuName  = getEl(uiIds.menuProfileName);
     const menuEmail = getEl(uiIds.menuProfileEmail);
-    const menuBtn = getEl(uiIds.menuLoginBtn);
+    const menuBtn   = getEl(uiIds.menuLoginBtn);
 
     if (user) {
-        if (avatar) avatar.src = user.photoURL || 'assets/icons/icon-192.png';
-        if (menuName) menuName.textContent = user.displayName || 'Usuario';
-        if (menuEmail) menuEmail.textContent = user.email;
-        if (menuBtn) {
-            menuBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>';
-        }
-
-        // Determine Role
-        const role = await window.checkUserRole(user.uid);
-        window.currentUserRole = role;
-
-        // Trigger Admin UI Update
-        if (typeof window.updateAdminUI === 'function') {
-            window.updateAdminUI();
-        }
-
+        if (avatar)    avatar.src           = user.photoURL || 'assets/icons/icon-192.png';
+        if (menuName)  menuName.textContent  = user.displayName || 'Usuario';
+        if (menuEmail) menuEmail.textContent = user.email || '';
+        if (menuBtn)   menuBtn.innerHTML     = '<i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>';
     } else {
-        if (avatar) avatar.src = 'assets/icons/icon-192.png'; // Default
-        if (menuName) menuName.textContent = 'Invitado';
-        if (menuEmail) menuEmail.textContent = 'Inicia sesión para más';
-        if (menuBtn) {
-            menuBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Iniciar Sesión</span>';
-        }
-        window.currentUserRole = 'guest';
-        // Trigger Admin UI Update (Hide controls)
-        if (typeof window.updateAdminUI === 'function') {
-            window.updateAdminUI();
-        }
+        if (avatar)    avatar.src           = 'assets/icons/icon-192.png';
+        if (menuName)  menuName.textContent  = 'Invitado';
+        if (menuEmail) menuEmail.textContent = 'Inicia sesión para acceder';
+        if (menuBtn)   menuBtn.innerHTML     = '<i class="fas fa-sign-in-alt"></i> <span>Iniciar Sesión</span>';
     }
 
-    // 3. Overlays (Protected Content)
-    const overlays = [getEl(uiIds.galleryOverlay), getEl(uiIds.videoOverlay), getEl(uiIds.docsOverlay)];
-    overlays.forEach(el => {
+    // 3. Overlays de contenido protegido
+    ['galleryOverlay', 'videoOverlay', 'docsOverlay'].forEach(id => {
+        const el = getEl(id);
         if (el) el.style.display = user ? 'none' : 'flex';
     });
 
-    // 4. Secure Data Loading Integration
-    if (user) {
-        if (typeof window.loadSecureContent === 'function') {
-            window.loadSecureContent();
-        }
-    }
-
-    // 5. Legacy/Desktop Nav
-    const lBtn = getEl(uiIds.loginBtn);
-    const uProf = getEl(uiIds.userProfile);
-    const uName = getEl(uiIds.userName);
+    // 4. Nav de escritorio (legacy)
+    const lBtn    = getEl(uiIds.loginBtn);
+    const uProf   = getEl(uiIds.userProfile);
+    const uName   = getEl(uiIds.userName);
     const uAvatar = getEl(uiIds.userAvatar);
 
     if (user) {
-        if (lBtn) lBtn.style.display = 'none';
-        if (uProf) uProf.style.display = 'flex';
-        if (uName) uName.textContent = (user.displayName || 'User').split(' ')[0];
-        if (uAvatar) uAvatar.src = user.photoURL || 'assets/icons/icon-192.png';
+        if (lBtn)    lBtn.style.display  = 'none';
+        if (uProf)   uProf.style.display = 'flex';
+        if (uName)   uName.textContent   = (user.displayName || '').split(' ')[0];
+        if (uAvatar) uAvatar.src         = user.photoURL || '';
     } else {
-        if (lBtn) lBtn.style.display = 'block';
+        if (lBtn)  lBtn.style.display  = 'block';
         if (uProf) uProf.style.display = 'none';
+    }
+
+    // 5. Cargar contenido seguro tras login
+    if (user && window.loadSecureContent) {
+        window.loadSecureContent();
     }
 };
 
-// Auth State Observer
+// -----------------------------------------------------------
+//  OBSERVADOR DE ESTADO
+// -----------------------------------------------------------
 onAuthStateChanged(auth, (user) => {
     updateUI(user);
 });
 
-// Event Listeners for Overlays
+// Listeners para overlay buttons y nav legacy
 document.querySelectorAll('.overlay-login-btn').forEach(btn => {
-    btn.addEventListener('click', login);
+    btn.addEventListener('click', loginWithGoogle);
 });
 
-// Legacy Listeners
 const lgBtn = getEl(uiIds.loginBtn);
-if (lgBtn) lgBtn.addEventListener('click', login);
+if (lgBtn) lgBtn.addEventListener('click', loginWithGoogle);
 
 const lgOutBtn = getEl(uiIds.logoutBtn);
 if (lgOutBtn) lgOutBtn.addEventListener('click', logout);
 
+export { auth };
 console.log("Auth module loaded");
-
-// Export auth functions
-export {
-    auth,
-    login,
-    logout,
-    updateUI,
-    loginWithGoogle,
-    loginWithEmail,
-    registerWithEmail
-};
