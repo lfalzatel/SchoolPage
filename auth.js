@@ -3,7 +3,10 @@ import {
     GoogleAuthProvider,
     signInWithPopup,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    updateProfile
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import {
     doc,
@@ -35,23 +38,73 @@ const uiIds = {
 
 const getEl = (id) => document.getElementById(id);
 
-// Login Function
-const login = async () => {
+// --- Auth Functions ---
+
+const saveUserToDB = async (user) => {
     try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
         const userRef = doc(db, 'users', user.uid);
         await setDoc(userRef, {
-            name: user.displayName,
+            name: user.displayName || user.email.split('@')[0],
             email: user.email,
-            photo: user.photoURL,
+            photo: user.photoURL || 'assets/icons/icon-192.png',
             lastLogin: serverTimestamp()
         }, { merge: true });
-        console.log("User logged in:", user.displayName);
     } catch (error) {
-        console.error("Login failed:", error);
-        alert("Error al iniciar sesión: " + error.message);
+        console.error("Error saving user to DB:", error);
     }
+};
+
+// 1. Google Login
+const loginWithGoogle = async () => {
+    try {
+        const result = await signInWithPopup(auth, provider);
+        await saveUserToDB(result.user);
+        console.log("User logged in via Google:", result.user.displayName);
+        return result.user;
+    } catch (error) {
+        console.error("Google Login failed:", error);
+        throw error;
+    }
+};
+
+// 2. Email Login
+const loginWithEmail = async (email, password) => {
+    try {
+        const result = await signInWithEmailAndPassword(auth, email, password);
+        await saveUserToDB(result.user);
+        console.log("User logged in via Email:", result.user.email);
+        return result.user;
+    } catch (error) {
+        console.error("Email Login failed:", error);
+        throw error;
+    }
+};
+
+// 3. Register with Email (for Test User / Future use)
+const registerWithEmail = async (email, password, name) => {
+    try {
+        const result = await createUserWithEmailAndPassword(auth, email, password);
+        const user = result.user;
+
+        // Update Profile
+        await updateProfile(user, {
+            displayName: name,
+            photoURL: "https://ui-avatars.com/api/?name=" + encodeURIComponent(name) + "&background=059669&color=fff"
+        });
+
+        await saveUserToDB(user);
+        console.log("User registered:", user.email);
+        return user;
+    } catch (error) {
+        console.error("Registration failed:", error);
+        throw error;
+    }
+};
+
+// Legacy Login Wrapper (Default to Redirect or Popup)
+const login = async () => {
+    // Redirect to login page instead of popup for main action
+    window.location.href = 'login.html';
 };
 
 // Logout Function
@@ -62,6 +115,8 @@ const logout = async () => {
         // Close profile menu if open
         const menu = getEl('profileDropdown');
         if (menu) menu.classList.remove('active');
+        // Optional: Redirect to home
+        // window.location.href = 'index.html'; 
     } catch (error) {
         console.error("Logout failed:", error);
     }
@@ -76,8 +131,6 @@ window.checkUserRole = async (uid) => {
         if (docSnap.exists() && docSnap.data().role) {
             return docSnap.data().role;
         } else {
-            // If user doc doesn't exist or has no role, default to member
-            // We could also set it here if we wanted to enforce it in DB
             return 'member';
         }
     } catch (error) {
@@ -91,7 +144,7 @@ window.handleAuthAction = () => {
     if (auth.currentUser) {
         logout();
     } else {
-        login();
+        login(); // Redirects to login.html
     }
 };
 
@@ -100,10 +153,8 @@ const updateUI = async (user) => {
     // 1. Mobile Bottom Nav
     const mobBtn = getEl(uiIds.mobileAuthBtn);
     if (mobBtn) {
-        // Remove existing listeners to avoid duplicates if called multiple times (though replace element is better, strict update is fine)
         if (user) {
             mobBtn.innerHTML = '<i class="fas fa-user-circle"></i><span>Perfil</span>';
-            // If user clicks Profile in bottom nav, toggle the top menu
             mobBtn.onclick = (e) => {
                 e.preventDefault();
                 if (window.toggleProfileMenu) window.toggleProfileMenu();
@@ -124,12 +175,11 @@ const updateUI = async (user) => {
     const menuBtn = getEl(uiIds.menuLoginBtn);
 
     if (user) {
-        if (avatar) avatar.src = user.photoURL;
-        if (menuName) menuName.textContent = user.displayName;
+        if (avatar) avatar.src = user.photoURL || 'assets/icons/icon-192.png';
+        if (menuName) menuName.textContent = user.displayName || 'Usuario';
         if (menuEmail) menuEmail.textContent = user.email;
         if (menuBtn) {
             menuBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>';
-            // onclick is handled by handleAuthAction global
         }
 
         // Determine Role
@@ -144,7 +194,7 @@ const updateUI = async (user) => {
     } else {
         if (avatar) avatar.src = 'assets/icons/icon-192.png'; // Default
         if (menuName) menuName.textContent = 'Invitado';
-        if (menuEmail) menuEmail.textContent = 'Inicia sesión para acceder';
+        if (menuEmail) menuEmail.textContent = 'Inicia sesión para más';
         if (menuBtn) {
             menuBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Iniciar Sesión</span>';
         }
@@ -162,18 +212,14 @@ const updateUI = async (user) => {
     });
 
     // 4. Secure Data Loading Integration
-    // If user is logged in, trigger data load if functions exist
     if (user) {
         if (typeof window.loadSecureContent === 'function') {
             window.loadSecureContent();
         }
-    } else {
-        // Clear content if needed or just hide via overlays (already handled)
     }
 
     // 5. Legacy/Desktop Nav
     const lBtn = getEl(uiIds.loginBtn);
-    const loBtn = getEl(uiIds.logoutBtn);
     const uProf = getEl(uiIds.userProfile);
     const uName = getEl(uiIds.userName);
     const uAvatar = getEl(uiIds.userAvatar);
@@ -181,8 +227,8 @@ const updateUI = async (user) => {
     if (user) {
         if (lBtn) lBtn.style.display = 'none';
         if (uProf) uProf.style.display = 'flex';
-        if (uName) uName.textContent = user.displayName.split(' ')[0];
-        if (uAvatar) uAvatar.src = user.photoURL;
+        if (uName) uName.textContent = (user.displayName || 'User').split(' ')[0];
+        if (uAvatar) uAvatar.src = user.photoURL || 'assets/icons/icon-192.png';
     } else {
         if (lBtn) lBtn.style.display = 'block';
         if (uProf) uProf.style.display = 'none';
@@ -208,5 +254,13 @@ if (lgOutBtn) lgOutBtn.addEventListener('click', logout);
 
 console.log("Auth module loaded");
 
-// Export auth for other modules
-export { auth, login, logout, updateUI };
+// Export auth functions
+export {
+    auth,
+    login,
+    logout,
+    updateUI,
+    loginWithGoogle,
+    loginWithEmail,
+    registerWithEmail
+};

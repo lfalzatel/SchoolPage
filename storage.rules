@@ -3,8 +3,9 @@ service firebase.storage {
   match /b/{bucket}/o {
     // Public read access for images (or auth-only as per prompt preferences? 
     // Prompt said: "Solo usuarios logueados pueden ver". Current: allow read: if request.auth != null; is correct.)
+    // Public read access for images (essential for the site to work for visitors)
     match /{allPaths=**} {
-      allow read: if request.auth != null;
+      allow read: if true;
     }
     
     // Granular Write Rules

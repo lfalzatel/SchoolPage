@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Green Force</title>
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2E7D32">
+    <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/images/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-mode .login-container {
+            background: rgba(30, 30, 30, 0.95);
+            color: white;
+        }
+
+        .login-logo img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-title {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .login-subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .dark-mode .login-subtitle {
+            color: #aaa;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .dark-mode .form-group label {
+            color: #eee;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .dark-mode .form-input {
+            background: #333;
+            border-color: #555;
+            color: white;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            margin-top: 1rem;
+        }
+
+        .btn-submit:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .divider {
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        .google-btn {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .google-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .dark-mode .google-btn {
+            background: #333;
+            color: white;
+            border-color: #555;
+        }
+
+        .dark-mode .google-btn:hover {
+            background: #444;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 1.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover {
+            color: var(--primary-color);
+        }
+
+        .dark-mode .back-link {
+            color: #aaa;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="login-logo">
+            <img src="assets/images/1. logo 3.jpg" alt="Green Force Logo">
+        </div>
+        <h2 class="login-title">Bienvenido a Green Force</h2>
+        <p class="login-subtitle">Accede para gestionar actividades y ver contenido exclusivo</p>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Correo Electrónico</label>
+                <div style="position: relative;">
+                    <i class="fas fa-envelope" style="position: absolute; left: 15px; top: 15px; color: #888;"></i>
+                    <input type="email" id="email" class="form-input" placeholder="ejemplo@greenforce.com"
+                        style="padding-left: 40px;" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <div style="position: relative;">
+                    <i class="fas fa-lock" style="position: absolute; left: 15px; top: 15px; color: #888;"></i>
+                    <input type="password" id="password" class="form-input" placeholder="••••••••"
+                        style="padding-left: 40px;" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>O continúa con</span>
+        </div>
+
+        <button id="googleLoginBtn" class="google-btn">
+            <i class="fab fa-google" style="color: #DB4437;"></i> Google
+        </button>
+
+        <button id="installAppBtn" class="google-btn"
+            style="display: none; margin-top: 1rem; background: #2E7D32; color: white; border: none;">
+            <i class="fas fa-download"></i> Instalar Aplicación
+        </button>
+
+        <div style="margin-top: 1.5rem; font-size: 0.9rem;">
+            <a href="#" id="createTestUserBtn" style="color: var(--secondary-color); text-decoration: none;">(Debug)
+                Crear Usuario de Prueba</a>
+        </div>
+
+        <!-- Hidden back link just in case -->
+        <!-- <a href="index.html" class="back-link">Volver al Inicio</a> -->
+    </div>
+
+    <script>
+        // --- PWA Installation Logic ---
+        let deferredPrompt;
+        const installBtn = document.getElementById('installAppBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBtn) installBtn.style.display = 'flex';
+            console.log('beforeinstallprompt fired');
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response to the install prompt: ${outcome}`);
+            deferredPrompt = null;
+            installBtn.style.display = 'none';
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBtn.style.display = 'none';
+            deferredPrompt = null;
+            console.log('PWA was installed');
+        });
+    </script>
+
+    <script type="module">
+        import { loginWithEmail, loginWithGoogle, registerWithEmail, auth } from './auth.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+        // Auth Guard: If already logged in, redirect to index
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("User already logged in, redirecting...");
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Check for dark mode pref
+        if (localStorage.getItem('darkMode') === 'enabled' ||
+            window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Email Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = e.target.querySelector('button');
+
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+            btn.disabled = true;
+
+            try {
+                await loginWithEmail(email, password);
+                // Redirect handled by onAuthStateChanged
+            } catch (error) {
+                console.error(error);
+                alert("Error: " + error.message);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // Google Login
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            try {
+                await loginWithGoogle();
+                // Redirect handled by onAuthStateChanged
+            } catch (error) {
+                console.error(error);
+                alert("Error con Google: " + error.message);
+            }
+        });
+
+        // Quick Test User Creation (For Demo)
+        document.getElementById('createTestUserBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = "test@greenforce.com";
+            const password = "password123";
+            const name = "Usuario de Prueba";
+
+            if (confirm(`¿Crear usuario de prueba?\nEmail: ${email}\nPass: ${password}`)) {
+                try {
+                    await registerWithEmail(email, password, name);
+                    alert("Usuario creado! Iniciando sesion...");
+                } catch (err) {
+                    alert("Error: " + err.message);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

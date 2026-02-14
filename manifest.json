@@ -1,7 +1,7 @@
 {
   "name": "Proyecto Green Force",
   "short_name": "Green Force",
-  "start_url": "./index.html",
+  "start_url": "./login.html",
   "display": "standalone",
   "background_color": "#f4f4f4",
   "theme_color": "#2E7D32",
