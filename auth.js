@@ -224,9 +224,15 @@ const updateUI = (user) => {
     if (user) {
         if (avatar) avatar.src = user.photoURL || 'assets/icons/icon-192.png';
         if (headerName) headerName.textContent = (user.displayName || 'Usuario').split(' ')[0];
-        // En una app real, el rol vendría de Firestore. Aquí simulamos según el email o nombre.
-        const role = user.email === 'greenforceiebb@gmail.com' ? 'Admin' : 'Miembro';
-        if (headerRole) headerRole.textContent = role;
+
+        // Define Admins
+        const admins = ['greenforceiebb@gmail.com', 'lfalzatel@gmail.com'];
+        const uniqueRole = admins.includes(user.email) ? 'admin' : 'miembro';
+        window.currentUserRole = uniqueRole; // Set global for gallery.js
+
+        // Display Role
+        const roleDisplay = uniqueRole === 'admin' ? 'Administrador' : 'Miembro';
+        if (headerRole) headerRole.textContent = roleDisplay;
 
         if (menuName) menuName.textContent = user.displayName || 'Usuario';
         if (menuEmail) menuEmail.textContent = user.email || '';
@@ -237,6 +243,7 @@ const updateUI = (user) => {
             menuBtn.classList.add('btn-logout');
         }
     } else {
+        window.currentUserRole = 'visitor';
         if (avatar) avatar.src = 'assets/icons/icon-192.png';
         if (headerName) headerName.textContent = 'Invitado';
         if (headerRole) headerRole.textContent = 'Visitante';
@@ -251,18 +258,17 @@ const updateUI = (user) => {
         }
     }
 
-    // 3. Overlays de contenido protegido
-    ['galleryOverlay', 'videoOverlay', 'docsOverlay'].forEach(id => {
+    // 3. Overlays de contenido protegido - MODIFICADO: Galería pública
+    ['videoOverlay', 'docsOverlay'].forEach(id => { // galleryOverlay removed
         const el = getEl(id);
         if (el) {
-            if (id === 'galleryOverlay' && window.location.pathname.includes('gallery.html')) {
-                // Keep the relative overlay styling in gallery.html
-                el.style.display = user ? 'none' : 'flex';
-            } else {
-                el.style.display = user ? 'none' : 'flex';
-            }
+            el.style.display = user ? 'none' : 'flex';
         }
     });
+
+    // Explicitly hide gallery overlay if it exists (cleanup)
+    const galOverlay = getEl('galleryOverlay');
+    if (galOverlay) galOverlay.style.display = 'none';
 
     // 4. Nav de escritorio (legacy)
     const lBtn = getEl(uiIds.loginBtn);

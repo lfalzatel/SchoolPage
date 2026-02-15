@@ -1478,6 +1478,26 @@ section h2 {
   transition: all 0.3s ease;
 }
 
+.header-brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.header-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+  -webkit-text-fill-color: #10b981;
+}
+
+.header-subtitle {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 300;
+}
+
 .header-left {
   display: flex;
   align-items: center;
