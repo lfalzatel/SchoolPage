@@ -904,9 +904,11 @@ footer {
   width: 100%;
   background: white;
   box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
-  z-index: 2000;
+  z-index: 5000;
+  /* Increased to be above everything */
   padding: 10px 20px;
-  padding-bottom: calc(10px + env(safe-area-inset-bottom)); /* iOS safe area */
+  padding-bottom: env(safe-area-inset-bottom, 10px);
+  /* iOS safe area with fallback */
   justify-content: space-between;
   align-items: center;
   border-radius: 20px 20px 0 0;
@@ -1305,13 +1307,15 @@ footer {
   left: 0;
   width: 100%;
   height: 60px;
-  background: linear-gradient(135deg, #2E7D32, #388E3C); /* Verde marca */
+  background: linear-gradient(135deg, #2E7D32, #388E3C);
+  /* Verde marca */
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 1rem;
   box-shadow: 0 3px 15px rgba(0, 0, 0, 0.25);
-  z-index: 2500; /* Por encima del bottom-nav (z-index: 2000) */
+  z-index: 2500;
+  /* Por encima del bottom-nav (z-index: 2000) */
   transition: transform 0.3s ease;
 }
 
@@ -1331,7 +1335,8 @@ footer {
 .header-title {
   font-weight: 700;
   font-size: 1.1rem;
-  color: #ffffff; /* Blanco sobre fondo verde */
+  color: #ffffff;
+  /* Blanco sobre fondo verde */
   letter-spacing: -0.5px;
 }
 
@@ -1351,7 +1356,8 @@ footer {
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.6); /* Borde blanco semi-transparente */
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  /* Borde blanco semi-transparente */
   transition: border-color 0.2s;
 }
 
@@ -1479,6 +1485,7 @@ body {
     display: none;
   }
 }
+
 /* Fix: Dropdown hereda color blanco del header verde */
 .profile-dropdown .dropdown-item {
   color: #4b5563 !important;
