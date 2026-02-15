@@ -45,13 +45,20 @@ async function saveUserToFirestore(user) {
 //  LOGIN CON GOOGLE (Redirect — sin popup)
 // -----------------------------------------------------------
 export const loginWithGoogle = async () => {
+    console.log("Starting loginWithGoogle process...");
     try {
         // Guarda la URL actual para volver después del redirect
         sessionStorage.setItem('authRedirectFrom', window.location.href);
+
+        console.log("Calling signInWithRedirect with provider...");
+        // Alert temporal para depuración visual
+        // alert("Redirigiendo a Google... Por favor espera.");
+
         await signInWithRedirect(auth, provider);
-        // El navegador redirige a Google, la función no sigue aquí
+        console.log("signInWithRedirect called successfully.");
     } catch (error) {
-        console.error("Google Login failed:", error);
+        console.error("Google Login failed (in auth.js):", error.code, error.message);
+        alert("Fallo crítico al iniciar Google: " + error.message);
         throw error;
     }
 };
