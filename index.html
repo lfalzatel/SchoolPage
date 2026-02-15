@@ -236,11 +236,9 @@
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="auth.js"></script>
   <script type="module">
-    import { loadTimeline } from './timeline.js';
     import { loadActivities, loadVideos } from './gallery.js';
 
     // Expose to window for global access if needed (or use in module scope)
-    window.loadTimeline = loadTimeline;
     window.loadActivities = loadActivities;
     window.loadVideos = loadVideos;
   </script>
@@ -386,6 +384,23 @@
     <div id="view-cronograma" class="view-section">
       <section id="cronograma" class="relative-section">
         <h2><i class="fas fa-calendar-alt"></i> Cronograma de Actividades</h2>
+
+        <!-- Year Selector and Admin Controls for Cronograma -->
+        <div class="year-selector-container">
+          <div class="year-scroll" id="cronogramaYearTrack">
+            <button class="year-pill active" data-year="2025" onclick="filterCronogramaByYear('2025')">2025</button>
+            <button class="year-pill" data-year="2024" onclick="filterCronogramaByYear('2024')">2024</button>
+            <button class="year-pill" data-year="2023" onclick="filterCronogramaByYear('2023')">2023</button>
+          </div>
+
+          <div class="admin-controls" id="cronogramaAdminPanel" style="display: none;">
+            <button class="premium-action-btn" onclick="openUploadModal('event')"
+              style="padding: 6px 16px; font-size: 0.9rem;">
+              <i class="fas fa-plus-circle"></i> Nuevo
+            </button>
+          </div>
+        </div>
+
         <div id="timeline-container"></div>
       </section>
     </div>
@@ -399,8 +414,7 @@
         </div>
 
         <!-- Premium Year Selector — Sliding Track -->
-        <div class="year-selector-container"
-          style="display: flex; align-items: center; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <div class="year-selector-container">
           <div class="year-scroll" id="yearTrack">
             <button class="year-pill active" data-year="all">Todos</button>
             <button class="year-pill" data-year="2025">2025</button>
@@ -431,10 +445,21 @@
       <section id="video" class="relative-section">
         <h2><i class="fas fa-video"></i> Videos del Proyecto</h2>
 
-        <div class="admin-controls" style="display: none; text-align: center; margin-bottom: 2rem;">
-          <button class="cta-button" onclick="openUploadModal('video')">
-            <i class="fas fa-plus"></i> Nuevo Video
-          </button>
+        <!-- Year Selector and Admin Controls for Videos -->
+        <div class="year-selector-container">
+          <div class="year-scroll" id="videoYearTrack">
+            <button class="year-pill active" data-year="all" onclick="filterVideosByYear('all')">Todos</button>
+            <button class="year-pill" data-year="2025" onclick="filterVideosByYear('2025')">2025</button>
+            <button class="year-pill" data-year="2024" onclick="filterVideosByYear('2024')">2024</button>
+            <button class="year-pill" data-year="2023" onclick="filterVideosByYear('2023')">2023</button>
+          </div>
+
+          <div class="admin-controls" id="videoAdminPanel" style="display: none;">
+            <button class="premium-action-btn" onclick="openUploadModal('video')"
+              style="padding: 6px 16px; font-size: 0.9rem;">
+              <i class="fas fa-plus-circle"></i> Nuevo
+            </button>
+          </div>
         </div>
 
         <div id="videoOverlay" class="protected-overlay">
@@ -477,87 +502,39 @@
     </div>
 
     <!-- PROTECTED SECTION: Documentos -->
-    <div id="view-docs" class="view-section">
+    <!-- PROTECTED SECTION: Documentos -->
+    <div id="view-documentos" class="view-section" style="display: none;">
       <section id="documentos" class="relative-section">
         <h2><i class="fas fa-folder-open"></i> Documentos del Proyecto</h2>
         <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">Haz clic en un documento para visualizarlo
         </p>
 
-        <div id="docsOverlay" class="protected-overlay">
-          <h3><i class="fas fa-lock"></i> Contenido Protegido</h3>
-          <p>Solo los miembros registrados pueden acceder a la documentación oficial.</p>
-          <button class="btn-login overlay-login-btn"><i class="fab fa-google"></i> Iniciar Sesión</button>
+        <!-- Year Selector for Documents -->
+        <div class="year-selector-container">
+          <div class="year-scroll" id="docsYearSelector">
+            <button class="year-pill active" data-year="all" onclick="filterDocumentsByYear('all')">Todos</button>
+            <button class="year-pill" data-year="2025" onclick="filterDocumentsByYear('2025')">2025</button>
+            <button class="year-pill" data-year="2024" onclick="filterDocumentsByYear('2024')">2024</button>
+            <button class="year-pill" data-year="2023" onclick="filterDocumentsByYear('2023')">2023</button>
+          </div>
+
+          <div class="admin-controls" id="docsAdminPanel" style="display: none;">
+            <button class="premium-action-btn" onclick="openUploadModal('document')"
+              style="padding: 6px 16px; font-size: 0.9rem;">
+              <i class="fas fa-plus-circle"></i> Nuevo
+            </button>
+          </div>
         </div>
 
+
+
         <div class="documents-grid" id="documentsGrid">
-          <!-- Document cards will be populated here naturally, but are hidden/blurred via JS/CSS if not auth -->
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf')">
-            <i class="fas fa-certificate"></i>
-            <h4>Reconocimiento Oficial del grupo ambiental (GREEN FORCE) 2024</h4>
-          </div>
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.3. Solicitud de Autorización para Actividades Extracurriculares del Grupo Ambiental “Green Force” – Segundo Semestre 2024.pdf')">
-            <i class="fas fa-file-signature"></i>
-            <h4>Solicitud Autorización actividades Extracurriculares 2024</h4>
-          </div>
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.2. Informe 1 - Evaluación del Proyecto Ambiental Escolar (GREEN FORCE).pdf')">
-            <i class="fas fa-file-alt"></i>
-            <h4>Informe 1 - Actividades GREEN FORCE 2024</h4>
-          </div>
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.4. Informe 2 de Actividades del Grupo Ambiental.pdf')">
-            <i class="fas fa-file-alt"></i>
-            <h4>Informe 2 - Actividades GREEN FORCE 2024</h4>
-          </div>
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.8. Reconocimiento Oficial del Grupo Ambiental 2025.pdf')">
-            <i class="fas fa-image"></i>
-            <h4>Reconocimiento Oficial del Grupo Ambiental 2025</h4>
-          </div>
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.7. Propuesta educativa Fortaleciendo la Conciencia Ambiental a través de la Educación Experiencial en la Institución Educativa Barroblanco.pdf')">
-            <i class="fas fa-image"></i>
-            <h4>Propuesta educativa para el 2025</h4>
-          </div>
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.5. Poster 1 Fomento de la conciencia ambiental y desarrollo sostenible a través de la creación del grupo.pdf')">
-            <i class="fas fa-image"></i>
-            <h4>Poster Encuentro Regional marzo 2025</h4>
-          </div>
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.6. Poster 2 Semillero IE Barro Blanco Green Force 2025.pdf')">
-            <i class="fas fa-image"></i>
-            <h4>Poster Encuentro Departamental 7 mayo 2025</h4>
-          </div>
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.9. Carta Solicitud de Visita Educativa AGROSAVIA para la Semana del 12 al 16 de mayo de 2025.pdf')">
-            <i class="fas fa-image"></i>
-            <h4>Carta Solicitud de Visita Educativa AGROSAVIA mayo 2025</h4>
-          </div>
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.10. 6. Carta Solicitud de vinculación a prácticas ambientales y visitas pedagógicas CAM CORNARE.pdf')">
-            <i class="fas fa-image"></i>
-            <h4>Carta Solicitud de vinculación a prácticas ambientales junio 2025</h4>
-          </div>
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.11. 11. Carta Solicitud de pedagógica a la planta de tratamiento y participación en jornada de siembra de árboles.pdf')">
-            <i class="fas fa-image"></i>
-            <h4>Carta Solicitud de pedagógica a la planta de tratamiento ARSA agosto 2025</h4>
-          </div>
-          <div class="document-card"
-            onclick="openDocument('assets/documents/1.12. 12. Carta Solicitud de permiso para participación en evento académico de 22 al 26 de septiembre de 2025 en la UCO.pdf')">
-            <i class="fas fa-image"></i>
-            <h4>Carta Solicitud de permiso para participación evento UCO septiembre 2025</h4>
-          </div>
-          <div class="document-card" onclick="openDocument('assets/documents/1.13. Poster 3 Green force - ENISIS.pdf')">
-            <i class="fas fa-image"></i>
-            <h4>Poster 3 Encuentro Nacional de Investigación de Semilleros octubre 2025</h4>
-          </div>
+          <!-- Dynamic Documents will be loaded here -->
+          <p style="grid-column: 1/-1; text-align: center; color: #666;">Cargando documentos...</p>
         </div>
       </section>
     </div>
+
 
     <div class="view-section view-home active">
       <section id="contacto">
@@ -569,11 +546,7 @@
             <i class="fas fa-chalkboard-teacher"></i>
             <h3>Titular del Proyecto</h3>
             <p><strong>Luis Fernando Alzate López</strong></p>
-            <p><a
-                href="/cdn-cgi/l/email-protection#adc1d8c4de83ccc1d7ccd9c8edcfccdfdfc2cfc1ccc3cec283c8c9d883cec2"><span
-                  class="__cf_email__"
-                  data-cfemail="3458415d471a55584e55405174565546465b5658555a575b1a5150411a575b">[email&#160;protected]</span></a>
-            </p>
+            <p><a href="mailto:lfalzatel@gmail.com">lfalzatel@gmail.com</a></p>
             <p><i class="fas fa-phone"></i> +57 310 460 4592</p>
           </div>
 
@@ -581,11 +554,7 @@
             <i class="fas fa-user-graduate"></i>
             <h3>Líder Green Force</h3>
             <p><strong>Nicolas Gañan Bedoya</strong></p>
-            <p><a
-                href="/cdn-cgi/l/email-protection#d1bfb8b2bebdb0a2b6b0bfb0bfb391b3b0a3a3beb3bdb0bfb2beffb4b5a4ffb2be"><span
-                  class="__cf_email__"
-                  data-cfemail="2a44434945464b594d4b444b44486a484b58584548464b444945044f4e5f044945">[email&#160;protected]</span></a>
-            </p>
+            <p><a href="mailto:nico050529@gmail.com">nico050529@gmail.com</a></p>
             <p><i class="fas fa-phone"></i> +57 301 2625799</p>
           </div>
 
@@ -593,11 +562,7 @@
             <i class="fas fa-user-graduate"></i>
             <h3>Colíder Green Force</h3>
             <p><strong>Melissa Vargas Franco</strong></p>
-            <p><a
-                href="/cdn-cgi/l/email-protection#d6bbb3babfa5a5b7a0b7a4b1b7a5b096b4b7a4a4b9b4bab7b8b5b9f8b3b2a3f8b5b9"><span
-                  class="__cf_email__"
-                  data-cfemail="0b666e676278786a7d6a796c6a786d4b696a79796469676a656864256e6f7e256864">[email&#160;protected]</span></a>
-            </p>
+            <p><a href="mailto:melissavargasfranco2@gmail.com">melissavargasfranco2@gmail.com</a></p>
             <p><i class="fas fa-phone"></i> +57 323 3990232</p>
           </div>
         </div>
@@ -608,7 +573,7 @@
         <p>Rionegro, Antioquia - Colombia</p>
         <p class="footer-slogan">Somos GREEN FORCE - Sembrando futuro</p>
         <p><a href="mailto:greenforce2485@gmail.com">greenforce2485@gmail.com</a></p>
-        <p><a href="mailto:green.force@barroblanco.edu.co">green.force@barroblanco.edu.co</a></p>
+        <p><a href="mailto:luis.alzate@barroblanco.edu.co">green.force@barroblanco.edu.co</a></p>
       </footer>
     </div>
   </div>
@@ -773,6 +738,19 @@
             </div>
           </div>
 
+          <div id="documentFields" style="display: none;">
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Archivo (PDF, Word, Excel)</label>
+              <input type="file" id="uploadDocumentFile" accept=".pdf,.doc,.docx,.xls,.xlsx"
+                style="width: 100%; padding: 0.8rem; border-radius: 5px; border: none; background: #333; color: white;">
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+              <label style="display: block; margin-bottom: 0.5rem; color: #ccc;">Imagen de Fondo (Opcional)</label>
+              <input type="file" id="uploadDocumentImage" accept="image/*"
+                style="width: 100%; padding: 0.8rem; border-radius: 5px; border: none; background: #333; color: white;">
+            </div>
+          </div>
+
           <button type="submit" class="cta-button" style="width: 100%; justify-content: center; margin-top: 1rem;">
             <i class="fas fa-save"></i> Guardar
           </button>
@@ -856,7 +834,6 @@
     });
   </script>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
   <script>
     // --- PWA Installation Logic ---
     let deferredPrompt;
@@ -897,7 +874,6 @@
   <script type="module">
     // --- IMPORTS ---
     import { loadActivities, loadVideos, createActivity, filterActivitiesByDate } from './gallery.js';
-    import { loadTimeline } from './timeline.js';
     import { auth } from './auth.js';
 
     // --- GLOBAL VARIABLES ---
@@ -1201,6 +1177,7 @@
     // Flags para carga perezosa (lazy load) — evita recargar al volver a la sección
     let _activitiesLoaded = false;
     let _videosLoaded = false;
+    let _documentsLoaded = false;
 
     // --- Navigation Logic ---
     function showView(viewName) {
@@ -1243,6 +1220,13 @@
             }
           }
 
+          if (viewName === 'documentos' && !_documentsLoaded) {
+            if (window.loadDocuments) {
+              window.loadDocuments();
+              _documentsLoaded = true;
+            }
+          }
+
         } else {
           console.warn("View not found:", viewName);
           showView('home');
@@ -1272,29 +1256,7 @@
     window.showView = showView;
     window.scrollToSection = scrollToSection;
 
-    // Enhanced Navigation Handler (Mobile + Desktop)
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', function (e) {
-        e.preventDefault();
-        const href = this.getAttribute('href').substring(1);
-
-        // Map specific sections to Views
-        if (['galeria', 'video', 'documentos', 'cronograma'].includes(href)) {
-          showView(href);
-        } else if (href === 'sobre') {
-          showView('home');
-        } else {
-          // For sections inside Home (e.g., #contacto, #siguenos)
-          if (!document.querySelector('.view-home.active')) {
-            showView('home');
-            // Wait for view to activate then scroll
-            setTimeout(() => scrollToSection(href), 100);
-          } else {
-            scrollToSection(href);
-          }
-        }
-      });
-    });
+    // Navigation logic moved to DOMContentLoaded
 
     // Handle Deep Links on Load
     window.addEventListener('load', () => {
@@ -1310,18 +1272,44 @@
       try {
         // Solo carga el timeline al hacer login.
         // Actividades y videos se cargan solo cuando el usuario navega a esa sección.
-        if (typeof loadTimeline === 'function') await loadTimeline();
+        if (typeof loadCronograma === 'function') await loadCronograma();
       } catch (error) {
         console.error("Error loading secure content:", error);
       }
     };
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Enhanced Navigation Handler (Mobile + Desktop)
+      // Moved inside DOMContentLoaded to ensure elements exist
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          const href = this.getAttribute('href').substring(1);
+
+          // Map specific sections to Views
+          if (['galeria', 'video', 'documentos', 'cronograma'].includes(href)) {
+            showView(href);
+          } else if (href === 'sobre') {
+            showView('home');
+          } else {
+            // For sections inside Home (e.g., #contacto, #siguenos)
+            if (!document.querySelector('.view-home.active')) {
+              showView('home');
+              // Wait for view to activate then scroll
+              setTimeout(() => scrollToSection(href), 100);
+            } else {
+              scrollToSection(href);
+            }
+          }
+        });
+      });
+
       // Check for hash
       const hash = window.location.hash.substring(1);
       if (hash && ['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
         showView(hash);
       } else {
+        // Default to home if no valid hash
         showView('home');
       }
     });

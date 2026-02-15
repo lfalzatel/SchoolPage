@@ -40,5 +40,11 @@ service cloud.firestore {
       allow read: if true; // Public videos
       allow create, update, delete: if isAdmin();
     }
+
+    // --- DOCUMENTS Collection ---
+    match /documents/{documentId} {
+      allow read: if true; // Public documents
+      allow create, update, delete: if isAdmin();
+    }
   }
 }

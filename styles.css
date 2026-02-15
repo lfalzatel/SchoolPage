@@ -702,34 +702,83 @@ section h2::after {
   border-left: 5px solid #059669;
   position: relative;
   overflow: hidden;
+  transition: all 0.4s ease;
+  min-height: 200px;
+  /* Ensure height for bg image */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
-.document-card::before {
-  content: '';
+.document-card.has-bg {
+  border-left: none;
+  /* Remove border if bg image exists */
+  color: white;
+}
+
+.document-card.has-bg .doc-info h4,
+.document-card.has-bg .doc-year,
+.document-card.has-bg i {
+  color: white !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  position: relative;
+  z-index: 2;
+}
+
+.document-card .doc-overlay {
   position: absolute;
   top: 0;
-  left: -100%;
+  left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(5, 150, 105, 0.2), transparent);
-  transition: left 0.6s ease;
+  background: rgba(0, 0, 0, 0.5);
+  /* Dark overlay */
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.document-card:hover::before {
-  left: 100%;
+.document-card.has-bg .doc-overlay {
+  opacity: 1;
+  /* Always show overlay if bg image exists */
+}
+
+.document-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .document-card i {
   color: #059669;
-  font-size: 2.5rem;
+  font-size: 3rem;
   margin-bottom: 1rem;
   display: block;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+
+.document-card:hover i {
+  transform: scale(1.1);
 }
 
 .document-card h4 {
   color: #065f46;
   font-size: 1.1rem;
   font-weight: 600;
+  position: relative;
+  z-index: 2;
+}
+
+.doc-year {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #6b7280;
+  position: relative;
+  z-index: 2;
 }
 
 /* Social Section */
@@ -2370,8 +2419,11 @@ body.dark-mode .hero-tagline,
 /* ── Year Selector: Sliding Track ── */
 .year-selector-container {
   display: flex;
+  align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .year-scroll {
@@ -2419,7 +2471,7 @@ body.dark-mode .hero-tagline,
   font-size: 0.78rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.4);
-  padding: 7px 16px;
+  padding: 6px 14px;
   border-radius: 40px;
   transition: color 0.25s ease;
   white-space: nowrap;
@@ -2437,9 +2489,130 @@ body.dark-mode .hero-tagline,
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
-@media (max-width: 480px) {
-  .year-pill {
-    font-size: 0.72rem;
-    padding: 6px 12px;
+
+/* --- View Visibility Logic --- */
+.view-section {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.view-section.active {
+  display: block;
+  opacity: 1;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Document Card Styles */
+.document-card {
+  position: relative;
+  background: #1f2937;
+  /* Fallback color */
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  aspect-ratio: 4/3;
+  /* Adjusted from 3/4 to be less tall */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.document-card.has-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.1) 100%);
+  z-index: 1;
+}
+
+.document-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.doc-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  transition: background 0.3s;
+}
+
+.document-card:hover .doc-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.doc-icon-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.doc-info {
+  position: relative;
+  z-index: 2;
+  color: white;
+  text-align: center;
+}
+
+.doc-info h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.doc-year {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  backdrop-filter: blur(4px);
+}
+
+.delete-btn-doc {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(220, 38, 38, 0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.2s;
+}
+
+.delete-btn-doc:hover {
+  background: rgba(220, 38, 38, 1);
 }
