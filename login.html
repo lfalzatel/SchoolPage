@@ -539,9 +539,10 @@
             if (confirm(`¿Crear usuario de prueba?\nEmail: ${email}\nPass: ${password}`)) {
                 try {
                     console.log("Registering test user...");
-                    await registerWithEmail(email, password, name);
-                    alert("Usuario creado! Iniciando sesión...");
-                    window.location.href = 'index.html';
+                    const user = await registerWithEmail(email, password, name);
+                    console.log("Test user created:", user);
+                    // Alert removed to prevent blocking execution. 
+                    // onAuthStateChanged will handle the redirect.
                 } catch (err) {
                     console.error("Registration Error:", err);
                     alert("Error: " + err.message);

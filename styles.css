@@ -1657,6 +1657,24 @@ section h2 {
   color: white;
 }
 
+/* Specific Footer Color Fix */
+.dropdown-footer p,
+.dropdown-footer span,
+.dropdown-footer a,
+.dropdown-footer div {
+  color: #ffffff !important;
+}
+
+/* Ensure Bottom Nav is visible on mobile */
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 9999 !important;
+  }
+}
+
 .bg-blue {
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
 }
