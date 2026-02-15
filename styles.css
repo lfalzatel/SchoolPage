@@ -10,6 +10,12 @@
   --danger-hover: #991b1b;
   --gradient-main: linear-gradient(135deg, rgba(5, 150, 105, 0.95), rgba(4, 120, 87, 0.9));
   --font-main: 'Poppins', sans-serif;
+
+  /* Glassmorphism Design Tokens */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --glass-blur: blur(12px);
 }
 
 * {
@@ -894,48 +900,76 @@ footer {
   opacity: 0;
 }
 
-/* Bottom Navigation */
+/* Bottom Navigation - Premium Floating Glassmorphism Style */
 .bottom-nav {
   display: none;
   /* Hidden on desktop */
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: white;
-  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+  bottom: 25px;
+  /* Floating from bottom */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 450px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 50px;
+  /* Fully rounded capsule */
   z-index: 5000;
-  /* Increased to be above everything */
-  padding: 10px 20px;
-  padding-bottom: env(safe-area-inset-bottom, 10px);
-  /* iOS safe area with fallback */
-  justify-content: space-between;
+  padding: 8px 15px;
+  justify-content: space-around;
   align-items: center;
-  border-radius: 20px 20px 0 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #9ca3af;
+  color: #64748b;
+  /* Sleek slate gray */
   text-decoration: none;
-  font-size: 0.75rem;
-  gap: 5px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  gap: 2px;
   transition: all 0.3s ease;
+  padding: 8px;
+  border-radius: 20px;
+  flex: 1;
 }
 
 .nav-item i {
-  font-size: 1.4rem;
-  margin-bottom: 2px;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .nav-item.active {
-  color: #059669;
+  color: var(--primary);
 }
 
 .nav-item.active i {
-  transform: translateY(-5px);
+  transform: translateY(-4px) scale(1.1);
+  color: var(--primary);
+}
+
+.nav-item.active span {
+  font-weight: 700;
+  transform: scale(1.05);
+}
+
+/* Specific styling for the Active indicator (optional, but looks premium) */
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  background: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--primary);
 }
 
 /* Mobile Responsiveness */
