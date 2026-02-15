@@ -230,7 +230,12 @@ const updateUI = (user) => {
 
         if (menuName) menuName.textContent = user.displayName || 'Usuario';
         if (menuEmail) menuEmail.textContent = user.email || '';
-        if (menuBtn) menuBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>';
+
+        if (menuBtn) {
+            menuBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>';
+            menuBtn.classList.remove('btn-login');
+            menuBtn.classList.add('btn-logout');
+        }
     } else {
         if (avatar) avatar.src = 'assets/icons/icon-192.png';
         if (headerName) headerName.textContent = 'Invitado';
@@ -238,7 +243,12 @@ const updateUI = (user) => {
 
         if (menuName) menuName.textContent = 'Invitado';
         if (menuEmail) menuEmail.textContent = 'Inicia sesión para acceder';
-        if (menuBtn) menuBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Iniciar Sesión</span>';
+
+        if (menuBtn) {
+            menuBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Iniciar Sesión</span>';
+            menuBtn.classList.remove('btn-logout');
+            menuBtn.classList.add('btn-login');
+        }
     }
 
     // 3. Overlays de contenido protegido

@@ -1716,25 +1716,48 @@ footer a:hover {
   color: var(--accent) !important;
 }
 
+/* High Contrast Login/Logout Buttons */
 .logout-pill-btn {
   width: 100%;
   padding: 12px;
   border-radius: 14px;
   border: none;
-  background: #fee2e2;
-  color: #b91c1c;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Default fallback */
+  background: #f3f4f6;
+  color: #374151;
 }
 
-.logout-pill-btn:hover {
-  background: #fecaca;
-  transform: scale(0.98);
+.btn-login {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(16, 185, 129, 0.5);
+  filter: brightness(1.1);
+}
+
+.btn-logout {
+  background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+}
+
+.btn-logout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.5);
+  filter: brightness(1.1);
 }
 
 /* Layout Adjustments */
