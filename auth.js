@@ -231,7 +231,7 @@ const updateUI = (user) => {
         window.currentUserRole = uniqueRole; // Set global for gallery.js
 
         // Display Role
-        const roleDisplay = uniqueRole === 'admin' ? 'Administrador' : 'Miembro';
+        const roleDisplay = uniqueRole === 'admin' ? 'Admin' : 'Miembro';
         if (headerRole) headerRole.textContent = roleDisplay;
 
         if (menuName) menuName.textContent = user.displayName || 'Usuario';

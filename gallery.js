@@ -1110,7 +1110,9 @@ window.filterActivitiesByYear = (year) => {
         ? window.currentGalleryActivities
         : window.currentGalleryActivities.filter(act => (act.year || '').toString() === year);
 
-    renderActivityCards(filtered, 'galleryGridFull'); // Ensure we target the correct grid
+    // Determine valid grid ID
+    const targetId = document.getElementById('activitiesGrid') ? 'activitiesGrid' : 'galleryGridFull';
+    renderActivityCards(filtered, targetId);
 };
 
 function setupYearSelector() {
@@ -1132,13 +1134,13 @@ async function initGallery() {
     setupYearSelector();
 
     // 2. Load Data
-    // We target 'galleryGridFull' which is the ID in gallery.html
-    await loadActivities('galleryGridFull');
+    // We target 'activitiesGrid' which is the ID in index.html
+    await loadActivities('activitiesGrid');
 
-    // 3. Load Videos if element exists (it might not in this specific gallery view if separated)
-    if (document.getElementById('videosGrid')) {
-        loadVideos();
-    }
+    // 3. Load Videos logic is now handled by SPA navigation in index.html to avoid conflicts
+    // if (document.getElementById('videosGrid')) {
+    //    loadVideos();
+    // }
 
     // 4. Update Admin UI based on role (needs auth state, so might delay or rely on onAuthStateChanged)
     // auth.js handles onAuthStateChanged which calls updateUI, we can hook into that or just check here
@@ -1150,3 +1152,51 @@ document.addEventListener('DOMContentLoaded', initGallery);
 
 // Also export for manual debugging
 export { initGallery };
+
+// ── Year Selector Initialization ──
+export function initYearSelector() {
+    const track = document.getElementById('yearTrack');
+    if (!track) return;
+
+    const pills = track.querySelectorAll('.year-pill');
+
+    function updateTrack(activePill) {
+        pills.forEach(p => p.classList.remove('active'));
+        activePill.classList.add('active');
+
+        const trackRect = track.getBoundingClientRect();
+        const pillRect = activePill.getBoundingClientRect();
+
+        track.style.setProperty('--pill-x', (pillRect.left - trackRect.left - 4) + 'px');
+        track.style.setProperty('--pill-w', pillRect.width + 'px');
+
+        // Filter Content
+        const year = activePill.dataset.year;
+        // Check if filter function exists
+        if (window.filterActivitiesByYear) {
+            window.filterActivitiesByYear(year);
+        } else {
+            // Fallback or load if data not ready
+            window.loadActivities('activitiesGrid');
+        }
+    }
+
+    // Initialize logic
+    pills.forEach(pill => {
+        // Remove old listeners to prevent duplicates if re-initialized
+        const newPill = pill.cloneNode(true);
+        pill.parentNode.replaceChild(newPill, pill);
+        newPill.addEventListener('click', () => updateTrack(newPill));
+    });
+
+    // Set initial state
+    const defaultActive = track.querySelector('.year-pill.active');
+    if (defaultActive) {
+        // Use setTimeout to ensure styles are applied
+        setTimeout(() => updateTrack(defaultActive), 100);
+    }
+}
+
+window.initYearSelector = initYearSelector;
+
+window.loadActivities = loadActivities;

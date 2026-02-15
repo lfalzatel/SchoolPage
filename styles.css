@@ -470,7 +470,7 @@ nav {
 
 /* Sections */
 section {
-  max-width: 1200px;
+  max-width: 90%;
   margin: 3rem auto;
   padding: 3rem 2rem;
   /* background: white; */
@@ -525,8 +525,8 @@ section h2::after {
 .contact-card {
   /* background: white; */
   background: rgba(0, 0, 0, 0.4) !important;
-    backdrop-filter: blur(0.2px);
-    -webkit-backdrop-filter: blur(10px);  
+  backdrop-filter: blur(0.2px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 5px 20px rgba(249, 245, 245, 0.1);
@@ -1168,7 +1168,7 @@ body {
 
 /* Adjust Sections */
 section {
-  padding: 2rem 1rem;
+  padding: 1rem 1rem;
   margin: 1rem auto;
   border-radius: 15px;
 }
@@ -1514,10 +1514,10 @@ section h2 {
   left: 0;
   width: 100%;
   height: 70px;
-  background: rgba(6, 78, 59, 0.95);
+  background: rgba(6, 78, 59, 0.7);
   /* Verde Esmeralda Muy Oscuro */
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2291,3 +2291,155 @@ body.dark-mode .hero-tagline,
 
 
 /* End of styles.css */
+/* --- GALLERY STYLES IMPORTED FROM gallery.html --- */
+.gallery-manage-container {
+  max-width: 1200px;
+  margin: 100px auto 40px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(0.5px);
+  -webkit-backdrop-filter: blur(0.5px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  min-height: 80vh;
+}
+
+.gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.gallery-header h1 {
+  font-size: 2rem;
+  background: linear-gradient(135deg, #a3e635, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #a3e635, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.back-btn:hover {
+  background: linear-gradient(135deg, #a3e635, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transform: scale(1.1);
+  transition: all 0.2s ease-in-out;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+#galleryGridFull {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-secondary);
+}
+
+.empty-state i {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.2;
+}
+
+/* ── Year Selector: Sliding Track ── */
+/* ── Year Selector: Sliding Track ── */
+.year-selector-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.year-scroll {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50px;
+  padding: 4px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Indicador deslizante */
+.year-scroll::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  height: calc(100% - 8px);
+  width: var(--pill-w, 70px);
+  transform: translateX(var(--pill-x, 0px));
+  background: linear-gradient(135deg, var(--primary, #10b981), #059669);
+  border-radius: 40px;
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow:
+    0 3px 12px rgba(16, 185, 129, 0.35),
+    0 0 0 1px rgba(16, 185, 129, 0.2);
+  z-index: 0;
+}
+
+.year-pill {
+  position: relative;
+  z-index: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-main, 'Poppins', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 7px 16px;
+  border-radius: 40px;
+  transition: color 0.25s ease;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.year-pill:hover:not(.active) {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.year-pill.active {
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 480px) {
+  .year-pill {
+    font-size: 0.72rem;
+    padding: 6px 12px;
+  }
+}

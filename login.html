@@ -25,8 +25,8 @@
             justify-content: center;
             margin: 0;
             padding: 1rem;
-            overflow: hidden;
-            position: relative;
+            overflow-y: auto;
+            /* Allow vertical scrolling if content overflows */
         }
 
         /* Slideshow background system */
@@ -77,110 +77,133 @@
             background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('assets/images/10.%20Reforestaci%C3%B3n%20institucional%20-%204.jpg');
         }
 
+        /* ===== ANIMACIÓN ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            color: #333;
-            padding: 1.5rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 380px;
+            background: rgba(255, 255, 255, 0.3);
+            color: #f5f3f3;
+            width: 340px;
+            /* User suggested width */
+            max-width: 90%;
+            /* Responsive fallback */
+            padding: 30px 28px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             text-align: center;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.6s ease;
         }
 
         .dark-mode .login-container {
-            background: rgba(245, 245, 245, 0.95);
-            color: #1a1a1a;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            background: rgba(30, 30, 30, 0.3);
+            color: #ddd;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
         .login-logo img {
             width: 80px;
-            /* Reduced size */
             height: 80px;
             object-fit: contain;
             border-radius: 50%;
             margin-bottom: 0.5rem;
-            /* Reduced margin */
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .login-title {
-            color: var(--primary-color);
+            color: #333;
             margin-bottom: 0.5rem;
-            font-weight: 700;
+            font-weight: 600;
+        }
+
+        .dark-mode .login-title {
+            color: #fff;
         }
 
         .login-subtitle {
-            color: #444;
-            /* Darker for better contrast in light mode */
-            margin-bottom: 1.2rem;
-            /* Reduced margin */
+            color: #c8c6c6;
+            margin-bottom: 1.0rem;
             font-size: 0.85rem;
         }
 
         .dark-mode .login-subtitle {
-            color: #555;
+            color: #aaa;
         }
 
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 14px;
             text-align: left;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
+            margin-bottom: 5px;
+            font-size: 13px;
             font-weight: 600;
-            color: #444;
+            color: #666;
         }
 
         .dark-mode .form-group label {
-            color: #333;
+            color: #ccc;
         }
 
         .form-input {
             width: 100%;
-            padding: 0.8rem 1rem;
-            border: 2px solid #ddd;
+            padding: 11px 12px;
             border-radius: 10px;
+            border: 1px solid #e3e3e3;
+            outline: none;
+            transition: all 0.25s ease;
+            font-size: 14px;
             font-family: 'Poppins', sans-serif;
-            transition: border-color 0.3s;
         }
 
         .form-input:focus {
-            border-color: var(--primary-color);
-            outline: none;
+            border-color: #6f42c1;
+            box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15);
         }
 
         .dark-mode .form-input {
-            background: #fff;
-            border-color: #ccc;
-            color: #333;
+            background: #2b2b2b;
+            border-color: #444;
+            color: #fff;
         }
 
         .dark-mode .form-input::placeholder {
-            color: #999;
+            color: #888;
         }
 
         .btn-submit {
             width: 100%;
-            padding: 1rem;
-            background: var(--primary-color);
-            color: white;
+            padding: 12px;
+            border-radius: 12px;
             border: none;
-            border-radius: 10px;
+            background: linear-gradient(135deg, #007bff, #6f42c1);
+            color: white;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+            transition: all 0.3s ease;
             margin-top: 1rem;
         }
 
         .btn-submit:hover {
-            background: var(--secondary-color);
             transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(111, 66, 193, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.97);
         }
 
         .divider {
@@ -188,7 +211,7 @@
             /* Reduced margin */
             display: flex;
             align-items: center;
-            color: #333;
+            color: #fdf9f9;
             font-size: 0.85rem;
         }
 

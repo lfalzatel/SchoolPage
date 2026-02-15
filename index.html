@@ -22,6 +22,11 @@
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
 
+  <!-- Scripts -->
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="auth.js"></script>
+  <script type="module" src="gallery.js"></script>
+
   <!-- PDF Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -61,6 +66,168 @@
       justify-content: center;
       align-items: center;
       z-index: 9999;
+    }
+
+    /* ✅ Modal overlay para #eventModal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 6000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-container-premium {
+      background: #1a1a1a;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .modal-header-premium {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .modal-header-premium h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .close-modal:hover {
+      color: #fff;
+    }
+
+    .form-grid-premium {
+      display: grid;
+      gap: 1rem;
+      padding: 1.5rem 2rem;
+    }
+
+    .form-group-premium {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group-premium.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-group-premium label {
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .form-group-premium input,
+    .form-group-premium textarea {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group-premium input:focus,
+    .form-group-premium textarea:focus {
+      border-color: var(--primary, #10b981);
+    }
+
+    .drop-zone-premium {
+      border: 1.5px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.4);
+      transition: border-color 0.2s, background 0.2s;
+      font-size: 0.85rem;
+    }
+
+    .drop-zone-premium:hover {
+      border-color: var(--primary, #10b981);
+      background: rgba(16, 185, 129, 0.05);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .drop-zone-premium i {
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .modal-actions-premium {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 1rem 2rem 1.5rem;
+    }
+
+    .btn-cancel {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      transition: all 0.2s;
+    }
+
+    .btn-cancel:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .btn-save-premium {
+      background: linear-gradient(135deg, var(--primary, #10b981), #059669);
+      border: none;
+      color: #fff;
+      padding: 10px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-save-premium:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
     }
   </style>
 
@@ -116,7 +283,7 @@
 
 
             <div class="dropdown-menu-list">
-              <a href="gallery.html" class="menu-item">
+              <a href="#galeria" class="menu-item">
                 <div class="menu-item-icon bg-blue"><i class="fas fa-images"></i></div>
                 <span>Gestionar Galería</span>
                 <i class="fas fa-chevron-right arrow-link"></i>
@@ -227,16 +394,24 @@
     <div id="view-galeria" class="view-section">
       <section id="galeria" class="relative-section">
         <h2><i class="fas fa-camera"></i> Galería de Actividades</h2>
+        <div>
+          <p>Momentos capturados sembrando futuro.</p>
+        </div>
 
-        <div class="gallery-controls-premium">
-          <div class="date-filter-wrapper">
-            <i class="fas fa-calendar-day"></i>
-            <input type="date" id="galleryDateFilter" class="premium-date-input">
+        <!-- Premium Year Selector — Sliding Track -->
+        <div class="year-selector-container"
+          style="display: flex; align-items: center; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <div class="year-scroll" id="yearTrack">
+            <button class="year-pill active" data-year="all">Todos</button>
+            <button class="year-pill" data-year="2025">2025</button>
+            <button class="year-pill" data-year="2024">2024</button>
+            <button class="year-pill" data-year="2023">2023</button>
           </div>
 
-          <div class="admin-controls" style="display: none;">
-            <button class="premium-action-btn" onclick="openEventModal()">
-              <i class="fas fa-plus-circle"></i> Crear Evento
+          <div class="admin-controls" id="galleryAdminPanel" style="display: none;">
+            <button class="premium-action-btn" onclick="openUploadModal('activity')"
+              style="padding: 6px 16px; font-size: 0.9rem;">
+              <i class="fas fa-plus-circle"></i> Nuevo
             </button>
           </div>
         </div>
@@ -394,7 +569,11 @@
             <i class="fas fa-chalkboard-teacher"></i>
             <h3>Titular del Proyecto</h3>
             <p><strong>Luis Fernando Alzate López</strong></p>
-            <p><a href="mailto:luis.alzate@barroblanco.edu.co">luis.alzate@barroblanco.edu.co</a></p>
+            <p><a
+                href="/cdn-cgi/l/email-protection#adc1d8c4de83ccc1d7ccd9c8edcfccdfdfc2cfc1ccc3cec283c8c9d883cec2"><span
+                  class="__cf_email__"
+                  data-cfemail="3458415d471a55584e55405174565546465b5658555a575b1a5150411a575b">[email&#160;protected]</span></a>
+            </p>
             <p><i class="fas fa-phone"></i> +57 310 460 4592</p>
           </div>
 
@@ -402,7 +581,11 @@
             <i class="fas fa-user-graduate"></i>
             <h3>Líder Green Force</h3>
             <p><strong>Nicolas Gañan Bedoya</strong></p>
-            <p><a href="mailto:nicolasgananb@barroblanco.edu.co">nicolasgananb@barroblanco.edu.co</a></p>
+            <p><a
+                href="/cdn-cgi/l/email-protection#d1bfb8b2bebdb0a2b6b0bfb0bfb391b3b0a3a3beb3bdb0bfb2beffb4b5a4ffb2be"><span
+                  class="__cf_email__"
+                  data-cfemail="2a44434945464b594d4b444b44486a484b58584548464b444945044f4e5f044945">[email&#160;protected]</span></a>
+            </p>
             <p><i class="fas fa-phone"></i> +57 301 2625799</p>
           </div>
 
@@ -410,7 +593,11 @@
             <i class="fas fa-user-graduate"></i>
             <h3>Colíder Green Force</h3>
             <p><strong>Melissa Vargas Franco</strong></p>
-            <p><a href="mailto:melissavargasf@barroblanco.edu.co">melissavargasf@barroblanco.edu.co</a></p>
+            <p><a
+                href="/cdn-cgi/l/email-protection#d6bbb3babfa5a5b7a0b7a4b1b7a5b096b4b7a4a4b9b4bab7b8b5b9f8b3b2a3f8b5b9"><span
+                  class="__cf_email__"
+                  data-cfemail="0b666e676278786a7d6a796c6a786d4b696a79796469676a656864256e6f7e256864">[email&#160;protected]</span></a>
+            </p>
             <p><i class="fas fa-phone"></i> +57 323 3990232</p>
           </div>
         </div>
@@ -424,6 +611,35 @@
         <p><a href="mailto:green.force@barroblanco.edu.co">green.force@barroblanco.edu.co</a></p>
       </footer>
     </div>
+  </div>
+
+  <!-- VIEW: GALERÍA (Migrated from gallery.html) -->
+  <div id="view-galeria" class="view-section" style="display: none;">
+    <main class="gallery-manage-container">
+      <div class="gallery-header">
+        <div>
+          <h1>Explora nuestras Actividades</h1>
+          <p>Momentos capturados sembrando futuro.</p>
+        </div>
+
+        <!-- Year Selector -->
+        <div class="year-selector-container">
+          <div class="year-scroll" id="yearTrack">
+            <button class="year-pill active" data-year="all">Todos</button>
+            <button class="year-pill" data-year="2025">2025</button>
+            <button class="year-pill" data-year="2024">2024</button>
+            <button class="year-pill" data-year="2023">2023</button>
+          </div>
+        </div>
+
+        <!-- Admin Actions (FAB handles this, but keeping container for potential use or legacy) -->
+        <div class="admin-actions" id="galleryAdminPanel" style="display: none;"></div>
+      </div>
+
+      <div id="galleryGridFull">
+        <!-- Events loaded here -->
+      </div>
+    </main>
   </div>
 
   <div id="documentModal" class="modal">
@@ -562,485 +778,578 @@
           </button>
         </form>
       </div>
-      <!-- MODAL: Crear Evento Premium -->
-      <div id="eventModal" class="modal-overlay">
-        <div class="modal-container-premium">
-          <div class="modal-header-premium">
-            <h3><i class="fas fa-plus-circle"></i> Nuevo Evento</h3>
-            <button class="close-modal" onclick="closeEventModal()">&times;</button>
-          </div>
-          <div class="modal-body">
-            <form id="eventForm" onsubmit="handleEventSubmit(event)">
-              <div class="form-grid-premium">
-                <div class="form-group-premium">
-                  <label><i class="fas fa-tag"></i> Título del Evento</label>
-                  <input type="text" id="eventTitle" placeholder="Ej: Jornada de Reforestación" required>
-                </div>
-                <div class="form-group-premium">
-                  <label><i class="fas fa-calendar-alt"></i> Fecha</label>
-                  <input type="date" id="eventDate" required>
-                </div>
-                <div class="form-group-premium full-width">
-                  <label><i class="fas fa-sticky-note"></i> Notas / Descripción</label>
-                  <textarea id="eventNotes" placeholder="Detalles sobre la actividad..." rows="4"></textarea>
-                </div>
-                <div class="form-group-premium full-width">
-                  <label><i class="fas fa-images"></i> Cargar Fotos</label>
-                  <div class="drop-zone-premium" onclick="document.getElementById('eventPhotos').click()">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <span>Arrastra o haz clic para subir imágenes</span>
-                    <input type="file" id="eventPhotos" accept="image/*" multiple style="display: none;"
-                      onchange="updatePhotoCount()">
-                    <p id="photoCount"
-                      style="margin-top: 5px; font-size: 0.8rem; color: var(--primary); font-weight: 600;"></p>
-                  </div>
-                </div>
+    </div>
+  </div><!-- ✅ cierra #uploadModal -->
+
+  <!-- MODAL: Crear Evento Premium — FUERA de uploadModal -->
+  <div id="eventModal" class="modal-overlay">
+    <div class="modal-container-premium">
+      <div class="modal-header-premium">
+        <h3><i class="fas fa-plus-circle"></i> Nuevo Evento</h3>
+        <button class="close-modal" onclick="closeEventModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="eventForm" onsubmit="handleEventSubmit(event)">
+          <div class="form-grid-premium">
+            <div class="form-group-premium">
+              <label><i class="fas fa-tag"></i> Título del Evento</label>
+              <input type="text" id="eventTitle" placeholder="Ej: Jornada de Reforestación" required>
+            </div>
+            <div class="form-group-premium">
+              <label><i class="fas fa-calendar-alt"></i> Fecha</label>
+              <input type="date" id="eventDate" required>
+            </div>
+            <div class="form-group-premium full-width">
+              <label><i class="fas fa-sticky-note"></i> Notas / Descripción</label>
+              <textarea id="eventNotes" placeholder="Detalles sobre la actividad..." rows="4"></textarea>
+            </div>
+            <div class="form-group-premium full-width">
+              <label><i class="fas fa-images"></i> Cargar Fotos</label>
+              <div class="drop-zone-premium" onclick="document.getElementById('eventPhotos').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Arrastra o haz clic para subir imágenes</span>
+                <input type="file" id="eventPhotos" accept="image/*" multiple style="display: none;"
+                  onchange="updatePhotoCount()">
+                <p id="photoCount" style="margin-top: 5px; font-size: 0.8rem; color: var(--primary); font-weight: 600;">
+                </p>
               </div>
-              <div class="modal-actions-premium">
-                <button type="button" class="btn-cancel" onclick="closeEventModal()">Cancelar</button>
-                <button type="submit" class="btn-save-premium">
-                  <i class="fas fa-check"></i> Publicar Evento
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
-        </div>
+          <div class="modal-actions-premium">
+            <button type="button" class="btn-cancel" onclick="closeEventModal()">Cancelar</button>
+            <button type="submit" class="btn-save-premium">
+              <i class="fas fa-check"></i> Publicar Evento
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-    </div><!-- ✅ cierra #uploadModal -->
+  </div>
 
-    <div class="fab" onclick="scrollToSection('sobre')">
-      <i class="fas fa-arrow-up"></i>
-    </div>
+  <div class="fab" onclick="scrollToSection('sobre')">
+    <i class="fas fa-arrow-up"></i>
+  </div>
+  <script type="module">
+    import { initBackgroundSlideshow } from './gallery.js';
+    import { auth } from './auth.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
+    document.addEventListener('DOMContentLoaded', () => {
+      initBackgroundSlideshow();
 
-    <script>
-      // --- PWA Installation Logic ---
-      let deferredPrompt;
+      onAuthStateChanged(auth, (user) => {
+        const adminPanel = document.getElementById('galleryAdminPanel');
+        const overlay = document.getElementById('galleryOverlay');
 
-      // Service Worker Registration
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('SW registered!', reg))
-            .catch(err => console.error('SW registration failed', err));
-        });
-      }
-
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const installBtn = document.getElementById('installAppBtn');
-        if (installBtn) installBtn.style.display = 'flex';
-        console.log('beforeinstallprompt fired');
-      });
-
-      async function installPWA() {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
-        deferredPrompt = null;
-        document.getElementById('installAppBtn').style.display = 'none';
-      }
-
-      window.addEventListener('appinstalled', () => {
-        document.getElementById('installAppBtn').style.display = 'none';
-        deferredPrompt = null;
-        console.log('PWA was installed');
-      });
-
-    </script>
-    <script type="module">
-      // --- IMPORTS ---
-      import { loadActivities, loadVideos, createActivity, filterActivitiesByDate } from './gallery.js';
-      import { loadTimeline } from './timeline.js';
-      import { auth } from './auth.js';
-
-      // --- GLOBAL VARIABLES ---
-      // Moved gallery variables to gallery.js
-
-      // --- SPA Navigation & UI Logic ---
-
-      // Toggle Profile Dropdown
-      window.toggleProfileMenu = function () {
-        const menu = document.getElementById('profileDropdown');
-        if (menu) menu.classList.toggle('active');
-      }
-
-
-      // --- Event Modal Logic ---
-      window.openEventModal = function () {
-        document.getElementById('eventModal').classList.add('active');
-      }
-
-      window.closeEventModal = function () {
-        document.getElementById('eventModal').classList.remove('active');
-      }
-
-      window.updatePhotoCount = function () {
-        const input = document.getElementById('eventPhotos');
-        const countDisplay = document.getElementById('photoCount');
-        const count = input.files.length;
-        countDisplay.textContent = count > 0 ? `${count} foto(s) seleccionada(s)` : '';
-      }
-
-      window.handleEventSubmit = async function (e) {
-        e.preventDefault();
-        const btn = e.target.querySelector('.btn-save-premium');
-        const originalContent = btn.innerHTML;
-
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publicando...';
-        btn.disabled = true;
-
-        try {
-          const data = {
-            title: document.getElementById('eventTitle').value,
-            date: document.getElementById('eventDate').value,
-            notes: document.getElementById('eventNotes').value
-          };
-          const photos = document.getElementById('eventPhotos').files;
-
-          if (photos.length === 0) {
-            alert("Por favor selecciona al menos una foto.");
-            return;
+        if (user) {
+          overlay.style.display = 'none';
+          // Simulación de rol admin (igual que en auth.js)
+          if (user.email === 'greenforceiebb@gmail.com') {
+            adminPanel.style.display = 'flex';
           }
-
-          await createActivity(data, photos);
-
-          alert("¡Evento publicado con éxito!");
-          closeEventModal();
-          e.target.reset();
-          document.getElementById('photoCount').textContent = '';
-
-        } catch (error) {
-          console.error("Error al publicar evento:", error);
-          alert("Hubo un error al publicar el evento: " + error.message);
-        } finally {
-          btn.innerHTML = originalContent;
-          btn.disabled = false;
-        }
-      }
-
-      // --- Gallery Filtering ---
-      const dateFilter = document.getElementById('galleryDateFilter');
-      if (dateFilter) {
-        dateFilter.addEventListener('change', (e) => {
-          filterActivitiesByDate(e.target.value);
-        });
-      }
-
-      // Close menus on outside click
-      window.addEventListener('click', (e) => {
-        // Close Profile Dropdown
-        if (!e.target.closest('.profile-menu-container')) {
-          const menu = document.getElementById('profileDropdown');
-          if (menu) menu.classList.remove('active');
-        }
-      });
-
-      // View Switcher Function
-      window.showView = function (viewId) {
-        // 1. Hide all View Sections
-        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-
-        // 2. Show Target View
-        if (viewId === 'home' || viewId === 'sobre') {
-          document.querySelectorAll('.view-home').forEach(el => el.classList.add('active'));
-          window.history.replaceState(null, null, '#sobre');
+          if (window.loadActivities) window.loadActivities('activitiesGrid');
         } else {
-          const target = document.getElementById('view-' + viewId);
-          if (target) {
-            target.classList.add('active');
-            window.history.replaceState(null, null, '#' + viewId);
-          }
-        }
-
-        // 3. Update Bottom Nav State
-        document.querySelectorAll('.bottom-nav .nav-item').forEach(el => {
-          el.classList.remove('active');
-          const href = el.getAttribute('href').substring(1);
-          if (href === viewId || (viewId === 'home' && href === 'sobre')) {
-            el.classList.add('active');
-          }
-        });
-
-        // 4. Scroll to Top
-        window.scrollTo({ top: 0, behavior: 'instant' });
-      }
-
-      // Register Service Worker
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('Service Worker registered', reg))
-            .catch(err => console.log('Service Worker registration failed', err));
-        });
-      }
-
-      // Toggle Mobile Menu
-      const hamburgerBtn = document.getElementById('hamburgerBtn');
-      if (hamburgerBtn) {
-        hamburgerBtn.addEventListener('click', () => {
-          const navMenu = document.getElementById('navMenu');
-          if (navMenu) navMenu.classList.toggle('active');
-        });
-      }
-
-      // Close menu when clicking a link
-      document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-          const navMenu = document.getElementById('navMenu');
-          if (navMenu) navMenu.classList.remove('active');
-        });
-      });
-
-      // --- DOCS & PDF LOGIC (Kept here for now) ---
-      window.openDocument = (src) => {
-        const viewer = document.getElementById('documentViewer');
-        const modal = document.getElementById('documentModal');
-        if (viewer && modal) {
-          viewer.src = src;
-          modal.classList.add('active');
-          document.body.style.overflow = 'hidden';
-        }
-      }
-
-      window.closeDocumentModal = () => {
-        const viewer = document.getElementById('documentViewer');
-        const modal = document.getElementById('documentModal');
-        if (modal) modal.classList.remove('active');
-        if (viewer) viewer.src = '';
-        document.body.style.overflow = 'auto';
-      }
-
-      window.scrollToSection = (id) => {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-
-      // --- EVENT LISTENERS FOR MODALS ---
-      window.addEventListener('click', (e) => {
-        // Use global functions from gallery.js
-        if (e.target.id === 'videoModal') window.closeVideoModal();
-        if (e.target.id === 'galleryModal') window.closeGalleryModal();
-        if (e.target.id === 'lightboxModal') window.closeLightbox();
-        if (e.target.id === 'documentModal') window.closeDocumentModal();
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          if (window.closeGalleryModal) window.closeGalleryModal();
-          if (window.closeLightbox) window.closeLightbox();
-          if (window.closeDocumentModal) window.closeDocumentModal();
-          if (window.closeVideoModal) window.closeVideoModal();
-        }
-        if (e.key === 'ArrowLeft' && window.navigateLightbox) window.navigateLightbox(-1);
-        if (e.key === 'ArrowRight' && window.navigateLightbox) window.navigateLightbox(1);
-      });
-
-      window.addEventListener('scroll', () => {
-        const fab = document.querySelector('.fab');
-        if (fab) fab.style.opacity = window.scrollY > 100 ? '1' : '0';
-      });
-
-      document.getElementById('downloadPdfBtnMenu')?.addEventListener('click', async function () {
-        const btn = this;
-        const originalContent = btn.innerHTML;
-        btn.style.opacity = '0.5';
-        btn.innerHTML = '<i class="fas fa-spinner loading"></i>';
-
-        try {
-          const element = document.getElementById('content-to-pdf');
-
-          // Hide YouTube images temporarily (CORS)
-          const youtubeImages = element.querySelectorAll('.video-card-thumbnail img');
-          const originalSrcs = [];
-          youtubeImages.forEach((img, i) => {
-            originalSrcs[i] = img.src;
-            img.style.display = 'none';
-          });
-
-          const options = {
-            margin: 10,
-            filename: 'Proyecto_Green_Force_2025.pdf',
-            image: { type: 'jpeg', quality: 0.95 },
-            html2canvas: {
-              scale: 2,
-              useCORS: false,
-              allowTaint: false,
-              logging: false,
-              letterRendering: true,
-              scrollY: 0,
-              scrollX: 0,
-              windowWidth: element.scrollWidth,
-              windowHeight: element.scrollHeight
-            },
-            jsPDF: {
-              unit: 'mm',
-              format: 'a4',
-              orientation: 'portrait',
-              compress: true
-            },
-            pagebreak: {
-              mode: ['avoid-all', 'css', 'legacy'],
-              before: '.section'
-            }
-          };
-
-          await html2pdf().set(options).from(element).save();
-
-          youtubeImages.forEach((img, i) => {
-            img.style.display = '';
-            img.src = originalSrcs[i];
-          });
-
-          btn.innerHTML = '<i class="fas fa-check"></i>';
-          setTimeout(() => {
-            btn.innerHTML = originalContent;
-            btn.style.opacity = '1';
-          }, 3000);
-
-        } catch (error) {
-          console.error('Error al generar PDF:', error);
-          btn.innerHTML = '<i class="fas fa-times"></i>';
-          setTimeout(() => {
-            btn.innerHTML = originalContent;
-            btn.style.opacity = '1';
-          }, 3000);
+          overlay.style.display = 'flex';
+          adminPanel.style.display = 'none';
         }
       });
+    });
+  </script>
 
-      // --- Navigation Logic ---
-      function showView(viewName) {
-        // Hide all views
-        document.querySelectorAll('.view-section').forEach(el => {
-          el.classList.remove('active');
-          el.style.display = 'none'; // Ensure hidden
-        });
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  <script>
+    // --- PWA Installation Logic ---
+    let deferredPrompt;
 
-        // Show target view
-        const targetId = viewName === 'home' ? 'view-home' : `view-${viewName}`;
-        let target;
-
-        if (viewName === 'home') {
-          // Show all sections that are part of home
-          document.querySelectorAll('.view-home').forEach(el => {
-            el.classList.add('active');
-            el.style.display = 'block';
-          });
-        } else {
-          target = document.getElementById(`view-${viewName}`);
-          if (target) {
-            target.classList.add('active');
-            target.style.display = 'block';
-            window.scrollTo(0, 0);
-          } else {
-            console.warn("View not found:", viewName);
-            showView('home');
-            return;
-          }
-        }
-
-        // Update Bottom Nav State
-        const navLinks = document.querySelectorAll('.bottom-nav .nav-item');
-        navLinks.forEach(el => {
-          el.classList.remove('active');
-          const href = el.getAttribute('href').substring(1);
-          if (href === viewName || (viewName === 'home' && href === 'sobre')) {
-            el.classList.add('active');
-          }
-        });
-      }
-
-      function scrollToSection(sectionId) {
-        const section = document.getElementById(sectionId);
-        if (section) {
-          section.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
-
-      // Expose to window
-      window.showView = showView;
-      window.scrollToSection = scrollToSection;
-
-      // Enhanced Navigation Handler (Mobile + Desktop)
-      document.querySelectorAll('a[href^="#"]').forEach(a => {
-        a.addEventListener('click', function (e) {
-          e.preventDefault();
-          const href = this.getAttribute('href').substring(1);
-
-          // Map specific sections to Views
-          if (['galeria', 'video', 'documentos', 'cronograma'].includes(href)) {
-            showView(href);
-          } else if (href === 'sobre') {
-            showView('home');
-          } else {
-            // For sections inside Home (e.g., #contacto, #siguenos)
-            if (!document.querySelector('.view-home.active')) {
-              showView('home');
-              // Wait for view to activate then scroll
-              setTimeout(() => scrollToSection(href), 100);
-            } else {
-              scrollToSection(href);
-            }
-          }
-        });
-      });
-
-      // Handle Deep Links on Load
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        const hash = window.location.hash.substring(1);
-        if (['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
-          showView(hash);
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('SW registered!', reg))
+          .catch(err => console.error('SW registration failed', err));
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const installBtn = document.getElementById('installAppBtn');
+      if (installBtn) installBtn.style.display = 'flex';
+      console.log('beforeinstallprompt fired');
+    });
+
+    async function installPWA() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      deferredPrompt = null;
+      document.getElementById('installAppBtn').style.display = 'none';
+    }
+
+    window.addEventListener('appinstalled', () => {
+      document.getElementById('installAppBtn').style.display = 'none';
+      deferredPrompt = null;
+      console.log('PWA was installed');
+    });
+
+  </script>
+  <script type="module">
+    // --- IMPORTS ---
+    import { loadActivities, loadVideos, createActivity, filterActivitiesByDate } from './gallery.js';
+    import { loadTimeline } from './timeline.js';
+    import { auth } from './auth.js';
+
+    // --- GLOBAL VARIABLES ---
+    // Moved gallery variables to gallery.js
+
+    // --- SPA Navigation & UI Logic ---
+
+    // Toggle Profile Dropdown
+    window.toggleProfileMenu = function () {
+      const menu = document.getElementById('profileDropdown');
+      if (menu) menu.classList.toggle('active');
+    }
+
+    // Close Dropdown when clicking outside or selection an option
+    document.addEventListener('click', function (e) {
+      const menu = document.getElementById('profileDropdown');
+      const trigger = document.querySelector('.header-avatar-container');
+
+      if (!menu || !trigger) return;
+
+      // Close if clicking outside
+      if (menu.classList.contains('active') && !menu.contains(e.target) && !trigger.contains(e.target)) {
+        menu.classList.remove('active');
+      }
+
+      // Close if clicking an option inside
+      if (menu.classList.contains('active') && menu.contains(e.target)) {
+        if (e.target.closest('.menu-item') || e.target.closest('a') || e.target.tagName === 'BUTTON') {
+          menu.classList.remove('active');
+        }
+      }
+    });
+
+
+    // --- Event Modal Logic ---
+    window.openEventModal = function () {
+      document.getElementById('eventModal').classList.add('active');
+    }
+
+    window.closeEventModal = function () {
+      document.getElementById('eventModal').classList.remove('active');
+    }
+
+    // ✅ Funciones de uploadModal (usadas por "Nuevo Video")
+    window.openUploadModal = function (type) {
+      const modal = document.getElementById('uploadModal');
+      const typeInput = document.getElementById('uploadType');
+      const activityFields = document.getElementById('activityFields');
+      const videoFields = document.getElementById('videoFields');
+      const title = document.getElementById('uploadModalTitle');
+      if (!modal) return;
+      if (typeInput) typeInput.value = type;
+      if (activityFields) activityFields.style.display = type === 'activity' ? 'block' : 'none';
+      if (videoFields) videoFields.style.display = type === 'video' ? 'block' : 'none';
+      if (title) title.innerHTML = type === 'video'
+        ? '<i class="fas fa-video"></i> Subir Video'
+        : '<i class="fas fa-cloud-upload-alt"></i> Subir Contenido';
+      modal.classList.add('active');
+      modal.style.display = 'flex';
+    }
+
+    window.closeUploadModal = function () {
+      const modal = document.getElementById('uploadModal');
+      if (!modal) return;
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
+
+    window.updatePhotoCount = function () {
+      const input = document.getElementById('eventPhotos');
+      const countDisplay = document.getElementById('photoCount');
+      const count = input.files.length;
+      countDisplay.textContent = count > 0 ? `${count} foto(s) seleccionada(s)` : '';
+    }
+
+    window.handleEventSubmit = async function (e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('.btn-save-premium');
+      const originalContent = btn.innerHTML;
+
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publicando...';
+      btn.disabled = true;
+
+      try {
+        const data = {
+          title: document.getElementById('eventTitle').value,
+          date: document.getElementById('eventDate').value,
+          notes: document.getElementById('eventNotes').value
+        };
+        const photos = document.getElementById('eventPhotos').files;
+
+        if (photos.length === 0) {
+          alert("Por favor selecciona al menos una foto.");
+          return;
+        }
+
+        await createActivity(data, photos);
+
+        alert("¡Evento publicado con éxito!");
+        closeEventModal();
+        e.target.reset();
+        document.getElementById('photoCount').textContent = '';
+
+      } catch (error) {
+        console.error("Error al publicar evento:", error);
+        alert("Hubo un error al publicar el evento: " + error.message);
+      } finally {
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+      }
+    }
+
+    // --- Gallery Filtering ---
+    const dateFilter = document.getElementById('galleryDateFilter');
+    if (dateFilter) {
+      dateFilter.addEventListener('change', (e) => {
+        filterActivitiesByDate(e.target.value);
+      });
+    }
+
+    // Close menus on outside click
+    window.addEventListener('click', (e) => {
+      // Close Profile Dropdown
+      if (!e.target.closest('.profile-menu-container')) {
+        const menu = document.getElementById('profileDropdown');
+        if (menu) menu.classList.remove('active');
+      }
+    });
+
+    // View Switcher Function
+    window.showView = function (viewId) {
+      // 1. Hide all View Sections
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+
+      // 2. Show Target View
+      if (viewId === 'home' || viewId === 'sobre') {
+        document.querySelectorAll('.view-home').forEach(el => el.classList.add('active'));
+        window.history.replaceState(null, null, '#sobre');
+      } else {
+        const target = document.getElementById('view-' + viewId);
+        if (target) {
+          target.classList.add('active');
+          window.history.replaceState(null, null, '#' + viewId);
+        }
+      }
+
+      // 3. Update Bottom Nav State
+      document.querySelectorAll('.bottom-nav .nav-item').forEach(el => {
+        el.classList.remove('active');
+        const href = el.getAttribute('href').substring(1);
+        if (href === viewId || (viewId === 'home' && href === 'sobre')) {
+          el.classList.add('active');
         }
       });
 
-      // --- Secure Data Loading ---
-      window.loadSecureContent = async () => {
-        console.log("Loading secure content from Firestore...");
-        try {
-          if (typeof loadTimeline === 'function') await loadTimeline();
-          if (typeof loadActivities === 'function') await loadActivities();
-          if (typeof loadVideos === 'function') await loadVideos();
-        } catch (error) {
-          console.error("Error loading secure content:", error);
-        }
-      };
+      // 4. Scroll to Top
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
 
-      document.addEventListener('DOMContentLoaded', () => {
-        // Check for hash
-        const hash = window.location.hash.substring(1);
-        if (hash && ['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
-          showView(hash);
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker registered', reg))
+          .catch(err => console.log('Service Worker registration failed', err));
+      });
+    }
+
+    // Toggle Mobile Menu
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener('click', () => {
+        const navMenu = document.getElementById('navMenu');
+        if (navMenu) navMenu.classList.toggle('active');
+      });
+    }
+
+    // Close menu when clicking a link
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        const navMenu = document.getElementById('navMenu');
+        if (navMenu) navMenu.classList.remove('active');
+      });
+    });
+
+    // --- DOCS & PDF LOGIC (Kept here for now) ---
+    window.openDocument = (src) => {
+      const viewer = document.getElementById('documentViewer');
+      const modal = document.getElementById('documentModal');
+      if (viewer && modal) {
+        viewer.src = src;
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    window.closeDocumentModal = () => {
+      const viewer = document.getElementById('documentViewer');
+      const modal = document.getElementById('documentModal');
+      if (modal) modal.classList.remove('active');
+      if (viewer) viewer.src = '';
+      document.body.style.overflow = 'auto';
+    }
+
+    window.scrollToSection = (id) => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // --- EVENT LISTENERS FOR MODALS ---
+    window.addEventListener('click', (e) => {
+      // Use global functions from gallery.js
+      if (e.target.id === 'videoModal') window.closeVideoModal();
+      if (e.target.id === 'galleryModal') window.closeGalleryModal();
+      if (e.target.id === 'lightboxModal') window.closeLightbox();
+      if (e.target.id === 'documentModal') window.closeDocumentModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (window.closeGalleryModal) window.closeGalleryModal();
+        if (window.closeLightbox) window.closeLightbox();
+        if (window.closeDocumentModal) window.closeDocumentModal();
+        if (window.closeVideoModal) window.closeVideoModal();
+      }
+      if (e.key === 'ArrowLeft' && window.navigateLightbox) window.navigateLightbox(-1);
+      if (e.key === 'ArrowRight' && window.navigateLightbox) window.navigateLightbox(1);
+    });
+
+    window.addEventListener('scroll', () => {
+      const fab = document.querySelector('.fab');
+      if (fab) fab.style.opacity = window.scrollY > 100 ? '1' : '0';
+    });
+
+    document.getElementById('downloadPdfBtnMenu')?.addEventListener('click', async function () {
+      const btn = this;
+      const originalContent = btn.innerHTML;
+      btn.style.opacity = '0.5';
+      btn.innerHTML = '<i class="fas fa-spinner loading"></i>';
+
+      try {
+        const element = document.getElementById('content-to-pdf');
+
+        // Hide YouTube images temporarily (CORS)
+        const youtubeImages = element.querySelectorAll('.video-card-thumbnail img');
+        const originalSrcs = [];
+        youtubeImages.forEach((img, i) => {
+          originalSrcs[i] = img.src;
+          img.style.display = 'none';
+        });
+
+        const options = {
+          margin: 10,
+          filename: 'Proyecto_Green_Force_2025.pdf',
+          image: { type: 'jpeg', quality: 0.95 },
+          html2canvas: {
+            scale: 2,
+            useCORS: false,
+            allowTaint: false,
+            logging: false,
+            letterRendering: true,
+            scrollY: 0,
+            scrollX: 0,
+            windowWidth: element.scrollWidth,
+            windowHeight: element.scrollHeight
+          },
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait',
+            compress: true
+          },
+          pagebreak: {
+            mode: ['avoid-all', 'css', 'legacy'],
+            before: '.section'
+          }
+        };
+
+        await html2pdf().set(options).from(element).save();
+
+        youtubeImages.forEach((img, i) => {
+          img.style.display = '';
+          img.src = originalSrcs[i];
+        });
+
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => {
+          btn.innerHTML = originalContent;
+          btn.style.opacity = '1';
+        }, 3000);
+
+      } catch (error) {
+        console.error('Error al generar PDF:', error);
+        btn.innerHTML = '<i class="fas fa-times"></i>';
+        setTimeout(() => {
+          btn.innerHTML = originalContent;
+          btn.style.opacity = '1';
+        }, 3000);
+      }
+    });
+
+    // Flags para carga perezosa (lazy load) — evita recargar al volver a la sección
+    let _activitiesLoaded = false;
+    let _videosLoaded = false;
+
+    // --- Navigation Logic ---
+    function showView(viewName) {
+      // Hide all views
+      document.querySelectorAll('.view-section').forEach(el => {
+        el.classList.remove('active');
+        el.style.display = 'none'; // Ensure hidden
+      });
+
+      // Show target view
+      const targetId = viewName === 'home' ? 'view-home' : `view-${viewName}`;
+      let target;
+
+      if (viewName === 'home') {
+        // Show all sections that are part of home
+        document.querySelectorAll('.view-home').forEach(el => {
+          el.classList.add('active');
+          el.style.display = 'block';
+        });
+      } else {
+        target = document.getElementById(`view-${viewName}`);
+        if (target) {
+          target.classList.add('active');
+          target.style.display = 'block';
+          window.scrollTo(0, 0);
+
+          // Carga perezosa: solo al navegar a la sección, y solo una vez
+          if (viewName === 'galeria' && !_activitiesLoaded) {
+            if (window.initYearSelector) window.initYearSelector();
+            if (window.loadActivities) {
+              window.loadActivities('activitiesGrid');
+              _activitiesLoaded = true;
+            }
+          }
+
+          if (viewName === 'video' && !_videosLoaded) {
+            if (window.loadVideos) {
+              window.loadVideos('videosGrid');
+              _videosLoaded = true;
+            }
+          }
+
         } else {
-          // Default view
+          console.warn("View not found:", viewName);
           showView('home');
+          return;
+        }
+      }
+
+      // Update Bottom Nav State
+      const navLinks = document.querySelectorAll('.bottom-nav .nav-item');
+      navLinks.forEach(el => {
+        el.classList.remove('active');
+        const href = el.getAttribute('href').substring(1);
+        if (href === viewName || (viewName === 'home' && href === 'sobre')) {
+          el.classList.add('active');
         }
       });
-    </script>
-    <!-- ✅ ÚNICO bottom-nav — igual al de gallery.html -->
-    <nav class="bottom-nav">
-      <a href="#sobre" class="nav-item active">
-        <i class="fas fa-home"></i>
-        <span>Inicio</span>
-      </a>
-      <a href="" class="nav-item">
-        <i class="fas fa-leaf"></i>
-        <span>Nosotros</span>
-      </a>
-      <a href="gallery.html" class="nav-item">
-        <i class="fas fa-images"></i>
-        <span>Galería</span>
-      </a>
-      <a href="#video" class="nav-item">
-        <i class="fas fa-play-circle"></i>
-        <span>Videos</span>
-      </a>
-      <a href="#documentos" class="nav-item">
-        <i class="fas fa-file-alt"></i>
-        <span>Docs</span>
-      </a>
-    </nav>
+    }
+
+    function scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Expose to window
+    window.showView = showView;
+    window.scrollToSection = scrollToSection;
+
+    // Enhanced Navigation Handler (Mobile + Desktop)
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        const href = this.getAttribute('href').substring(1);
+
+        // Map specific sections to Views
+        if (['galeria', 'video', 'documentos', 'cronograma'].includes(href)) {
+          showView(href);
+        } else if (href === 'sobre') {
+          showView('home');
+        } else {
+          // For sections inside Home (e.g., #contacto, #siguenos)
+          if (!document.querySelector('.view-home.active')) {
+            showView('home');
+            // Wait for view to activate then scroll
+            setTimeout(() => scrollToSection(href), 100);
+          } else {
+            scrollToSection(href);
+          }
+        }
+      });
+    });
+
+    // Handle Deep Links on Load
+    window.addEventListener('load', () => {
+      const hash = window.location.hash.substring(1);
+      if (['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
+        showView(hash);
+      }
+    });
+
+    // --- Secure Data Loading ---
+    window.loadSecureContent = async () => {
+      console.log("Loading secure content from Firestore...");
+      try {
+        // Solo carga el timeline al hacer login.
+        // Actividades y videos se cargan solo cuando el usuario navega a esa sección.
+        if (typeof loadTimeline === 'function') await loadTimeline();
+      } catch (error) {
+        console.error("Error loading secure content:", error);
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check for hash
+      const hash = window.location.hash.substring(1);
+      if (hash && ['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
+        showView(hash);
+      } else {
+        showView('home');
+      }
+    });
+  </script>
+
+  <!-- ✅ ÚNICO bottom-nav — fuera de todos los modales -->
+  <nav class="bottom-nav">
+    <a href="#sobre" class="nav-item active">
+      <i class="fas fa-home"></i>
+      <span>Inicio</span>
+    </a>
+    <a href="#cronograma" class="nav-item">
+      <i class="fas fa-leaf"></i>
+      <span>Cronograma</span>
+    </a>
+    <a href="#galeria" class="nav-item">
+      <i class="fas fa-images"></i>
+      <span>Galería</span>
+    </a>
+    <a href="#video" class="nav-item">
+      <i class="fas fa-play-circle"></i>
+      <span>Videos</span>
+    </a>
+    <a href="#documentos" class="nav-item">
+      <i class="fas fa-file-alt"></i>
+      <span>Docs</span>
+    </a>
+  </nav>
 
 </body>
 
