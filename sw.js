@@ -1,4 +1,4 @@
-const CACHE_NAME = 'green-force-v25';
+const CACHE_NAME = 'green-force-v26';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -39,12 +39,18 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network-first for HTML, JS, CSS and Firebase/API calls to avoid caching old logic
+  // EXCLUDE Firebase Auth & API requests from Service Worker
+  // Letting the browser handle these directly prevents "auth/network-request-failed" and CORS issues.
+  if (event.request.url.includes('googleapis.com') ||
+    event.request.url.includes('firebase') ||
+    event.request.url.includes('identitytoolkit')) {
+    return;
+  }
+
+  // Network-first for HTML, JS, CSS to ensure fresh code
   const isCritical = event.request.url.endsWith('.html') ||
     event.request.url.endsWith('.js') ||
-    event.request.url.endsWith('.css') ||
-    event.request.url.includes('firebase') ||
-    event.request.url.includes('googleapis');
+    event.request.url.endsWith('.css');
 
   if (isCritical) {
     event.respondWith(
