@@ -2153,3 +2153,14 @@ footer a:hover {
   background: #064030;
   border-top-color: rgba(255, 255, 255, 0.05);
 }
+
+.footer-brand {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.footer-slogan {
+  margin-top: 1rem !important;
+  font-style: italic;
+  opacity: 0.9;
+}
