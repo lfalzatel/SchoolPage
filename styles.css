@@ -105,6 +105,19 @@ body {
   justify-content: center;
   color: var(--white);
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.6) 100%);
+  z-index: 0;
 }
 
 .hero-content {
@@ -146,7 +159,10 @@ body {
 .hero-content h1 {
   font-size: 4rem;
   margin-bottom: 1rem;
-  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.1;
   opacity: 0;
   animation: fadeInUp 1s ease 0.3s forwards;
 }
@@ -154,9 +170,10 @@ body {
 .hero-tagline {
   font-size: 1.5rem;
   margin-bottom: 2rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   opacity: 0;
   animation: fadeInUp 1s ease 0.6s forwards;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .hero-message {
@@ -1392,17 +1409,18 @@ footer {
   top: 0;
   left: 0;
   width: 100%;
-  height: 60px;
-  background: linear-gradient(135deg, #2E7D32, #388E3C);
-  /* Verde marca */
+  height: 70px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1rem;
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.25);
+  padding: 0 1.5rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   z-index: 2500;
-  /* Por encima del bottom-nav (z-index: 2000) */
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .header-left {
@@ -1419,11 +1437,14 @@ footer {
 }
 
 .header-title {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #ffffff;
-  /* Blanco sobre fondo verde */
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--primary);
   letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #065f46, #10b981);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .header-right {
@@ -1475,15 +1496,16 @@ footer {
 }
 
 .user-name-pill {
-  color: white;
+  color: #1f2937;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .user-role-pill {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--primary);
   font-size: 0.65rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -1491,91 +1513,138 @@ footer {
 .profile-dropdown {
   display: none;
   position: absolute;
-  top: 50px;
+  top: 60px;
   right: 0;
-  width: 240px;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  padding: 0.5rem 0;
-  z-index: 1001;
-  border: 1px solid #f3f4f6;
-  transform-origin: top right;
-  animation: scaleIn 0.2s ease-out forwards;
+  width: 300px;
+  z-index: 5001;
+  animation: dropdownSlideIn 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
 }
 
-.profile-dropdown.active {
-  display: block;
-}
-
-@keyframes scaleIn {
+@keyframes dropdownSlideIn {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: translateY(10px) scale(0.95);
   }
 
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 
-.dropdown-header {
-  padding: 0.75rem 1rem;
-  display: flex;
-  flex-direction: column;
-  background-color: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+.dropdown-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  padding: 0;
 }
 
-#menuProfileName {
-  font-weight: 600;
+.user-card-header {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 95, 70, 0.1));
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.user-card-name {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 800;
   color: #111827;
-  font-size: 0.95rem;
+  margin-bottom: 2px;
 }
 
-.text-sm {
-  font-size: 0.75rem;
-}
-
-.text-gray {
+.user-card-email {
+  font-size: 0.8rem;
   color: #6b7280;
 }
 
-.text-red {
-  color: #ef4444;
+.dropdown-menu-list {
+  padding: 0.5rem;
 }
 
-.dropdown-divider {
-  height: 1px;
-  background-color: #e5e7eb;
-  margin: 0.25rem 0;
-}
-
-.dropdown-item {
-  padding: 0.75rem 1rem;
+.menu-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #4b5563;
+  padding: 12px 16px;
+  margin: 4px;
+  color: #374151;
+  text-decoration: none;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
   cursor: pointer;
-  font-size: 0.9rem;
+}
+
+.menu-item:hover {
+  background: rgba(16, 185, 129, 0.08);
+  color: var(--primary);
+  transform: translateX(4px);
+}
+
+.menu-item-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: white;
+}
+
+.bg-blue {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.bg-gray {
+  background: linear-gradient(135deg, #6b7280, #374151);
+}
+
+.bg-red {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+.bg-green {
+  background: linear-gradient(135deg, #10b981, #065f46);
+}
+
+.arrow-link {
+  margin-left: auto;
+  font-size: 0.8rem;
+  opacity: 0.3;
+}
+
+.dropdown-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.logout-pill-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
   transition: all 0.2s;
 }
 
-.dropdown-item:active {
-  background-color: #f3f4f6;
-}
-
-.dropdown-item i {
-  width: 20px;
-  text-align: center;
-  color: #9ca3af;
-}
-
-.dropdown-item:hover i {
-  color: #059669;
-  /* Base Color */
+.logout-pill-btn:hover {
+  background: #fecaca;
+  transform: scale(0.98);
 }
 
 /* Layout Adjustments */
@@ -1589,16 +1658,15 @@ body {
 /* Desktop: Restore standard layout */
 @media (min-width: 769px) {
   .app-header {
-    display: none;
-    /* Hide App Header on Desktop to keep original Hero/Nav look */
+    display: flex;
+    /* Show App Header on Desktop */
   }
 
   body {
-    padding-top: 0;
+    padding-top: 70px;
     padding-bottom: 0;
   }
 
-  /* Keep bottom-nav visible on desktop too as requested */
   .bottom-nav {
     display: flex;
   }
