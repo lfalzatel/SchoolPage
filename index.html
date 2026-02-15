@@ -60,37 +60,80 @@
 </head>
 
 <body>
+  <!-- Randomized App Background -->
+  <div id="app-background"></div>
+
   <!-- Fixed App Header -->
   <header class="app-header">
     <div class="header-left">
       <img src="assets/images/1. logo 3.jpg" alt="Logo" class="header-logo">
-      <span class="header-title">Green Force</span>
+      <div class="header-brand">
+        <span class="header-title">Green Force</span>
+        <span class="header-subtitle">Sembrando Futuro</span>
+      </div>
     </div>
     <div class="header-right">
       <div class="profile-menu-container">
-        <!-- Default Avatar (will be updated by JS) -->
+        <!-- Premium Profile Pill -->
         <div class="header-avatar-container" onclick="toggleProfileMenu()">
           <img src="assets/icons/icon-192.png" alt="Profile" id="headerProfileAvatar" class="header-avatar">
+          <div class="user-info-pill">
+            <span id="headerUserName" class="user-name-pill">Invitado</span>
+            <span id="headerUserRole" class="user-role-pill">Visitante</span>
+          </div>
+          <i class="fas fa-chevron-down pill-chevron"></i>
         </div>
 
         <div id="profileDropdown" class="profile-dropdown">
-          <div class="dropdown-header">
-            <span id="menuProfileName">Invitado</span>
-            <span id="menuProfileEmail" class="text-sm text-gray">Inicia sesión para más</span>
-          </div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item" onclick="toggleDarkMode()">
-            <i class="fas fa-moon"></i> <span>Modo Oscuro</span>
-          </div>
-          <div class="dropdown-item" id="installAppBtn" style="display: none;" onclick="installPWA()">
-            <i class="fas fa-download"></i> <span>Instalar App</span>
-          </div>
-          <div class="dropdown-item" onclick="alert('Modo escritorio proximamente')">
-            <i class="fas fa-desktop"></i> <span>Modo Escritorio</span>
-          </div>
-          <div class="dropdown-divider"></div>
-          <div class="dropdown-item text-red" id="menuLoginBtn" onclick="handleAuthAction()">
-            <i class="fas fa-sign-in-alt"></i> <span>Iniciar Sesión</span>
+          <div class="dropdown-card">
+            <div class="user-card-header">
+              <div class="user-card-info">
+                <span id="menuProfileName" class="user-card-name">Invitado</span>
+                <span id="menuProfileEmail" class="user-card-email">Inicia sesión para más</span>
+              </div>
+            </div>
+
+            <div class="theme-switcher-container">
+              <div class="segmented-control">
+                <input type="radio" name="theme" id="theme-light" value="light" onclick="setTheme('light')">
+                <label for="theme-light"><i class="fas fa-sun"></i></label>
+
+                <input type="radio" name="theme" id="theme-dark" value="dark" onclick="setTheme('dark')">
+                <label for="theme-dark"><i class="fas fa-moon"></i></label>
+
+                <input type="radio" name="theme" id="theme-system" value="system" onclick="setTheme('system')" checked>
+                <label for="theme-system"><i class="fas fa-desktop"></i></label>
+
+                <div class="segmented-glider"></div>
+              </div>
+            </div>
+
+            <div class="dropdown-menu-list">
+              <a href="gallery.html" class="menu-item">
+                <div class="menu-item-icon bg-blue"><i class="fas fa-images"></i></div>
+                <span>Gestionar Galería</span>
+                <i class="fas fa-chevron-right arrow-link"></i>
+              </a>
+              <div class="menu-item" onclick="alert('Configuración próximamente')">
+                <div class="menu-item-icon bg-gray"><i class="fas fa-cog"></i></div>
+                <span>Configuración</span>
+                <i class="fas fa-chevron-right arrow-link"></i>
+              </div>
+              <div class="menu-item" id="downloadPdfBtnMenu">
+                <div class="menu-item-icon bg-red"><i class="fas fa-file-pdf"></i></div>
+                <span>Descargar Informe PDF</span>
+              </div>
+              <div class="menu-item" id="installAppBtn" style="display: none;" onclick="installPWA()">
+                <div class="menu-item-icon bg-green"><i class="fas fa-download"></i></div>
+                <span>Instalar Aplicación</span>
+              </div>
+            </div>
+
+            <div class="dropdown-footer">
+              <button class="logout-pill-btn" id="menuLoginBtn" onclick="handleAuthAction()">
+                <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -129,43 +172,6 @@
       </header>
     </div>
 
-    <nav id="navbar">
-      <div class="nav-container">
-        <a href="#" class="nav-logo">
-          <img src="assets/images/1. logo 3.jpg" alt="Logo"> Green Force
-        </a>
-
-        <button class="hamburger" id="hamburgerBtn">
-          <i class="fas fa-bars"></i>
-        </button>
-
-        <ul class="nav-menu" id="navMenu">
-          <li><a href="#sobre"><i class="fas fa-leaf"></i> Sobre el Proyecto</a></li>
-          <li><a href="#cronograma"><i class="fas fa-calendar-alt"></i> Cronograma</a></li>
-          <li><a href="#galeria"><i class="fas fa-images"></i> Galería</a></li>
-          <li><a href="#video"><i class="fas fa-play-circle"></i> Videos</a></li>
-          <li><a href="#siguenos"><i class="fab fa-youtube"></i> Síguenos</a></li>
-          <li><a href="#documentos"><i class="fas fa-file-pdf"></i> Documentos</a></li>
-          <li><a href="#contacto"><i class="fas fa-envelope"></i> Contacto</a></li>
-
-          <!-- Auth UI -->
-          <li id="authContainer">
-            <button id="loginBtn" class="btn-login"><i class="fab fa-google"></i> Acceder</button>
-            <div id="userProfile" class="user-profile" style="display: none;">
-              <img src="" alt="User" id="userAvatar" class="user-avatar">
-              <span id="userName" class="user-name">Usuario</span>
-              <button id="logoutBtn" class="btn-logout">Salir</button>
-            </div>
-          </li>
-
-          <li>
-            <button id="downloadPdfBtn" class="btn-pdf">
-              <i class="fas fa-download"></i> PDF
-            </button>
-          </li>
-        </ul>
-      </div>
-    </nav>
 
     <div class="view-section view-home active">
       <section id="sobre">
@@ -241,6 +247,20 @@
         </div>
 
         <div class="videos-grid" id="videosGrid"></div>
+
+        <div class="original-videos-links"
+          style="margin-top: 2rem; text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 2rem;">
+          <h3 style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 1rem;">Enlaces Directos a YouTube
+          </h3>
+          <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <a href="https://www.youtube.com/watch?v=9StDvt-2Nbs" target="_blank" class="back-btn"><i
+                class="fab fa-youtube"></i> Green Force: Nace un Movimiento Ambiental</a>
+            <a href="https://www.youtube.com/watch?v=QUC-DD5WTRI" target="_blank" class="back-btn"><i
+                class="fab fa-youtube"></i> Reforestación - 1000 Árboles para el Premio Zayed 2025</a>
+            <a href="https://www.youtube.com/watch?v=H_0aTsx8C-w" target="_blank" class="back-btn"><i
+                class="fab fa-youtube"></i> Planting a Sustainable Future</a>
+          </div>
+        </div>
       </section>
     </div>
 
@@ -698,11 +718,11 @@
       if (fab) fab.style.opacity = window.scrollY > 100 ? '1' : '0';
     });
 
-    document.getElementById('downloadPdfBtn')?.addEventListener('click', async function () {
+    document.getElementById('downloadPdfBtnMenu')?.addEventListener('click', async function () {
       const btn = this;
-      const originalText = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner loading"></i> Generando PDF...';
+      const originalContent = btn.innerHTML;
+      btn.style.opacity = '0.5';
+      btn.innerHTML = '<i class="fas fa-spinner loading"></i>';
 
       try {
         const element = document.getElementById('content-to-pdf');
@@ -715,7 +735,6 @@
           img.style.display = 'none';
         });
 
-        // Configuración mejorada para mejor compatibilidad
         const options = {
           margin: 10,
           filename: 'Proyecto_Green_Force_2025.pdf',
@@ -743,35 +762,25 @@
           }
         };
 
-        // Generar y descargar el PDF
         await html2pdf().set(options).from(element).save();
 
-        // Restaurar imágenes de YouTube
         youtubeImages.forEach((img, i) => {
           img.style.display = '';
           img.src = originalSrcs[i];
         });
 
-        btn.innerHTML = '<i class="fas fa-check-circle"></i> ¡Descargado!';
+        btn.innerHTML = '<i class="fas fa-check"></i>';
         setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.disabled = false;
+          btn.innerHTML = originalContent;
+          btn.style.opacity = '1';
         }, 3000);
 
       } catch (error) {
         console.error('Error al generar PDF:', error);
-
-        // Restaurar imágenes en caso de error
-        const youtubeImages = document.querySelectorAll('.video-card-thumbnail img');
-        youtubeImages.forEach(img => {
-          img.style.display = '';
-        });
-
-        alert('Hubo un error al generar el PDF. Por favor, intenta nuevamente.');
-        btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+        btn.innerHTML = '<i class="fas fa-times"></i>';
         setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.disabled = false;
+          btn.innerHTML = originalContent;
+          btn.style.opacity = '1';
         }, 3000);
       }
     });
@@ -904,10 +913,6 @@
     <a href="#documentos" class="nav-item">
       <i class="fas fa-file-pdf"></i>
       <span>Docs</span>
-    </a>
-    <a href="#" class="nav-item" id="mobileAuthBtn">
-      <i class="fas fa-user"></i>
-      <span>Perfil</span>
     </a>
   </nav>
 

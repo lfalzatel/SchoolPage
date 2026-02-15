@@ -103,39 +103,79 @@ window.currentGalleryActivities = [];
 window.currentGalleryVideos = [];
 
 // --- LOAD FUNCTIONS ---
-export async function loadActivities() {
-    const grid = document.getElementById('activitiesGrid');
+// Fallback Local Data (Se usará si Firestore está vacío o falla)
+const seedData = {
+    activities: [
+        {
+            title: "Reforestación Microcuenca ARSA",
+            description: "Jornada de siembra de 1000 árboles nativos para la protección del recurso hídrico.",
+            year: "2024",
+            thumbnail: "assets/images/17. Visita Microcuenca ARSA - 1.jpg",
+            images: [
+                "assets/images/17. Visita Microcuenca ARSA - 1.jpg",
+                "assets/images/17. Visita Microcuenca ARSA - 2.jpg",
+                "assets/images/17. Visita Microcuenca ARSA - 3.jpg"
+            ]
+        },
+        {
+            title: "Capacitación CORNARE",
+            description: "Taller sobre manejo de residuos sólidos y compostaje institucional.",
+            year: "2023",
+            thumbnail: "assets/images/10. Capacitación CORNARE - 1.jpg",
+            images: [
+                "assets/images/10. Capacitación CORNARE - 1.jpg",
+                "assets/images/10. Capacitación CORNARE - 2.jpg"
+            ]
+        }
+    ],
+    videos: [
+        {
+            title: "Presentación Green Force",
+            url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg"
+        }
+    ]
+};
+
+// Configuración de fondo
+const allBackgroundImages = [
+    "assets/images/10. Capacitación CORNARE - 1.jpg",
+    "assets/images/10. Reforestación institucional - 1.jpg",
+    "assets/images/12. Visita agrosavia 2025 - 1.jpg",
+    "assets/images/13. Preparación compostaje 2025 - 1.jpg",
+    "assets/images/14. Sembraton de 1000 árboles - 1.jpg",
+    "assets/images/17. Visita Microcuenca ARSA - 1.jpg",
+    "assets/images/19. Encuentro UCO - 1.jpg",
+    "assets/images/2. Inicio marzo 2023 - 0.jpg",
+    "assets/images/20. Encuentro Nacional 2025 - 1.jpg",
+    "assets/images/6. Embellecimiento 2024 - 1.jpg"
+];
+
+export async function loadActivities(targetId = 'activitiesGrid') {
+    const grid = document.getElementById(targetId);
     if (!grid) return;
 
     grid.innerHTML = '<div class="loader"><i class="fas fa-spinner fa-spin"></i> Cargando actividades...</div>';
 
     try {
-        const q = query(collection(db, "activities"), orderBy("createdAt", "desc")); // Temporarily sort by creation
+        const q = query(collection(db, "activities"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
 
-        window.currentGalleryActivities = [];
+        const activities = [];
         querySnapshot.forEach((doc) => {
-            window.currentGalleryActivities.push({ id: doc.id, ...doc.data() });
+            activities.push({ id: doc.id, ...doc.data() });
         });
 
-        // If empty, suggest seeding (for admin/dev)
-        if (window.currentGalleryActivities.length === 0) {
-            grid.innerHTML = `
-                <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
-                    <p>No hay actividades cargadas.</p>
-                    <button onclick="seedDatabase()" style="background: var(--primary); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-                        Cargar Datos Iniciales (Seed)
-                    </button>
-                </div>`;
-            return;
-        }
+        // Aplicar fallback si está vacío
+        const finalActivities = activities.length > 0 ? activities : seedData.activities;
+        window.currentGalleryActivities = finalActivities;
 
-        renderActivityCards(window.currentGalleryActivities);
+        renderActivityCards(finalActivities, targetId);
 
     } catch (e) {
         console.error("Error loading activities:", e);
-        grid.innerHTML = '<p class="error">Error cargando actividades. Intenta recargar.</p>';
-        console.log("Fallback to local data if needed...");
+        window.currentGalleryActivities = seedData.activities;
+        renderActivityCards(seedData.activities, targetId);
     }
 }
 
@@ -154,23 +194,67 @@ export async function loadVideos() {
             window.currentGalleryVideos.push({ id: doc.id, ...doc.data() });
         });
 
-        if (currentGalleryVideos.length === 0) {
-            grid.innerHTML = '<p>No hay videos cargados.</p>';
-            return;
-        }
-
-        renderVideoCards(window.currentGalleryVideos);
+        const videosToRender = window.currentGalleryVideos.length > 0 ? window.currentGalleryVideos : seedData.videos;
+        renderVideoCards(videosToRender);
 
     } catch (e) {
         console.error("Error loading videos:", e);
-        grid.innerHTML = '<p class="error">Error cargando videos.</p>';
+        renderVideoCards(seedData.videos);
     }
 }
 
+/**
+ * Inicia el carrusel de fondo aleatorio.
+ * @param {string[]} customImages - Lista opcional de imágenes. Si no se pasa, usa todas las disponibles.
+ */
+export function initBackgroundSlideshow(customImages = null) {
+    const bgContainer = document.getElementById('app-background');
+    if (!bgContainer) return;
+
+    const imagesToUse = customImages || allBackgroundImages;
+    // Mezclar imágenes
+    const shuffled = [...imagesToUse].sort(() => 0.5 - Math.random());
+
+    bgContainer.innerHTML = ''; // Limpiar si había algo
+
+    // Crear capas de slide
+    shuffled.forEach((img, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'bg-slide';
+        // Usar la ruta completa
+        const imgPath = img.startsWith('assets') ? img : `assets/images/${encodeURIComponent(img)}`;
+        slide.style.backgroundImage = `url('${imgPath}')`;
+        if (index === 0) slide.classList.add('active');
+        bgContainer.appendChild(slide);
+    });
+
+    let currentSlide = 0;
+    const slides = bgContainer.querySelectorAll('.bg-slide');
+
+    if (slides.length < 2) return;
+
+    setInterval(() => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }, 6000); // Cambiar cada 6 segundos
+}
+
+// Iniciar automáticamente si el contenedor existe (para index.html)
+document.addEventListener('DOMContentLoaded', () => {
+    // Si estamos en index.html, cargamos todas las imágenes
+    if (document.getElementById('app-background') && !window.location.pathname.includes('login.html')) {
+        initBackgroundSlideshow();
+    }
+});
+
 // --- RENDER HELPERS ---
-function renderActivityCards(activities) {
-    const grid = document.getElementById('activitiesGrid');
-    const isAdmin = window.currentUserRole === 'admin';
+function renderActivityCards(activities, targetId = 'activitiesGrid') {
+    const grid = document.getElementById(targetId);
+    if (!grid) return;
+
+    // Simular rol admin (mejorar si hay sistema de roles real)
+    const isAdmin = window.currentUserEmail === 'greenforceiebb@gmail.com';
 
     grid.innerHTML = activities.map((a, i) => `
         <div class="activity-card" onclick="openGalleryModal(${i})">
@@ -183,7 +267,7 @@ function renderActivityCards(activities) {
             <h3>${a.title}</h3>
             <p>${a.description}</p>
             <div class="activity-card-footer">
-              <span class="activity-year"><i class="fas fa-calendar-alt"></i> ${a.year}</span>
+              <span class="activity-year"><i class="fas fa-calendar-alt"></i> ${a.year || '2025'}</span>
               <button class="view-gallery-btn">Ver Galería <i class="fas fa-arrow-right"></i></button>
             </div>
           </div>

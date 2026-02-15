@@ -107,10 +107,45 @@ export const logout = async () => {
         await signOut(auth);
         const menu = document.getElementById('profileDropdown');
         if (menu) menu.classList.remove('active');
+        // Clear UI or redirect if necessary
     } catch (error) {
         console.error("Logout failed:", error);
     }
 };
+
+// -----------------------------------------------------------
+//  TEMA (Modo Oscuro / Claro / Sistema)
+// -----------------------------------------------------------
+window.setTheme = (theme) => {
+    const body = document.body;
+    body.classList.remove('dark-mode');
+
+    if (theme === 'dark') {
+        body.classList.add('dark-mode');
+    } else if (theme === 'system') {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            body.classList.add('dark-mode');
+        }
+    }
+    localStorage.setItem('green-force-theme', theme);
+    updateThemeSelector(theme);
+};
+
+const updateThemeSelector = (theme) => {
+    const input = document.getElementById(`theme-${theme}`);
+    if (input) input.checked = true;
+};
+
+// Inicializar tema al cargar
+const savedTheme = localStorage.getItem('green-force-theme') || 'system';
+window.setTheme(savedTheme);
+
+// Escuchar cambios de sistema si está en modo auto
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (localStorage.getItem('green-force-theme') === 'system') {
+        window.setTheme('system');
+    }
+});
 
 // -----------------------------------------------------------
 //  MANEJAR EL RESULTADO DEL REDIRECT DE GOOGLE
@@ -178,37 +213,32 @@ const uiIds = {
 const getEl = (id) => document.getElementById(id);
 
 const updateUI = (user) => {
-    // 1. Botón móvil inferior
-    const mobBtn = getEl(uiIds.mobileAuthBtn);
-    if (mobBtn) {
-        if (user) {
-            mobBtn.innerHTML = '<i class="fas fa-user-circle"></i><span>Perfil</span>';
-            mobBtn.onclick = (e) => {
-                e.preventDefault();
-                if (window.toggleProfileMenu) window.toggleProfileMenu();
-            };
-        } else {
-            mobBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i><span>Login</span>';
-            mobBtn.onclick = (e) => {
-                e.preventDefault();
-                loginWithGoogle();
-            };
-        }
-    }
+    // 1. Botón móvil inferior - Removido el acceso a perfil para evitar redundancia
+    // El menú inferior ahora solo muestra opciones de navegación principales
 
-    // 2. Header avatar y dropdown
+    // 2. Header avatar y pill info
     const avatar = getEl(uiIds.headerProfileAvatar);
+    const headerName = getEl('headerUserName');
+    const headerRole = getEl('headerUserRole');
     const menuName = getEl(uiIds.menuProfileName);
     const menuEmail = getEl(uiIds.menuProfileEmail);
     const menuBtn = getEl(uiIds.menuLoginBtn);
 
     if (user) {
         if (avatar) avatar.src = user.photoURL || 'assets/icons/icon-192.png';
+        if (headerName) headerName.textContent = (user.displayName || 'Usuario').split(' ')[0];
+        // En una app real, el rol vendría de Firestore. Aquí simulamos según el email o nombre.
+        const role = user.email === 'greenforceiebb@gmail.com' ? 'Admin' : 'Miembro';
+        if (headerRole) headerRole.textContent = role;
+
         if (menuName) menuName.textContent = user.displayName || 'Usuario';
         if (menuEmail) menuEmail.textContent = user.email || '';
         if (menuBtn) menuBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>';
     } else {
         if (avatar) avatar.src = 'assets/icons/icon-192.png';
+        if (headerName) headerName.textContent = 'Invitado';
+        if (headerRole) headerRole.textContent = 'Visitante';
+
         if (menuName) menuName.textContent = 'Invitado';
         if (menuEmail) menuEmail.textContent = 'Inicia sesión para acceder';
         if (menuBtn) menuBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Iniciar Sesión</span>';
@@ -217,7 +247,14 @@ const updateUI = (user) => {
     // 3. Overlays de contenido protegido
     ['galleryOverlay', 'videoOverlay', 'docsOverlay'].forEach(id => {
         const el = getEl(id);
-        if (el) el.style.display = user ? 'none' : 'flex';
+        if (el) {
+            if (id === 'galleryOverlay' && window.location.pathname.includes('gallery.html')) {
+                // Keep the relative overlay styling in gallery.html
+                el.style.display = user ? 'none' : 'flex';
+            } else {
+                el.style.display = user ? 'none' : 'flex';
+            }
+        }
     });
 
     // 4. Nav de escritorio (legacy)

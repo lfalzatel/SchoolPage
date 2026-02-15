@@ -68,8 +68,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7));
+            z-index: 10;
         }
 
         .dark-mode body {
@@ -284,7 +284,7 @@
 
 <body>
 
-    <div id="bg-slideshow">
+    <div id="app-background">
         <div class="bg-overlay"></div>
     </div>
 
@@ -352,8 +352,9 @@
             alert('Error crítico de carga: ' + msg);
             return false;
         };
-        // Background Slideshow Logic - Exact user list (10 images)
-        const images = [
+        import { initBackgroundSlideshow } from './gallery.js';
+
+        const loginImages = [
             '12. Visita agrosavia 2025 - 8.jpg',
             '14. Sembraton de 1000 árboles - 5.jpg',
             '14. Sembraton de 1000 árboles - 16.jpg',
@@ -366,38 +367,8 @@
             '20. Encuentro Nacional 2025 - 8.jpg'
         ];
 
-        const slideshowContainer = document.getElementById('bg-slideshow');
-        let currentSlide = 0;
-
-        function initSlideshow() {
-            images.forEach((img, index) => {
-                const slide = document.createElement('div');
-                slide.className = `bg-slide ${index === 0 ? 'active' : ''}`;
-                slide.style.backgroundImage = `url('assets/images/${encodeURIComponent(img)}')`;
-                slideshowContainer.appendChild(slide);
-            });
-
-            setInterval(nextSlide, 3000); // Change every 3 seconds
-        }
-
-        function nextSlide() {
-            const slides = document.querySelectorAll('.bg-slide');
-
-            // Remove previous markers
-            slides.forEach(s => s.classList.remove('last-active'));
-
-            // Current becomes "last active" to stay underneath
-            slides[currentSlide].classList.add('last-active');
-            slides[currentSlide].classList.remove('active');
-
-            // New slide becomes active and fades in ON TOP
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('Login.html generic script starting...');
-            initSlideshow();
+            initBackgroundSlideshow(loginImages);
         });
     </script>
     <script>

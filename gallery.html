@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería Green Force - Gestión de Eventos</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="gallery.js"></script>
+
+    <style>
+        .gallery-manage-container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: var(--glass-shadow);
+            min-height: 80vh;
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .gallery-header h1 {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        #galleryGridFull {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.2;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-background"></div>
+
+    <header class="app-header">
+        <div class="header-left">
+            <img src="assets/images/1. logo 3.jpg" alt="Logo" class="header-logo">
+            <div class="header-brand">
+                <span class="header-title">Green Force</span>
+                <span class="header-subtitle">Galería de Eventos</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Volver al Inicio</a>
+        </div>
+    </header>
+
+    <main class="gallery-manage-container">
+        <div class="gallery-header">
+            <div>
+                <h1>Explora nuestras Actividades</h1>
+                <p>Momentos capturados sembrando futuro.</p>
+            </div>
+            <div class="admin-actions" id="galleryAdminPanel" style="display: none;">
+                <button class="cta-button" onclick="openUploadModal('activity')">
+                    <i class="fas fa-plus"></i> Nuevo Evento
+                </button>
+            </div>
+        </div>
+
+        <div id="galleryOverlay" class="protected-overlay"
+            style="position: relative; height: 300px; border-radius: 20px;">
+            <h3><i class="fas fa-lock"></i> Galería Protegida</h3>
+            <p>Inicia sesión para ver y gestionar las fotos del proyecto.</p>
+            <button class="btn-login overlay-login-btn"><i class="fab fa-google"></i> Iniciar Sesión</button>
+        </div>
+
+        <div id="galleryGridFull">
+            <!-- Los eventos se cargarán aquí -->
+        </div>
+    </main>
+
+    <!-- Modals Reutilizados (se asume que gallery.js los maneja o existen en el DOM) -->
+    <!-- En una app ideal, los fragmentos se compartirían, aquí los incluimos para que funcione solo -->
+
+    <div id="galleryModal" class="gallery-modal">
+        <div class="gallery-modal-content">
+            <div class="gallery-modal-header">
+                <h3 id="galleryModalHeaderTitle">Detalles del Evento</h3>
+                <button class="gallery-modal-close" onclick="closeGalleryModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="gallery-modal-info">
+                <h3 id="galleryModalTitle">Titulo</h3>
+                <p id="galleryModalDescription">Descripción</p>
+                <div id="galleryModalDate" class="gallery-date">Fecha</div>
+            </div>
+            <div class="gallery-modal-body" id="galleryModalBody"></div>
+        </div>
+    </div>
+
+    <div id="uploadModal" class="modal" style="z-index: 4000;">
+        <!-- ... Contenido del Formulario de Subida ... -->
+        <!-- Se recomienda que gallery.js inyecte esto o se mantenga consistente con index.html -->
+    </div>
+
+    <script type="module">
+        import { initBackgroundSlideshow } from './gallery.js';
+        import { auth } from './auth.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initBackgroundSlideshow();
+
+            onAuthStateChanged(auth, (user) => {
+                const adminPanel = document.getElementById('galleryAdminPanel');
+                const overlay = document.getElementById('galleryOverlay');
+
+                if (user) {
+                    overlay.style.display = 'none';
+                    // Simulación de rol admin (igual que en auth.js)
+                    if (user.email === 'greenforceiebb@gmail.com') {
+                        adminPanel.style.display = 'flex';
+                    }
+                    if (window.loadActivities) window.loadActivities('galleryGridFull');
+                } else {
+                    overlay.style.display = 'flex';
+                    adminPanel.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -12,10 +12,66 @@
   --font-main: 'Poppins', sans-serif;
 
   /* Glassmorphism Design Tokens */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.3);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   --glass-blur: blur(12px);
+
+  /* Theme States */
+  --card-bg: #fff;
+  --item-hover: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+}
+
+.dark-mode {
+  --background: #111827;
+  --card-bg: #1f2937;
+  --item-hover: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --white: #1f2937;
+  --text-dark: #f9fafb;
+}
+
+/* Randomized Background Container */
+#app-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: #059669;
+  /* Verde base */
+  overflow: hidden;
+}
+
+#app-background .bg-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+
+#app-background .bg-slide.active {
+  opacity: 1;
+}
+
+#app-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6));
+  z-index: 1;
 }
 
 * {
@@ -43,10 +99,7 @@ body {
 /* Header & Hero */
 .header-hero {
   height: 100vh;
-  background: var(--gradient-main),
-    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect fill="%23f0fdf4" width="1200" height="800"/></svg>');
-  background-size: cover;
-  background-position: center;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1383,25 +1436,56 @@ footer {
   position: relative;
 }
 
+/* Profile Pill Button */
 .header-avatar-container {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  padding: 4px 12px 4px 4px;
+  border-radius: 50px;
+  border: 1px solid var(--glass-border);
   cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.6);
-  /* Borde blanco semi-transparente */
-  transition: border-color 0.2s;
+  transition: all 0.3s ease;
+}
+
+.header-avatar-container:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
 }
 
 .header-avatar-container:active {
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
 
 .header-avatar {
-  width: 100%;
-  height: 100%;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.user-info-pill {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.user-name-pill {
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.user-role-pill {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .profile-dropdown {
