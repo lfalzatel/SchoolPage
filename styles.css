@@ -1006,47 +1006,65 @@ footer {
 
 /* Bottom Navigation - Premium Floating Glassmorphism Style */
 .bottom-nav {
-  display: flex;
-  position: fixed;
-  bottom: 25px;
-  top: auto !important;
-  /* Fix: avoid stretching due to inherited top:0 from global nav */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 92%;
-  max-width: 450px;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  display: flex !important;
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  width: auto !important;
+  min-width: 320px;
+  max-width: 90%;
+  height: 65px;
+  padding: 0 25px;
+
+  /* Glassmorphism & Fallback */
+  background-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   border-radius: 50px;
-  z-index: 5000;
-  padding: 8px 15px;
-  justify-content: space-around;
+
+  z-index: 2147483647 !important;
+  /* Max Z-Index to stay on top */
+  visibility: visible !important;
+  opacity: 1 !important;
+
+  justify-content: space-between;
   align-items: center;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-nav:hover {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  transform: translateX(-50%) translateY(-3px) !important;
 }
 
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   color: #64748b;
-  /* Sleek slate gray */
   text-decoration: none;
   font-size: 0.65rem;
   font-weight: 500;
   gap: 2px;
   transition: all 0.3s ease;
-  padding: 8px;
-  border-radius: 20px;
+  padding: 5px 0;
+  border-radius: 12px;
   flex: 1;
+  position: relative;
 }
 
 .nav-item i {
-  font-size: 1.2rem;
-  transition: transform 0.3s ease, color 0.3s ease;
+  font-size: 1.4rem;
+  margin-bottom: 2px;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .nav-item.active {
@@ -1054,117 +1072,115 @@ footer {
 }
 
 .nav-item.active i {
-  transform: translateY(-4px) scale(1.1);
+  transform: scale(1.1);
+  filter: drop-shadow(0 4px 6px rgba(46, 125, 50, 0.3));
   color: var(--primary);
 }
 
 .nav-item.active span {
+  opacity: 1;
   font-weight: 700;
-  transform: scale(1.05);
 }
 
-/* Specific styling for the Active indicator (optional, but looks premium) */
+/* Specific styling for the Active indicator */
 .nav-item.active::after {
   content: '';
   position: absolute;
-  bottom: 4px;
+  bottom: 5px;
   width: 4px;
   height: 4px;
   background: var(--primary);
   border-radius: 50%;
-  box-shadow: 0 0 10px var(--primary);
+  box-shadow: 0 0 8px var(--primary);
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+  /* Removed conflicting nav { display: none; } */
 
-  /* Hide Top Nav elements */
-  nav {
-    display: none;
-  }
-
-  /* Show Bottom Nav */
+  /* Show Bottom Nav (Redundant but safe to keep logical structure) */
   .bottom-nav {
-    display: flex;
+    display: flex !important;
   }
+}
 
-  /* Adjust Body Padding */
-  body {
-    padding-bottom: 80px;
-    /* Space for bottom nav */
-  }
+/* Adjust Body Padding */
+body {
+  padding-bottom: 80px;
+  /* Space for bottom nav */
+}
 
-  /* Adjust Hero */
-  .header-hero {
-    height: 100dvh;
-    /* Use dynamic viewport height */
-    padding-top: 0;
-  }
+/* Adjust Hero */
+.header-hero {
+  height: 100dvh;
+  /* Use dynamic viewport height */
+  padding-top: 0;
+}
 
-  .hero-content h1 {
-    font-size: 2.5rem;
-  }
+.hero-content h1 {
+  font-size: 2.5rem;
+}
 
-  .hero-tagline {
-    font-size: 1.1rem;
-  }
+.hero-tagline {
+  font-size: 1.1rem;
+}
 
-  .hero-message {
-    padding: 1rem;
-  }
+.hero-message {
+  padding: 1rem;
+}
 
-  .hero-message p {
-    font-size: 1rem;
-  }
+.hero-message p {
+  font-size: 1rem;
+}
 
-  /* Adjust Sections */
-  section {
-    padding: 2rem 1rem;
-    margin: 1rem auto;
-    border-radius: 15px;
-  }
+/* Adjust Sections */
+section {
+  padding: 2rem 1rem;
+  margin: 1rem auto;
+  border-radius: 15px;
+}
 
-  section h2 {
-    font-size: 2rem;
-  }
+section h2 {
+  font-size: 2rem;
+}
 
-  /* Adjust Grid */
-  .activities-grid,
-  .videos-grid,
-  .documents-grid,
-  .contact-grid {
-    grid-template-columns: 1fr;
-    /* Single column on mobile */
-    gap: 1.5rem;
-  }
+/* Adjust Grid */
+.activities-grid,
+.videos-grid,
+.documents-grid,
+.contact-grid {
+  grid-template-columns: 1fr;
+  /* Single column on mobile */
+  gap: 1.5rem;
+}
 
-  /* Touch Targets */
-  .cta-button,
-  .btn-login,
-  .btn-logout,
-  .view-gallery-btn {
-    padding: 12px 25px;
-    /* Larger touch area */
-  }
+/* Touch Targets */
+.cta-button,
+.btn-login,
+.btn-logout,
+.view-gallery-btn {
+  padding: 12px 25px;
+  /* Larger touch area */
+}
 
-  /* Improve Readability - Scoped to sections to avoid breaking header/footer */
-  .view-section p {
-    font-size: 1rem !important;
-    color: #374151 !important;
-    /* Force dark gray on light sections */
-  }
+/* Improve Readability - Scoped to sections to avoid breaking header/footer */
+.view-section p {
+  font-size: 1rem !important;
+  color: #374151 !important;
+  /* Force dark gray on light sections */
+}
 
-  .view-section h2,
-  .view-section h3 {
-    color: #111827 !important;
-    /* Force dark headings on light sections */
-  }
+.view-section h2,
+.view-section h3 {
+  color: #111827 !important;
+  /* Force dark headings on light sections */
+}
 
-  /* Adjust FAB position */
-  .fab {
-    bottom: 85px;
-    right: 15px;
-  }
+/* Adjust FAB position */
+.fab {
+  bottom: 85px;
+  right: 15px;
+}
 }
 
 .fab:hover {
@@ -1714,24 +1730,10 @@ body {
     padding-bottom: 0;
   }
 
-  .bottom-nav {
-    display: flex;
-    position: static;
-    transform: none;
-    width: auto;
-    background: transparent;
-    box-shadow: none;
-    backdrop-filter: none;
-    gap: 1.5rem;
-    height: auto;
-    animation: none;
-  }
+  /* .bottom-nav styles removed to allow floating menu on desktop too */
 
   .nav-item {
-    flex-direction: row;
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.8);
-    width: auto;
+    /* Keep general nav item styles if needed, or simply inherit */
   }
 
   .nav-item.active {
@@ -2296,49 +2298,5 @@ body.dark-mode .hero-tagline,
   opacity: 0.9;
 }
 
-/* --- EMERGENCY FIX FOR MENU VISIBILITY --- */
-.bottom-nav {
-  position: fixed !important;
-  bottom: 20px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
 
-  display: flex !important;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-
-  width: auto !important;
-  min-width: 320px;
-  max-width: 90%;
-  height: 65px;
-  padding: 0 25px;
-
-  /* Fallback & Glass */
-  background-color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-
-  border-radius: 50px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-
-  z-index: 2147483647 !important;
-  /* Max Z-Index */
-  visibility: visible !important;
-  opacity: 1 !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.bottom-nav * {
-  visibility: visible !important;
-  opacity: 1;
-}
-
-/* Dark Mode Override */
-.dark-mode .bottom-nav {
-  background-color: #1f2937 !important;
-  background: rgba(31, 41, 55, 0.95) !important;
-  border-color: rgba(255, 255, 255, 0.1);
-}
+/* End of styles.css */
