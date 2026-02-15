@@ -298,7 +298,14 @@ export function initBackgroundSlideshow(customImages = null) {
 
     setInterval(() => {
         slides[currentSlide].classList.remove('active');
-        currentSlide = (currentSlide + 1) % slides.length;
+
+        // Selección aleatoria que no sea el mismo slide actual
+        let nextSlide;
+        do {
+            nextSlide = Math.floor(Math.random() * slides.length);
+        } while (nextSlide === currentSlide);
+
+        currentSlide = nextSlide;
         slides[currentSlide].classList.add('active');
     }, 6000); // Cambiar cada 6 segundos
 }
