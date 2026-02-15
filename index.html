@@ -27,22 +27,8 @@
 
   <!-- Auth Guard -->
   <script type="module">
-    import { onAuthStateChanged, getAuth } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-
-    // Re-declare config here for immediate check, or just wait for auth.js
-    // Simplest approach: wait for auth.js but show loading
-    // For strict protection, we can do a quick check:
-    const firebaseConfig = {
-      apiKey: "AIzaSyC0QFzN6ZZQGXhH1fcYdfx0-dcQ2XdYJ6g",
-      authDomain: "green-force-pwa-2025.firebaseapp.com",
-      projectId: "green-force-pwa-2025",
-      storageBucket: "green-force-pwa-2025.firebasestorage.app",
-      messagingSenderId: "385628439914",
-      appId: "1:385628439914:web:520a75554db345afe91113"
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    import { auth } from './firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
     onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -59,6 +45,7 @@
   </style>
 
   <!-- Firebase Scripts (Loaded as modules) -->
+  <!-- Scripts are imported as modules at the bottom -->
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="auth.js"></script>
   <script type="module">
@@ -405,7 +392,7 @@
   <div id="galleryModal" class="gallery-modal">
     <div class="gallery-modal-content">
       <div class="gallery-modal-header">
-        <h3 id="galleryModalTitle"></h3>
+        <h3 id="galleryModalHeaderTitle"></h3>
         <button class="gallery-modal-close" onclick="closeGalleryModal()">
           <i class="fas fa-times"></i>
         </button>
@@ -568,6 +555,15 @@
   <script>
     // --- PWA Installation Logic ---
     let deferredPrompt;
+
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('SW registered!', reg))
+          .catch(err => console.error('SW registration failed', err));
+      });
+    }
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -816,31 +812,36 @@
 
       // Show target view
       const targetId = viewName === 'home' ? 'view-home' : `view-${viewName}`;
-      // Note: 'view-home' is a class in my reading, but let's check structure.
-      // Structure: <div class="view-section view-home active">...</div>
-      // Structure: <div id="view-galeria" class="view-section">...</div>
-
       let target;
+
       if (viewName === 'home') {
         // Show all sections that are part of home
         document.querySelectorAll('.view-home').forEach(el => {
           el.classList.add('active');
           el.style.display = 'block';
         });
-        return;
       } else {
         target = document.getElementById(`view-${viewName}`);
+        if (target) {
+          target.classList.add('active');
+          target.style.display = 'block';
+          window.scrollTo(0, 0);
+        } else {
+          console.warn("View not found:", viewName);
+          showView('home');
+          return;
+        }
       }
 
-      if (target) {
-        target.classList.add('active');
-        target.style.display = 'block';
-        window.scrollTo(0, 0);
-      } else {
-        console.warn("View not found:", viewName);
-        // Fallback to home
-        showView('home');
-      }
+      // Update Bottom Nav State
+      const navLinks = document.querySelectorAll('.bottom-nav .nav-item');
+      navLinks.forEach(el => {
+        el.classList.remove('active');
+        const href = el.getAttribute('href').substring(1);
+        if (href === viewName || (viewName === 'home' && href === 'sobre')) {
+          el.classList.add('active');
+        }
+      });
     }
 
     function scrollToSection(sectionId) {
@@ -881,7 +882,7 @@
     // Handle Deep Links on Load
     window.addEventListener('load', () => {
       const hash = window.location.hash.substring(1);
-      if (['galeria', 'video', 'documentos'].includes(hash)) {
+      if (['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
         showView(hash);
       }
     });
@@ -889,13 +890,13 @@
     // --- Secure Data Loading ---
     window.loadSecureContent = async () => {
       console.log("Loading secure content from Firestore...");
-      // Timeline is public or private? Prompt says section in Nav, so likely public.
-      // But prompt also says "Admins can add...", implying it's dynamic.
-      // Let's load it always, or just when view is shown. 
-      // Current architecture loads everything at start.
-      await loadTimeline();
-      await loadActivities();
-      await loadVideos();
+      try {
+        if (typeof loadTimeline === 'function') await loadTimeline();
+        if (typeof loadActivities === 'function') await loadActivities();
+        if (typeof loadVideos === 'function') await loadVideos();
+      } catch (error) {
+        console.error("Error loading secure content:", error);
+      }
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -906,13 +907,6 @@
       } else {
         // Default view
         showView('home');
-      }
-
-      // Initial public content loading if any
-      // Secure content is now loaded via auth.js -> window.loadSecureContent()
-      // Make sure Timeline is loaded if it is public
-      if (typeof loadTimeline === 'function') {
-        loadTimeline();
       }
     });
   </script>

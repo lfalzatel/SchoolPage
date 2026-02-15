@@ -1,4 +1,5 @@
 import { db, storage } from './firebase-config.js';
+import { auth } from './auth.js';
 import {
     collection,
     addDoc,
@@ -98,8 +99,8 @@ window.seedDatabase = async () => {
 };
 
 // --- GLOBAL STATE ---
-let currentGalleryActivities = [];
-let currentGalleryVideos = [];
+window.currentGalleryActivities = [];
+window.currentGalleryVideos = [];
 
 // --- LOAD FUNCTIONS ---
 export async function loadActivities() {
@@ -112,13 +113,13 @@ export async function loadActivities() {
         const q = query(collection(db, "activities"), orderBy("createdAt", "desc")); // Temporarily sort by creation
         const querySnapshot = await getDocs(q);
 
-        currentGalleryActivities = [];
+        window.currentGalleryActivities = [];
         querySnapshot.forEach((doc) => {
-            currentGalleryActivities.push({ id: doc.id, ...doc.data() });
+            window.currentGalleryActivities.push({ id: doc.id, ...doc.data() });
         });
 
         // If empty, suggest seeding (for admin/dev)
-        if (currentGalleryActivities.length === 0) {
+        if (window.currentGalleryActivities.length === 0) {
             grid.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
                     <p>No hay actividades cargadas.</p>
@@ -129,7 +130,7 @@ export async function loadActivities() {
             return;
         }
 
-        renderActivityCards(currentGalleryActivities);
+        renderActivityCards(window.currentGalleryActivities);
 
     } catch (e) {
         console.error("Error loading activities:", e);
@@ -148,9 +149,9 @@ export async function loadVideos() {
         const q = query(collection(db, "videos"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
 
-        currentGalleryVideos = [];
+        window.currentGalleryVideos = [];
         querySnapshot.forEach((doc) => {
-            currentGalleryVideos.push({ id: doc.id, ...doc.data() });
+            window.currentGalleryVideos.push({ id: doc.id, ...doc.data() });
         });
 
         if (currentGalleryVideos.length === 0) {
@@ -158,7 +159,7 @@ export async function loadVideos() {
             return;
         }
 
-        renderVideoCards(currentGalleryVideos);
+        renderVideoCards(window.currentGalleryVideos);
 
     } catch (e) {
         console.error("Error loading videos:", e);
@@ -361,41 +362,61 @@ document.getElementById('uploadForm')?.addEventListener('submit', async (e) => {
 let currentLightboxIndex = 0;
 
 window.openGalleryModal = (index) => {
-    const activity = currentGalleryActivities[index];
+    const activity = window.currentGalleryActivities[index];
     if (!activity) return;
 
     const modal = document.getElementById('galleryModal');
-    const title = document.getElementById('galleryTitle');
-    const grid = document.getElementById('galleryImagesGrid');
+    // Using correct ID from index.html
+    const title = document.getElementById('galleryModalTitle');
+    // Using correct ID for body/grid from index.html
+    const grid = document.getElementById('galleryModalBody');
+
+    // Also update description and date if they exist
+    const desc = document.getElementById('galleryModalDescription');
+    const date = document.getElementById('galleryModalDate');
 
     // Set global for lightbox
     window.currentActivityImages = activity.images || [];
 
     if (title) title.textContent = activity.title;
+    if (desc) desc.textContent = activity.description || '';
+    if (date) date.textContent = activity.year || '';
+
     if (grid) {
-        grid.innerHTML = activity.images.map((img, i) => `
+        grid.innerHTML = (activity.images || []).map((img, i) => `
             <div class="gallery-item" onclick="openLightbox(${i})">
                 <img src="${img}" loading="lazy" alt="Foto ${i + 1}">
             </div>
         `).join('');
     }
 
+    // Initialize social features for this activity
+    initSocialFeatures(activity.id);
+
     if (modal) {
-        modal.style.display = 'block';
+        modal.classList.add('active'); // Use class instead of display: block for animation consistency
+        modal.style.display = 'block'; // Keep ensuring display for safety
         document.body.style.overflow = 'hidden';
     }
 };
 
 window.closeGalleryModal = () => {
+    // Unsubscribe from real-time listeners
+    if (unsubscribeLikes) unsubscribeLikes();
+    if (unsubscribeComments) unsubscribeComments();
+
     const modal = document.getElementById('galleryModal');
     if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        modal.classList.remove('active');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 300); // Wait for transition
     }
 };
 
 window.openVideoModal = (index) => {
-    const video = currentGalleryVideos[index];
+    const video = window.currentGalleryVideos[index];
     if (!video) return;
 
     const modal = document.getElementById('videoModal');
@@ -658,27 +679,4 @@ window.deleteComment = async (activityId, commentId) => {
     }
 };
 
-// Override closeGalleryModal to unsubscribe
-const originalClose = window.closeGalleryModal;
-window.closeGalleryModal = () => {
-    if (unsubscribeLikes) unsubscribeLikes();
-    if (unsubscribeComments) unsubscribeComments();
 
-    // Call original or recreate logic
-    // Since originalClose is defined in global scope or simple function, 
-    // let's just replicate the simple logic:
-    const modal = document.getElementById('galleryModal');
-    if (modal) {
-        modal.classList.remove('active');
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300);
-    }
-    // Or call the original if accessible:
-    // originalClose(); // Risk of recursion/undefined if not captured well?
-    // Actually the function is defined in this file's scope in previous version?
-    // It was likely 'window.closeGalleryModal = ...' so we are overwriting it. 
-    // The previous implementation was:
-    // window.closeGalleryModal = function() { ... }
-    // So we just redefine it.
-};
