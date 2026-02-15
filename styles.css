@@ -30,7 +30,8 @@
   --item-hover: #374151;
   --text-primary: #f9fafb;
   --text-secondary: #9ca3af;
-  --white: #1f2937;
+  --white: #ffffff;
+  /* Keep it white for contrast markers */
   --text-dark: #f9fafb;
 }
 
@@ -2038,6 +2039,28 @@ footer {
   text-align: center;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: 2rem;
+}
+
+
+/* Reset info-cards and section text to white where required */
+.info-card h2,
+.info-card p,
+.about-project h2,
+.about-project p,
+.hero-content h1,
+.hero-content p,
+.hero-tagline,
+.view-section h2,
+.view-section section>p {
+  color: #ffffff !important;
+}
+
+/* Ensure bottom nav is always on top and visible */
+.bottom-nav {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
 }
 
 footer p {
