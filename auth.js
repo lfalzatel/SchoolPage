@@ -11,7 +11,6 @@ import {
     createUserWithEmailAndPassword,
     updateProfile,
     signOut,
-    signOut,
     onAuthStateChanged,
     setPersistence,
     browserLocalPersistence
