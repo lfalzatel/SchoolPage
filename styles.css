@@ -110,6 +110,21 @@ body {
   overflow: hidden;
 }
 
+/* Force white text for Header Brand */
+.app-header .header-brand .header-title,
+.app-header .header-brand .header-subtitle {
+  color: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Force white text for Hero Message Card */
+.hero-message,
+.hero-message p,
+.hero-message strong {
+  color: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
 /* .header-hero::before removed per user request */
 
 .hero-content {
@@ -2075,25 +2090,27 @@ footer {
 /* Ensure bottom nav is always on top and visible */
 .bottom-nav {
   position: fixed !important;
-  /* Force fixed positioning */
-  bottom: 2rem !important;
-  /* Ensure it's lifted from bottom */
+  bottom: 20px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   display: flex !important;
+  align-items: center;
+  justify-content: space-around;
   visibility: visible !important;
   opacity: 1 !important;
   z-index: 2147483647 !important;
-  /* Max z-index */
   background: rgba(255, 255, 255, 0.95);
-  /* High opacity for visibility */
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  width: auto;
-  min-width: 300px;
-  padding: 0.8rem 2rem;
+  width: 90%;
+  /* Responsive width */
+  max-width: 400px;
+  height: auto;
+  padding: 10px 20px;
   border-radius: 50px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  margin: 0 auto;
+  /* Safety centering */
 }
 
 /* Dark Mode Bottom Nav */
@@ -2110,12 +2127,10 @@ footer {
   color: var(--primary);
 }
 
-footer p {
+footer p,
+footer a {
   color: #ffffff !important;
-  /* Force white footer text */
-  margin-top: 1rem;
-  opacity: 0.9;
-  margin: 0.5rem 0;
+  text-decoration: none;
 }
 
 footer a {
