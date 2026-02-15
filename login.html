@@ -323,8 +323,8 @@
             <span>O continúa con</span>
         </div>
 
-        <button id="googleLoginBtn" class="google-btn" onclick="handleGoogleClick()">
-            <i class="fab fa-google" style="color: #DB4437;"></i> Google
+        <button id="googleLoginBtn" class="google-btn">
+            <i class="fab fa-google" style="color: #DB4437;"></i> <span id="googleBtnText">Google</span>
         </button>
 
         <button id="installAppBtn" class="google-btn"
@@ -456,18 +456,35 @@
         window.registerWithEmail = registerWithEmail;
 
         window.handleGoogleClick = async () => {
-            console.log("GOOGLE BUTTON CLICKED (GLOBAL HANDLER)");
+            console.log("GOOGLE BUTTON CLICKED");
+            const gBtn = document.getElementById('googleLoginBtn');
+            const gBtnText = document.getElementById('googleBtnText');
+            const originalText = gBtnText.innerText;
+
             try {
                 if (typeof window.loginWithGoogle !== 'function') {
                     alert("Error: loginWithGoogle no está cargado todavía.");
                     return;
                 }
+
+                gBtn.disabled = true;
+                gBtnText.innerText = "Cargando...";
+
                 await window.loginWithGoogle();
+
             } catch (err) {
                 console.error("DEBUG: Google Click Error:", err);
-                alert("Error de Google: " + err.message);
+                // Si el error no es cancelación del usuario, mostrar alerta
+                if (err.code !== 'auth/cancelled-popup-request' && err.code !== 'auth/popup-closed-by-user') {
+                    alert("Error de Google: " + err.message);
+                }
+                gBtn.disabled = false;
+                gBtnText.innerText = originalText;
             }
         };
+
+        // Escuchar el evento click de forma limpia
+        document.getElementById('googleLoginBtn')?.addEventListener('click', window.handleGoogleClick);
 
         // Auth Guard: If already logged in, redirect to index
         onAuthStateChanged(auth, (user) => {
