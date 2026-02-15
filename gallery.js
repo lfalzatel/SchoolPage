@@ -58,10 +58,16 @@ const activitiesSeedData = [
 ];
 
 const videosSeedData = [
-    { title: 'Green Force: Nace un Movimiento Ambiental', description: 'Presentación inicial de nuestro proyecto Green Force, mostrando cómo nació esta iniciativa ambiental en la IE Barro Blanco.', videoId: '9StDvt-2Nbs', thumbnail: 'https://img.youtube.com/vi/9StDvt-2Nbs/hqdefault.jpg' },
-    { title: 'Reforestación - 1000 Árboles para el Premio Zayed 2025', description: 'Jornada de reforestación donde plantamos más de 1000 árboles nativos como parte de nuestra postulación al Premio Zayed de Sostenibilidad.', videoId: 'QUC-DD5WTRI', thumbnail: 'https://img.youtube.com/vi/QUC-DD5WTRI/hqdefault.jpg' },
-    { title: 'Planting a Sustainable Future', description: 'Documental completo sobre nuestro proyecto Green Force y nuestra postulación al Premio Zayed 2025, mostrando todas nuestras actividades ambientales.', videoId: 'H_0aTsx8C-w', thumbnail: 'https://img.youtube.com/vi/H_0aTsx8C-w/hqdefault.jpg' }
+    { title: 'Planting a Sustainable Future', description: 'Documental completo sobre nuestro proyecto Green Force y nuestra postulación al Premio Zayed 2025.', videoId: 'H_0aTsx8C-w', thumbnail: 'https://img.youtube.com/vi/H_0aTsx8C-w/hqdefault.jpg' },
+    { title: 'Fomentando la Conciencia Ambiental', description: 'Video sobre el fomento de la conciencia ambiental en nuestra institución.', videoId: 'XeIvLfG3K3A', thumbnail: 'https://img.youtube.com/vi/XeIvLfG3K3A/hqdefault.jpg' },
+    { title: 'Green Force: Nace un Movimiento Ambiental', description: 'Presentación inicial de nuestro proyecto Green Force en la IE Barro Blanco.', videoId: '9StDvt-2Nbs', thumbnail: 'https://img.youtube.com/vi/9StDvt-2Nbs/hqdefault.jpg' },
+    { title: 'Reforestación - 1000 Árboles (Short)', description: 'Jornada de reforestación como parte de nuestra postulación al Premio Zayed 2025.', videoId: 'QUC-DD5WTRI', thumbnail: 'https://img.youtube.com/vi/QUC-DD5WTRI/hqdefault.jpg', isShort: true }
 ];
+
+const seedData = {
+    activities: activitiesSeedData,
+    videos: videosSeedData
+};
 
 // --- SEED FUNCTION ---
 window.seedDatabase = async () => {
@@ -102,40 +108,7 @@ window.seedDatabase = async () => {
 window.currentGalleryActivities = [];
 window.currentGalleryVideos = [];
 
-// --- LOAD FUNCTIONS ---
-// Fallback Local Data (Se usará si Firestore está vacío o falla)
-const seedData = {
-    activities: [
-        {
-            title: "Reforestación Microcuenca ARSA",
-            description: "Jornada de siembra de 1000 árboles nativos para la protección del recurso hídrico.",
-            year: "2024",
-            thumbnail: "assets/images/17. Visita Microcuenca ARSA - 1.jpg",
-            images: [
-                "assets/images/17. Visita Microcuenca ARSA - 1.jpg",
-                "assets/images/17. Visita Microcuenca ARSA - 2.jpg",
-                "assets/images/17. Visita Microcuenca ARSA - 3.jpg"
-            ]
-        },
-        {
-            title: "Capacitación CORNARE",
-            description: "Taller sobre manejo de residuos sólidos y compostaje institucional.",
-            year: "2023",
-            thumbnail: "assets/images/10. Capacitación CORNARE - 1.jpg",
-            images: [
-                "assets/images/10. Capacitación CORNARE - 1.jpg",
-                "assets/images/10. Capacitación CORNARE - 2.jpg"
-            ]
-        }
-    ],
-    videos: [
-        {
-            title: "Presentación Green Force",
-            url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-            thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg"
-        }
-    ]
-};
+// La variable seedData ya fue definida correctamente arriba agrupando las constantes activitiesSeedData y videosSeedData corregidas.
 
 // Configuración de fondo
 const allBackgroundImages = [
@@ -166,10 +139,20 @@ export async function loadActivities(targetId = 'activitiesGrid') {
             activities.push({ id: doc.id, ...doc.data() });
         });
 
-        // Aplicar fallback si está vacío
-        const finalActivities = activities.length > 0 ? activities : seedData.activities;
-        window.currentGalleryActivities = finalActivities;
+        // Combinar datos de Firestore con Seed Data para asegurar que se muestre todo
+        // Usamos un Map por título para evitar duplicados si ya se subieron
+        const activitiesMap = new Map();
 
+        // Primero cargamos los seed (históricos)
+        seedData.activities.forEach(act => activitiesMap.set(act.title, act));
+
+        // Luego sobreescribimos/añadimos con los de Firestore (más recientes o editados)
+        activities.forEach(act => activitiesMap.set(act.title, act));
+
+        const finalActivities = Array.from(activitiesMap.values())
+            .sort((a, b) => (b.year || '0').localeCompare(a.year || '0'));
+
+        window.currentGalleryActivities = finalActivities;
         renderActivityCards(finalActivities, targetId);
 
     } catch (e) {
@@ -189,12 +172,18 @@ export async function loadVideos() {
         const q = query(collection(db, "videos"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
 
-        window.currentGalleryVideos = [];
+        const firestoreVideos = [];
         querySnapshot.forEach((doc) => {
-            window.currentGalleryVideos.push({ id: doc.id, ...doc.data() });
+            firestoreVideos.push({ id: doc.id, ...doc.data() });
         });
 
-        const videosToRender = window.currentGalleryVideos.length > 0 ? window.currentGalleryVideos : seedData.videos;
+        // Combinar videos
+        const videosMap = new Map();
+        seedData.videos.forEach(v => videosMap.set(v.videoId, v));
+        firestoreVideos.forEach(v => videosMap.set(v.videoId, v));
+
+        const videosToRender = Array.from(videosMap.values());
+        window.currentGalleryVideos = videosToRender;
         renderVideoCards(videosToRender);
 
     } catch (e) {
