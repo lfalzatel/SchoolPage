@@ -31,9 +31,12 @@
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
     onAuthStateChanged(auth, (user) => {
+      console.log("Index Auth Guard: State Changed. User:", user ? user.uid : "null");
       if (!user) {
+        console.warn("Index Auth Guard: No user, redirecting to login.html...");
         window.location.href = 'login.html';
       } else {
+        console.log("Index Auth Guard: User authenticated. Showing content.");
         document.body.style.display = 'block'; // Show content
       }
     });

@@ -460,10 +460,18 @@
         document.getElementById('googleLoginBtn')?.addEventListener('click', window.handleGoogleClick);
 
         // Auth Guard: If already logged in, redirect to index
+        // Auth Guard: If already logged in, redirect to index
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log("User already logged in, redirecting...");
-                window.location.href = 'index.html';
+                console.log("User already logged in (uid: " + user.uid + "), waiting for persistence...");
+                document.getElementById('authStatus').innerText = "Sesión detectada. Redirigiendo...";
+                // Small delay to ensure IndexedDB persistence is complete before jumping
+                setTimeout(() => {
+                    console.log("Redirecting to index.html now.");
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                console.log("No user session found in onAuthStateChanged.");
             }
         });
 
