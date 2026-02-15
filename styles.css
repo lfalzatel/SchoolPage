@@ -84,7 +84,8 @@
 body {
   font-family: var(--font-main);
   line-height: 1.6;
-  color: var(--text-dark);
+  /* color: var(--text-dark); */
+  color: white;
   /* IMPORTANT: overflow-x: hidden en body rompe position:fixed en mobile.
      En su lugar se aplica en el wrapper #content-to-pdf */
   scroll-padding-top: 100px;
@@ -111,7 +112,7 @@ body {
 }
 
 /* Force white text for Header Brand */
-.app-header .header-brand .header-title,
+.app-header .header-brand,
 .app-header .header-brand .header-subtitle {
   color: #ffffff !important;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
@@ -172,9 +173,13 @@ body {
   line-height: 1.1;
   opacity: 0;
   animation: fadeInUp 1s ease 0.3s forwards;
-  color: #ffffff !important;
+  /* color: #ffffff !important; */
   /* Force white text */
-  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8) !important;
+  background: linear-gradient(135deg, #c1fc63, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8) !important; */
   /* Stronger shadow */
 }
 
@@ -194,7 +199,7 @@ body {
 .hero-message {
   background: rgba(0, 0, 0, 0.4) !important;
   /* Darker semi-transparent background */
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(0.2px);
   -webkit-backdrop-filter: blur(10px);
   padding: 1.5rem 2rem;
   border-radius: 20px;
@@ -302,7 +307,7 @@ nav {
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(15px);
   position: sticky;
-  top: 0;
+  /* top: 0; */
   z-index: 1000;
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
   padding: 0.5rem 1rem;
@@ -468,9 +473,17 @@ section {
   max-width: 1200px;
   margin: 3rem auto;
   padding: 3rem 2rem;
-  background: white;
-  border-radius: 25px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  /* background: white; */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(0.5px);
+  -webkit-backdrop-filter: blur(0.5px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  padding: 24px;
+  text-align: center;
+  /* border-radius: 25px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); */
 }
 
 section h2 {
@@ -510,10 +523,13 @@ section h2::after {
 .video-card,
 .document-card,
 .contact-card {
-  background: white;
+  /* background: white; */
+  background: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(0.2px);
+    -webkit-backdrop-filter: blur(10px);  
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 20px rgba(249, 245, 245, 0.1);
   transition: all 0.4s ease;
   cursor: pointer;
   border: 2px solid transparent;
@@ -573,7 +589,11 @@ section h2::after {
 
 .activity-card-content h3,
 .video-card-content h3 {
-  color: #065f46;
+  /* color: #065f46; */
+  background: linear-gradient(135deg, #99fbad, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-size: 1.3rem;
   margin-bottom: 0.8rem;
   font-weight: 600;
@@ -581,7 +601,7 @@ section h2::after {
 
 .activity-card-content p,
 .video-card-content p {
-  color: #6b7280;
+  color: #d1dffd;
   font-size: 0.95rem;
   line-height: 1.6;
   margin-bottom: 1rem;
@@ -714,7 +734,13 @@ section h2::after {
 
 /* Social Section */
 .social-section {
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(0.5px);
+  -webkit-backdrop-filter: blur(0.5px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  padding: 24px;
   text-align: center;
 }
 
@@ -756,7 +782,11 @@ section h2::after {
 
 /* Contact Cards */
 .contact-card {
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  /* background: linear-gradient(135deg, #f0fdf4, #dcfce7); */
+  background: rgba(0, 0, 0, 0.4);
+  /* Darker semi-transparent background */
+  backdrop-filter: blur(0.2px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 2.5rem;
   border-radius: 20px;
   text-align: center;
@@ -771,12 +801,12 @@ section h2::after {
 }
 
 .contact-card h3 {
-  color: #065f46;
+  color: #f7fbfa;
   margin-bottom: 0.8rem;
 }
 
 .contact-card a {
-  color: #047857;
+  color: #f8f9f9;
   text-decoration: none;
   font-weight: 500;
 }
@@ -1005,6 +1035,7 @@ footer {
 }
 
 /* Bottom Navigation - Premium Floating Glassmorphism Style */
+/* Bottom Navigation - Premium Floating Glassmorphism Style */
 .bottom-nav {
   display: flex !important;
   position: fixed !important;
@@ -1018,18 +1049,18 @@ footer {
   height: 65px;
   padding: 0 25px;
 
-  /* Glassmorphism & Fallback */
-  background-color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* ✅ Glassmorphism real */
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   border-radius: 50px;
 
   z-index: 2147483647 !important;
-  /* Max Z-Index to stay on top */
   visibility: visible !important;
   opacity: 1 !important;
 
@@ -1037,10 +1068,15 @@ footer {
   align-items: center;
   gap: 10px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Safe area for iPhone */
   padding-bottom: env(safe-area-inset-bottom);
   margin-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav:hover {
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: translateX(-50%) translateY(-3px) !important;
 }
 
 .bottom-nav:hover {
@@ -1053,7 +1089,7 @@ footer {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #64748b;
+  color: #99fbad;
   text-decoration: none;
   font-size: 0.65rem;
   font-weight: 500;
@@ -1163,14 +1199,28 @@ section h2 {
 /* Improve Readability - Scoped to sections to avoid breaking header/footer */
 .view-section p {
   font-size: 1rem !important;
-  color: #374151 !important;
+  color: #f9fafb !important;
   /* Force dark gray on light sections */
 }
 
-.view-section h2,
+.view-section h2 {
+  background: linear-gradient(135deg, #a3e635, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* background: linear-gradient(135deg, #ffffff, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text; */
+}
+
 .view-section h3 {
-  color: #111827 !important;
+  /* color: #111827 !important; */
   /* Force dark headings on light sections */
+  background: linear-gradient(135deg, #99fbad, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Adjust FAB position */
@@ -1519,7 +1569,7 @@ section h2 {
   background: linear-gradient(135deg, #ffffff, #d1fae5);
   -webkit-background-clip: text;
   background-clip: text;
-  -webkit-text-fill-color: transparent;
+  /* -webkit-text-fill-color: transparent; */
 }
 
 .header-right {
@@ -2156,77 +2206,8 @@ footer a:hover {
   text-decoration: underline;
 }
 
-/* Premium Floating Menu Styles Consolidated at line 1008 */
-
-.bottom-nav:hover {
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-  transform: translateX(-50%) translateY(-2px) !important;
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  color: #555;
-  position: relative;
-  transition: all 0.3s ease;
-  flex: 1;
-  /* Share space */
-  padding: 5px 0;
-  border-radius: 12px;
-}
-
-.nav-item i {
-  font-size: 1.4rem;
-  margin-bottom: 2px;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.nav-item span {
-  font-size: 0.65rem;
-  font-weight: 600;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-
-/* Hover State */
-.nav-item:hover {
-  color: var(--primary);
-  background: rgba(0, 0, 0, 0.03);
-}
-
-.nav-item:hover i {
-  transform: translateY(-2px);
-}
-
-/* Active State */
-.nav-item.active {
-  color: var(--primary);
-}
-
-.nav-item.active i {
-  transform: scale(1.1);
-  filter: drop-shadow(0 4px 6px rgba(46, 125, 50, 0.3));
-}
-
-.nav-item.active span {
-  opacity: 1;
-  font-weight: 700;
-}
-
-/* Active Indicator Dot */
-.nav-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: 5px;
-  width: 4px;
-  height: 4px;
-  background: var(--primary);
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--primary);
-}
+/* Premium Floating Menu Styles Consolidated at line 1030 */
+/* Redundant .bottom-nav:hover and .nav-item styles removed */
 
 /* Dark Mode Overrides for Menu */
 .dark-mode .bottom-nav {

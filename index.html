@@ -32,18 +32,35 @@
 
     onAuthStateChanged(auth, (user) => {
       console.log("Index Auth Guard: State Changed. User:", user ? user.uid : "null");
+      const loader = document.getElementById('auth-loader');
       if (!user) {
         console.warn("Index Auth Guard: No user, redirecting to login.html...");
         window.location.href = 'login.html';
       } else {
         console.log("Index Auth Guard: User authenticated. Showing content.");
-        document.body.style.display = 'block'; // Show content
+        if (loader) loader.style.display = 'none';
+        // document.body.style.display = 'block'; // No longer needed as body isn't hidden
       }
     });
   </script>
   <style>
     body {
-      display: none;
+      margin: 0;
+      background-color: #000;
+      color: #fff;
+    }
+
+    #auth-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
     }
   </style>
 
@@ -63,6 +80,7 @@
 </head>
 
 <body>
+  <div id="auth-loader"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
   <!-- Randomized App Background -->
   <div id="app-background"></div>
 
@@ -589,6 +607,7 @@
         </div>
       </div>
     </div>
+    </div><!-- ✅ cierra #uploadModal -->
 
     <div class="fab" onclick="scrollToSection('sobre')">
       <i class="fas fa-arrow-up"></i>
@@ -999,25 +1018,25 @@
         }
       });
     </script>
-    <nav class="bottom-nav"
-      style="display: flex !important; position: fixed !important; bottom: 20px !important; z-index: 2147483647 !important; visibility: visible !important; opacity: 1 !important;">
-      <a href="#home" class="nav-item active" onclick="showView('home')">
+    <!-- ✅ ÚNICO bottom-nav — igual al de gallery.html -->
+    <nav class="bottom-nav">
+      <a href="#sobre" class="nav-item active">
         <i class="fas fa-home"></i>
         <span>Inicio</span>
       </a>
-      <a href="#about-project" class="nav-item" onclick="scrollToSection('about-project')">
+      <a href="" class="nav-item">
         <i class="fas fa-leaf"></i>
         <span>Nosotros</span>
       </a>
-      <a href="#galeria" class="nav-item" onclick="showView('galeria')">
+      <a href="gallery.html" class="nav-item">
         <i class="fas fa-images"></i>
         <span>Galería</span>
       </a>
-      <a href="#video" class="nav-item" onclick="showView('video')">
+      <a href="#video" class="nav-item">
         <i class="fas fa-play-circle"></i>
         <span>Videos</span>
       </a>
-      <a href="#documentos" class="nav-item" onclick="showView('documentos')">
+      <a href="#documentos" class="nav-item">
         <i class="fas fa-file-alt"></i>
         <span>Docs</span>
       </a>

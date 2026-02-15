@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Year Selector - Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #022c1a 0%, #064e3b 40%, #065f46 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    font-family: 'Sora', sans-serif;
+    padding: 40px 20px;
+  }
+
+  /* ─── Label contextual ─── */
+  .selector-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(110, 231, 183, 0.6);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  /* ════════════════════════════════════
+     VERSIÓN 1 — Sliding Track Premium
+  ════════════════════════════════════ */
+  .year-selector-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .year-scroll {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(110, 231, 183, 0.15);
+    border-radius: 50px;
+    padding: 5px;
+    gap: 0;
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  /* Indicador deslizante */
+  .year-scroll::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    height: calc(100% - 10px);
+    width: var(--pill-w, 80px);
+    transform: translateX(var(--pill-x, 0px));
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-radius: 40px;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4),
+                0 0 0 1px rgba(16, 185, 129, 0.3);
+    z-index: 0;
+  }
+
+  .year-pill {
+    position: relative;
+    z-index: 1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Sora', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.45);
+    padding: 9px 22px;
+    border-radius: 40px;
+    transition: color 0.25s ease;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .year-pill:hover:not(.active) {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .year-pill.active {
+    color: #ffffff;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  }
+
+  /* ════════════════════════════════════
+     VERSIÓN 2 — Cards con icono de año
+  ════════════════════════════════════ */
+  .year-cards-wrapper {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .year-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 16px 24px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 80px;
+    overflow: hidden;
+    font-family: 'Sora', sans-serif;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .year-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.08));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 18px;
+  }
+
+  .year-card:hover::before,
+  .year-card.active::before {
+    opacity: 1;
+  }
+
+  .year-card.active {
+    border-color: rgba(16, 185, 129, 0.5);
+    transform: translateY(-4px);
+    box-shadow:
+      0 12px 30px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(16, 185, 129, 0.3),
+      0 0 20px rgba(16, 185, 129, 0.15);
+  }
+
+  .year-card:hover:not(.active) {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .year-card-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .year-card.active .year-card-dot {
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  }
+
+  .year-card-text {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.05em;
+    transition: color 0.3s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .year-card.active .year-card-text {
+    color: #ffffff;
+  }
+
+  .year-card-sub {
+    font-size: 0.6rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.25);
+    transition: color 0.3s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .year-card.active .year-card-sub {
+    color: rgba(16, 185, 129, 0.8);
+  }
+
+  /* ════════════════════════════════════
+     VERSIÓN 3 — Timeline Horizontal
+  ════════════════════════════════════ */
+  .timeline-selector {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+  }
+
+  .timeline-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    position: relative;
+    padding: 0 4px;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    background: none;
+    border: none;
+    font-family: 'Sora', sans-serif;
+  }
+
+  .timeline-line {
+    width: 60px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-top: -20px; /* alinear con el nodo */
+    transition: background 0.3s ease;
+  }
+
+  .timeline-item.active + .timeline-line,
+  .timeline-line.passed {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.6), rgba(255,255,255,0.1));
+  }
+
+  .timeline-node {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+
+  .timeline-node::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid rgba(16, 185, 129, 0);
+    transition: border-color 0.3s ease, transform 0.3s ease;
+    transform: scale(0.8);
+  }
+
+  .timeline-item:hover .timeline-node {
+    border-color: rgba(16, 185, 129, 0.4);
+    transform: scale(1.05);
+  }
+
+  .timeline-item.active .timeline-node {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15),
+                0 4px 15px rgba(16, 185, 129, 0.4);
+    transform: scale(1.15);
+  }
+
+  .timeline-item.active .timeline-node::after {
+    border-color: rgba(16, 185, 129, 0.3);
+    transform: scale(1);
+  }
+
+  .timeline-node-inner {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .timeline-item.active .timeline-node-inner {
+    background: white;
+    box-shadow: 0 0 6px rgba(255,255,255,0.5);
+  }
+
+  .timeline-year {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.05em;
+    transition: color 0.3s ease;
+    margin-top: 4px;
+  }
+
+  .timeline-item.active .timeline-year {
+    color: #fff;
+  }
+
+  .timeline-item:hover:not(.active) .timeline-year {
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  /* Labels de sección */
+  .section-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(110, 231, 183, 0.4);
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  /* Separadores de demo */
+  .demo-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  /* Ripple animation */
+  @keyframes ripple {
+    to { transform: scale(3); opacity: 0; }
+  }
+
+  .ripple-ring {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(16, 185, 129, 0.5);
+    animation: ripple 0.6s ease-out forwards;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════
+     VERSIÓN 1 — Sliding Track
+════════════════════════════ -->
+<div class="demo-block">
+  <div class="section-label">Opción A — Track deslizante</div>
+  <div class="year-selector-container">
+    <div class="year-scroll" id="trackScroll">
+      <button class="year-pill active" data-year="all">Todos</button>
+      <button class="year-pill" data-year="2025">2025</button>
+      <button class="year-pill" data-year="2024">2024</button>
+      <button class="year-pill" data-year="2023">2023</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     VERSIÓN 2 — Cards
+════════════════════════════ -->
+<div class="demo-block">
+  <div class="section-label">Opción B — Cards elevadas</div>
+  <div class="year-cards-wrapper" id="cardsWrapper">
+    <button class="year-card active" data-year="all">
+      <span class="year-card-dot"></span>
+      <span class="year-card-text">Todos</span>
+      <span class="year-card-sub">Período</span>
+    </button>
+    <button class="year-card" data-year="2025">
+      <span class="year-card-dot"></span>
+      <span class="year-card-text">2025</span>
+      <span class="year-card-sub">Actual</span>
+    </button>
+    <button class="year-card" data-year="2024">
+      <span class="year-card-dot"></span>
+      <span class="year-card-text">2024</span>
+      <span class="year-card-sub">Pasado</span>
+    </button>
+    <button class="year-card" data-year="2023">
+      <span class="year-card-dot"></span>
+      <span class="year-card-text">2023</span>
+      <span class="year-card-sub">Inicio</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     VERSIÓN 3 — Timeline
+════════════════════════════ -->
+<div class="demo-block">
+  <div class="section-label">Opción C — Línea de tiempo</div>
+  <div class="timeline-selector" id="timelineSelector">
+    <button class="timeline-item" data-year="all">
+      <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+      <span class="timeline-year">Todo</span>
+    </button>
+    <div class="timeline-line"></div>
+    <button class="timeline-item active" data-year="2025">
+      <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+      <span class="timeline-year">2025</span>
+    </button>
+    <div class="timeline-line"></div>
+    <button class="timeline-item" data-year="2024">
+      <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+      <span class="timeline-year">2024</span>
+    </button>
+    <div class="timeline-line"></div>
+    <button class="timeline-item" data-year="2023">
+      <div class="timeline-node"><div class="timeline-node-inner"></div></div>
+      <span class="timeline-year">2023</span>
+    </button>
+  </div>
+</div>
+
+<script>
+/* ── Versión 1: Sliding track ── */
+const track = document.getElementById('trackScroll');
+const pills = track.querySelectorAll('.year-pill');
+
+function updateTrack(activePill) {
+  pills.forEach(p => p.classList.remove('active'));
+  activePill.classList.add('active');
+
+  // Calcular posición y ancho del pill activo
+  const trackRect = track.getBoundingClientRect();
+  const pillRect = activePill.getBoundingClientRect();
+  const offset = pillRect.left - trackRect.left - 5; // -5 = padding
+  const width = pillRect.width;
+
+  track.style.setProperty('--pill-x', offset + 'px');
+  track.style.setProperty('--pill-w', width + 'px');
+}
+
+// Inicializar posición
+window.addEventListener('load', () => {
+  const firstActive = track.querySelector('.year-pill.active');
+  if (firstActive) updateTrack(firstActive);
+});
+
+pills.forEach(pill => {
+  pill.addEventListener('click', () => updateTrack(pill));
+});
+
+
+/* ── Versión 2: Cards ── */
+const cards = document.querySelectorAll('#cardsWrapper .year-card');
+cards.forEach(card => {
+  card.addEventListener('click', () => {
+    cards.forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+  });
+});
+
+
+/* ── Versión 3: Timeline con ripple ── */
+const timelineItems = document.querySelectorAll('#timelineSelector .timeline-item');
+
+timelineItems.forEach(item => {
+  item.addEventListener('click', () => {
+    // Quitar activos
+    timelineItems.forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+
+    // Ripple en el nodo
+    const node = item.querySelector('.timeline-node');
+    const ring = document.createElement('div');
+    ring.className = 'ripple-ring';
+    node.appendChild(ring);
+    setTimeout(() => ring.remove(), 700);
+  });
+});
+</script>
+</body>
+</html>

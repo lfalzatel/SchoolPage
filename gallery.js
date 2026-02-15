@@ -1149,4 +1149,4 @@ async function initGallery() {
 document.addEventListener('DOMContentLoaded', initGallery);
 
 // Also export for manual debugging
-export { initGallery, filterActivitiesByYear };
+export { initGallery };
