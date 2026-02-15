@@ -902,11 +902,11 @@ footer {
 
 /* Bottom Navigation - Premium Floating Glassmorphism Style */
 .bottom-nav {
-  display: none;
-  /* Hidden on desktop */
+  display: flex;
   position: fixed;
   bottom: 25px;
-  /* Floating from bottom */
+  top: auto !important;
+  /* Fix: avoid stretching due to inherited top:0 from global nav */
   left: 50%;
   transform: translateX(-50%);
   width: 92%;
@@ -917,7 +917,6 @@ footer {
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   border-radius: 50px;
-  /* Fully rounded capsule */
   z-index: 5000;
   padding: 8px 15px;
   justify-content: space-around;
@@ -1515,8 +1514,9 @@ body {
     padding-bottom: 0;
   }
 
+  /* Keep bottom-nav visible on desktop too as requested */
   .bottom-nav {
-    display: none;
+    display: flex;
   }
 }
 
