@@ -1181,7 +1181,7 @@ section h2 {
   bottom: 85px;
   right: 15px;
 }
-}
+
 
 .fab:hover {
   transform: scale(1.15);
@@ -2204,9 +2204,9 @@ body.dark-mode .hero-tagline,
 
 /* Dark Mode Footer */
 .dark-mode footer {
-  background: #f4f5f5;
-  /* background: #064030; */
-  border-top-color: rgba(255, 255, 255, 0.05);
+  background: #064e3b;
+  /* Dark Emerald */
+  border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 .footer-brand {

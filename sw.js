@@ -1,4 +1,4 @@
-const CACHE_NAME = 'green-force-v15';
+const CACHE_NAME = 'green-force-v16';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -39,9 +39,10 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network-first for HTML, JS and Firebase/API calls to avoid caching old logic
+  // Network-first for HTML, JS, CSS and Firebase/API calls to avoid caching old logic
   const isCritical = event.request.url.endsWith('.html') ||
     event.request.url.endsWith('.js') ||
+    event.request.url.endsWith('.css') ||
     event.request.url.includes('firebase') ||
     event.request.url.includes('googleapis');
 
