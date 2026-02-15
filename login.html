@@ -261,7 +261,7 @@
             <span>O continúa con</span>
         </div>
 
-        <button id="googleLoginBtn" class="google-btn">
+        <button id="googleLoginBtn" class="google-btn" onclick="handleGoogleClick()">
             <i class="fab fa-google" style="color: #DB4437;"></i> Google
         </button>
 
@@ -343,6 +343,21 @@
         import { loginWithEmail, loginWithGoogle, registerWithEmail, logout } from './auth.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
+        // Exponer funciones globales para mayor compatibilidad
+        window.loginWithGoogle = loginWithGoogle;
+        window.loginWithEmail = loginWithEmail;
+        window.registerWithEmail = registerWithEmail;
+
+        window.handleGoogleClick = async () => {
+            console.log("GOOGLE BUTTON CLICKED (GLOBAL HANDLER)");
+            try {
+                await loginWithGoogle();
+            } catch (err) {
+                console.error("DEBUG: Google Click Error:", err);
+                alert("Error de Google: " + err.message);
+            }
+        };
+
         // Auth Guard: If already logged in, redirect to index
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -387,17 +402,16 @@
             }
         });
 
-        // Google Login
-        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-            console.log("Google login clicked");
-            try {
-                await loginWithGoogle();
-                // Redirect handled by onAuthStateChanged
-            } catch (error) {
-                console.error("Google Login Error:", error);
-                alert("Error con Google: " + error.message);
-            }
-        });
+        // Google Login Listener (Redundant but safe)
+        const gBtn = document.getElementById('googleLoginBtn');
+        if (gBtn) {
+            console.log("Google button listener attached successfully");
+            gBtn.addEventListener('click', () => {
+                console.log("Google login listener (addEventListener) detected click");
+            });
+        } else {
+            console.error("CRITICAL: Google button not found in DOM during script init");
+        }
 
         // Quick Test User Creation (For Demo)
         document.getElementById('createTestUserBtn').addEventListener('click', async (e) => {
