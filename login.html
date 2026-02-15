@@ -509,6 +509,12 @@
             console.log("Google button listener attached successfully");
             gBtn.addEventListener('click', () => {
                 console.log("Google login listener (addEventListener) detected click");
+                if (typeof window.handleGoogleClick === 'function') {
+                    window.handleGoogleClick();
+                } else {
+                    console.error("handleGoogleClick not found");
+                    alert("Error de inicialización. Por favor recarga la página.");
+                }
             });
         } else {
             console.error("CRITICAL: Google button not found in DOM during script init");

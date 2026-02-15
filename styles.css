@@ -1728,9 +1728,7 @@ body {
 
   /* .bottom-nav styles removed to allow floating menu on desktop too */
 
-  .nav-item {
-    /* Keep general nav item styles if needed, or simply inherit */
-  }
+
 
   .nav-item.active {
     color: white;
