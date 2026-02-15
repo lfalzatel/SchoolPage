@@ -1037,6 +1037,10 @@ footer {
   align-items: center;
   gap: 10px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Safe area for iPhone */
+  padding-bottom: env(safe-area-inset-bottom);
+  margin-bottom: env(safe-area-inset-bottom);
 }
 
 .bottom-nav:hover {
@@ -1742,7 +1746,7 @@ body {
   }
 }
 
-/* Bottom Navigation Styles Removed (Consolidated at line 1008) */
+/* Bottom Navigation Styles Consolidated at line 1008 */
 
 .nav-item i {
   font-size: 1.3rem;
@@ -2080,7 +2084,7 @@ footer a:hover {
   text-decoration: underline;
 }
 
-/* Premium Floating Menu Styles Removed (Consolidated at line 1008) */
+/* Premium Floating Menu Styles Consolidated at line 1008 */
 
 .bottom-nav:hover {
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
@@ -2218,6 +2222,7 @@ body.dark-mode .hero-tagline,
   color: #ffffff !important;
   opacity: 1 !important;
   text-shadow: none !important;
+  mix-blend-mode: normal !important;
 }
 
 .footer-brand {

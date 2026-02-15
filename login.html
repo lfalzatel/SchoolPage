@@ -349,27 +349,9 @@
     <script>
         window.onerror = function (msg, url, lineNo, columnNo, error) {
             console.error('GLOBAL ERROR:', msg, 'at', url, 'line', lineNo);
-            alert('Error crítico de carga: ' + msg);
+            // alert('Error crítico de carga: ' + msg); 
             return false;
         };
-        import { initBackgroundSlideshow } from './gallery.js';
-
-        const loginImages = [
-            '12. Visita agrosavia 2025 - 8.jpg',
-            '14. Sembraton de 1000 árboles - 5.jpg',
-            '14. Sembraton de 1000 árboles - 16.jpg',
-            '16. Miroorganismos del suelo - 2.jpg',
-            '15. Siembra y mantenimiento 5.jpg',
-            '16. Miroorganismos del suelo - 3.jpg',
-            '17. Visita Microcuenca ARSA - 15.jpg',
-            '19. Encuentro UCO - 4.jpg',
-            '19. Encuentro UCO - 8.jpg',
-            '20. Encuentro Nacional 2025 - 8.jpg'
-        ];
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initBackgroundSlideshow(loginImages);
-        });
     </script>
     <script>
         // --- PWA Installation Logic ---
@@ -420,12 +402,29 @@
         import { auth } from './firebase-config.js';
         import { loginWithEmail, loginWithGoogle, registerWithEmail, logout, handleRedirectAuth } from './auth.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { initBackgroundSlideshow } from './gallery.js';
+
+        const loginImages = [
+            '12. Visita agrosavia 2025 - 8.jpg',
+            '14. Sembraton de 1000 árboles - 5.jpg',
+            '14. Sembraton de 1000 árboles - 16.jpg',
+            '16. Miroorganismos del suelo - 2.jpg',
+            '15. Siembra y mantenimiento 5.jpg',
+            '16. Miroorganismos del suelo - 3.jpg',
+            '17. Visita Microcuenca ARSA - 15.jpg',
+            '19. Encuentro UCO - 4.jpg',
+            '19. Encuentro UCO - 8.jpg',
+            '20. Encuentro Nacional 2025 - 8.jpg'
+        ];
 
         // Exponer funciones globales para mayor compatibilidad
         window.loginWithGoogle = loginWithGoogle;
         window.loginWithEmail = loginWithEmail;
         window.registerWithEmail = registerWithEmail;
         window.handleRedirectAuth = handleRedirectAuth;
+
+        // Start slideshow immediately (module scripts defer by default)
+        initBackgroundSlideshow(loginImages);
 
         // Check for Redirect Result on load to catch errors or finish sign-in
         window.addEventListener('load', async () => {

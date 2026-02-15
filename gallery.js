@@ -519,7 +519,7 @@ export async function loadVideos() {
         renderVideoCards(videosToRender);
 
     } catch (e) {
-        console.error("Error loading videos:", e);
+        console.error("Error// Reading file first:", e);
         renderVideoCards(seedData.videos);
     }
 }
