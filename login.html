@@ -511,22 +511,9 @@
             }
         });
 
-        // Google Login Listener (Redundant but safe)
-        const gBtn = document.getElementById('googleLoginBtn');
-        if (gBtn) {
-            console.log("Google button listener attached successfully");
-            gBtn.addEventListener('click', () => {
-                console.log("Google login listener (addEventListener) detected click");
-                if (typeof window.handleGoogleClick === 'function') {
-                    window.handleGoogleClick();
-                } else {
-                    console.error("handleGoogleClick not found");
-                    alert("Error de inicialización. Por favor recarga la página.");
-                }
-            });
-        } else {
-            console.error("CRITICAL: Google button not found in DOM during script init");
-        }
+        // Google Login Listener cleanup
+        // The main listener is attached at line 460 via window.handleGoogleClick
+        // Removing duplicate listener to avoid "auth/popup-blocked" or race conditions.
 
         // Quick Test User Creation (For Demo)
         document.getElementById('createTestUserBtn').addEventListener('click', async (e) => {
