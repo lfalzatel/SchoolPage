@@ -1,18 +1,15 @@
 // ============================================================
 //  auth.js  —  Green Force PWA
-//  Usa signInWithRedirect en lugar de signInWithPopup para
-//  evitar bloqueos de popup en Edge, Chrome móvil y Vercel.
+//  Changed to signInWithPopup to avoid 404 handler errors
 // ============================================================
 
 import { auth, db } from './firebase-config.js';
 import {
     GoogleAuthProvider,
     signInWithPopup,
-    signInWithRedirect,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     updateProfile,
-    getRedirectResult,
     signOut,
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
@@ -43,46 +40,41 @@ async function saveUserToFirestore(user) {
 }
 
 // -----------------------------------------------------------
-//  LOGIN CON GOOGLE (Redirect — sin popup)
+//  LOGIN CON GOOGLE (POPUP)
 // -----------------------------------------------------------
 export const loginWithGoogle = async () => {
-    console.log("Starting loginWithGoogle process with Redirect...");
+    console.log("Starting loginWithGoogle process with POPUP...");
     try {
-        await signInWithRedirect(auth, provider);
-        // La redirección ocurrirá aquí, el código siguiente no se ejecutará inmediatamente.
+        const result = await signInWithPopup(auth, provider);
+        console.log("Popup Login Success:", result.user.displayName);
+
+        await saveUserToFirestore(result.user);
+
+        // onAuthStateChanged in login.html will handle the redirect, 
+        // but we can force it here too for snappy feel.
+        if (window.location.pathname.includes('login') || window.location.pathname.endsWith('/')) {
+            window.location.href = 'index.html';
+        }
+        return result.user;
+
     } catch (error) {
-        console.error("Google Login Redirect failed:", error);
-        alert("Error al iniciar redirección: " + error.message);
+        console.error("Google Login Popup failed:", error);
+        if (error.code === 'auth/popup-closed-by-user') {
+            console.warn("Popup closed by user");
+        } else {
+            alert("Error al iniciar sesión: " + error.message);
+        }
         throw error;
     }
 };
 
-// Nueva función para manejar el retorno del redireccionamiento
+// -----------------------------------------------------------
+//  HANDLERS (No-op for Redirect compatibility)
+// -----------------------------------------------------------
+// Deprecated: No needed for Popup flow, kept to avoid breaking imports in login.html
 export const handleRedirectAuth = async () => {
-    console.log("Checking Google Redirect result (handleRedirectAuth)...");
-    try {
-        const result = await getRedirectResult(auth);
-        if (result && result.user) {
-            console.log("User logged in via Google Redirect:", result.user.displayName);
-            await saveUserToFirestore(result.user);
-
-            // Redirigir si estamos en login
-            if (window.location.pathname.includes('login') || window.location.pathname.endsWith('/')) {
-                console.log("Redirect result success, jumping to index.html");
-                window.location.href = 'index.html';
-            }
-            return result.user;
-        } else {
-            console.log("No redirect result found (handleRedirectAuth).");
-        }
-    } catch (error) {
-        console.error("Error returning from Redirect:", error);
-        if (error.code === 'auth/unauthorized-domain') {
-            alert("Dominio no autorizado: " + window.location.hostname);
-        } else if (error.code !== 'auth/cancelled-popup-request') {
-            alert("Error al completar el inicio de sesión: " + error.message);
-        }
-    }
+    console.log("handleRedirectAuth called (noop for popup mode)");
+    return null;
 };
 
 // -----------------------------------------------------------

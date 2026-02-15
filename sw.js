@@ -1,4 +1,4 @@
-const CACHE_NAME = 'green-force-v21';
+const CACHE_NAME = 'green-force-v22';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
