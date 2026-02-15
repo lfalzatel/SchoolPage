@@ -47,6 +47,7 @@ async function saveUserToFirestore(user) {
 export const loginWithGoogle = async () => {
     console.log("Starting loginWithGoogle process with POPUP...");
     try {
+        await setPersistence(auth, browserLocalPersistence);
         const result = await signInWithPopup(auth, provider);
         console.log("Popup Login Success:", result.user.displayName);
 
