@@ -1750,55 +1750,7 @@ body {
   }
 }
 
-/* Bottom Navigation Bar (Mobile & Base) */
-.bottom-nav {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 95%;
-  max-width: 500px;
-  height: 70px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  z-index: 4000;
-  padding: 0 15px;
-  animation: navSlideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-@keyframes navSlideUp {
-  from {
-    transform: translate(-50%, 100px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translate(-50%, 0);
-    opacity: 1;
-  }
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #64748b;
-  text-decoration: none;
-  font-size: 0.75rem;
-  font-weight: 700;
-  transition: all 0.3s ease;
-  width: 65px;
-  height: 100%;
-  gap: 5px;
-}
+/* Bottom Navigation Styles Removed (Consolidated at line 1008) */
 
 .nav-item i {
   font-size: 1.3rem;
@@ -2136,38 +2088,7 @@ footer a:hover {
   text-decoration: underline;
 }
 
-/* --- PREMIUM FLOATING MENU --- */
-.bottom-nav {
-  position: fixed !important;
-  bottom: 20px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-
-  display: flex !important;
-  align-items: center;
-  justify-content: space-between;
-  /* Spaced out nicely */
-  gap: 10px;
-
-  width: auto !important;
-  min-width: 320px;
-  max-width: 90%;
-  height: 65px;
-  /* Fixed height for consistency */
-  padding: 0 25px;
-
-  background: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-
-  border-radius: 50px;
-  /* Capsule shape */
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-
-  z-index: 10000 !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* Premium Floating Menu Styles Removed (Consolidated at line 1008) */
 
 .bottom-nav:hover {
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
