@@ -2295,3 +2295,50 @@ body.dark-mode .hero-tagline,
   font-style: italic;
   opacity: 0.9;
 }
+
+/* --- EMERGENCY FIX FOR MENU VISIBILITY --- */
+.bottom-nav {
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  width: auto !important;
+  min-width: 320px;
+  max-width: 90%;
+  height: 65px;
+  padding: 0 25px;
+
+  /* Fallback & Glass */
+  background-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+  z-index: 2147483647 !important;
+  /* Max Z-Index */
+  visibility: visible !important;
+  opacity: 1 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-nav * {
+  visibility: visible !important;
+  opacity: 1;
+}
+
+/* Dark Mode Override */
+.dark-mode .bottom-nav {
+  background-color: #1f2937 !important;
+  background: rgba(31, 41, 55, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
