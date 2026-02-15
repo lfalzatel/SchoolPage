@@ -206,7 +206,11 @@ body {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
-.hero-message p {
+/* SUPER SPECIFIC SELECTORS TO OVERRIDE ANY THEME */
+body .hero-message p,
+body.dark-mode .hero-message p,
+.hero-message p,
+.hero-message {
   font-size: 1.2rem;
   font-weight: 500;
   line-height: 1.8;
@@ -215,6 +219,8 @@ body {
   margin: 0;
 }
 
+body .hero-message strong,
+body.dark-mode .hero-message strong,
 .hero-message strong {
   color: #ffffff !important;
   font-weight: 800;
