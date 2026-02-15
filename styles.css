@@ -2283,7 +2283,8 @@ body.dark-mode .hero-tagline,
 
 /* Dark Mode Footer */
 .dark-mode footer {
-  background: #064030;
+  background: #f4f5f5;
+  /* background: #064030; */
   border-top-color: rgba(255, 255, 255, 0.05);
 }
 

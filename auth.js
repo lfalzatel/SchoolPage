@@ -8,6 +8,7 @@ import { auth, db } from './firebase-config.js';
 import {
     GoogleAuthProvider,
     signInWithPopup,
+    signInWithRedirect,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     updateProfile,
@@ -45,28 +46,30 @@ async function saveUserToFirestore(user) {
 //  LOGIN CON GOOGLE (Redirect — sin popup)
 // -----------------------------------------------------------
 export const loginWithGoogle = async () => {
-    console.log("Starting loginWithGoogle process with Popup...");
+    console.log("Starting loginWithGoogle process with Redirect...");
     try {
-        const result = await signInWithPopup(auth, provider);
-        console.log("User logged in via Google Popup:", result.user.displayName);
-        await saveUserToFirestore(result.user);
-
-        // Redirigir si estamos en el login
-        if (window.location.pathname.includes('login.html')) {
-            window.location.href = 'index.html';
-        }
-        return result.user;
+        await signInWithRedirect(auth, provider);
+        // La redirección ocurrirá aquí, el código siguiente no se ejecutará inmediatamente.
     } catch (error) {
-        console.error("Google Login Popup failed:", error.code, error.message);
-
-        if (error.code === 'auth/popup-blocked') {
-            alert("El navegador bloqueó la ventana emergente. Por favor, permite ventanas emergentes para este sitio e intenta de nuevo.");
-        } else if (error.code === 'auth/cancelled-popup-request') {
-            console.log("Popup closed by user.");
-        } else {
-            alert("Error al iniciar sesión con Google: " + error.message);
-        }
+        console.error("Google Login Redirect failed:", error);
+        alert("Error al iniciar redirección: " + error.message);
         throw error;
+    }
+};
+
+// Nueva función para manejar el retorno del redireccionamiento
+export const handleRedirectAuth = async () => {
+    try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+            console.log("User logged in via Google Redirect:", result.user.displayName);
+            await saveUserToFirestore(result.user);
+            // El onAuthStateChanged en index/login se encargará de la navegación
+            return result.user;
+        }
+    } catch (error) {
+        console.error("Error returning from Redirect:", error);
+        alert("Error al completar el inicio de sesión: " + error.message);
     }
 };
 
