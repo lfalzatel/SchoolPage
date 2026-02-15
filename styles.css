@@ -2043,10 +2043,7 @@ footer {
 
 
 /* Reset info-cards and section text to white where required */
-.info-card h2,
-.info-card p,
-.about-project h2,
-.about-project p,
+/* Scoped white text for dark sections only */
 .hero-content h1,
 .hero-content p,
 .hero-tagline,
@@ -2055,12 +2052,49 @@ footer {
   color: #ffffff !important;
 }
 
+/* Info cards should adapt to theme unless specifically dark */
+.info-card h2,
+.info-card p,
+.about-project h2,
+.about-project p {
+  color: var(--text-primary);
+  /* Use variable to adapt */
+}
+
+/* Force white text in these cards ONLY when in dark mode */
+.dark-mode .info-card h2,
+.dark-mode .info-card p,
+.dark-mode .about-project h2,
+.dark-mode .about-project p {
+  color: #ffffff !important;
+}
+
+/* Ensure bottom nav is always on top and visible */
 /* Ensure bottom nav is always on top and visible */
 .bottom-nav {
   display: flex !important;
   visibility: visible !important;
   opacity: 1 !important;
   z-index: 9999 !important;
+  background: rgba(255, 255, 255, 0.9);
+  /* Slightly more opaque for better contrast */
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+
+/* Dark Mode Bottom Nav */
+.dark-mode .bottom-nav {
+  background: rgba(31, 41, 55, 0.9);
+  /* Dark background for dark mode */
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .nav-item {
+  color: #9ca3af;
+}
+
+.dark-mode .nav-item.active {
+  color: var(--primary);
 }
 
 footer p {
