@@ -2146,10 +2146,17 @@ footer {
   color: var(--primary);
 }
 
+/* SUPER SPECIFIC FOOTER CONTRAST FIX */
+body footer p,
+body footer a,
+.footer-text,
+.footer-brand,
+.footer-slogan,
 footer p,
 footer a {
   color: #ffffff !important;
   text-decoration: none;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 footer a {
@@ -2161,6 +2168,22 @@ footer a {
 footer a:hover {
   opacity: 0.8;
   text-decoration: underline;
+}
+
+/* Ensure tagline is also white - SUPER SPECIFIC TO FIX GRAY TEXT */
+body .hero-tagline,
+body.dark-mode .hero-tagline,
+.hero-tagline {
+  color: #ffffff !important;
+  font-size: 1.4rem;
+  margin-bottom: 2rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+  /* Stronger shadow */
+  opacity: 0;
+  animation: fadeInUp 1s ease 0.6s forwards;
+  font-weight: 600;
+  /* Increased weight for better visibility */
+  letter-spacing: 0.5px;
 }
 
 /* Dark Mode Footer */
