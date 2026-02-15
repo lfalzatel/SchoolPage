@@ -1095,14 +1095,7 @@ footer {
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 768px) {
-  /* Removed conflicting nav { display: none; } */
-
-  /* Show Bottom Nav (Redundant but safe to keep logical structure) */
-  .bottom-nav {
-    display: flex !important;
-  }
-}
+/* Mobile Responsiveness - Styles consolidated in main block */
 
 /* Adjust Body Padding */
 body {
@@ -1461,7 +1454,6 @@ section h2 {
   }
 }
 
-/* Fixed App Header (Mobile First) */
 .app-header {
   position: fixed;
   top: 0;
