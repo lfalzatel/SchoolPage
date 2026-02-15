@@ -11,7 +11,10 @@ import {
     createUserWithEmailAndPassword,
     updateProfile,
     signOut,
-    onAuthStateChanged
+    signOut,
+    onAuthStateChanged,
+    setPersistence,
+    browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import {
     doc,
