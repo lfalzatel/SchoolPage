@@ -100,10 +100,19 @@
                 <h1>Explora nuestras Actividades</h1>
                 <p>Momentos capturados sembrando futuro.</p>
             </div>
+
+            <!-- Premium Year Selector -->
+            <div class="year-selector-container">
+                <div class="year-scroll">
+                    <button class="year-pill active" data-year="all">Todos</button>
+                    <button class="year-pill" data-year="2025">2025</button>
+                    <button class="year-pill" data-year="2024">2024</button>
+                    <button class="year-pill" data-year="2023">2023</button>
+                </div>
+            </div>
+
             <div class="admin-actions" id="galleryAdminPanel" style="display: none;">
-                <button class="cta-button" onclick="openUploadModal('activity')">
-                    <i class="fas fa-plus"></i> Nuevo Evento
-                </button>
+                <!-- Admin actions handled by FAB now -->
             </div>
         </div>
 
@@ -141,8 +150,32 @@
 
     <div id="uploadModal" class="modal" style="z-index: 4000;">
         <!-- ... Contenido del Formulario de Subida ... -->
-        <!-- Se recomienda que gallery.js inyecte esto o se mantenga consistente con index.html -->
     </div>
+
+    <!-- Premium Floating Action Button -->
+    <button id="fabAddActivity" class="fab-primary" onclick="openUploadModal('activity')">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Premium Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="gallery.html" class="nav-item active">
+            <i class="fas fa-images"></i>
+            <span>Galería</span>
+        </a>
+        <a href="map.html" class="nav-item">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>Mapa</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Perfil</span>
+        </a>
+    </nav>
 
     <script type="module">
         import { initBackgroundSlideshow } from './gallery.js';

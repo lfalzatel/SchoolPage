@@ -383,7 +383,7 @@ const allBackgroundImages = [
     "assets/images/9. Reforestación 2024 - 7.jpg"
 ];
 
-export async function loadActivities(targetId = 'activitiesGrid') {
+export async function loadActivities(targetId = 'galleryGridFull') {
     const grid = document.getElementById(targetId);
     if (!grid) return;
 
@@ -1092,3 +1092,61 @@ window.deleteComment = async (activityId, commentId) => {
 };
 
 
+// --- INITIALIZATION ---
+window.currentYearFilter = 'all';
+
+window.filterActivitiesByYear = (year) => {
+    window.currentYearFilter = year;
+
+    // Update UI
+    document.querySelectorAll('.year-pill').forEach(btn => {
+        if (btn.dataset.year === year) btn.classList.add('active');
+        else btn.classList.remove('active');
+    });
+
+    if (!window.currentGalleryActivities) return;
+
+    const filtered = year === 'all'
+        ? window.currentGalleryActivities
+        : window.currentGalleryActivities.filter(act => (act.year || '').toString() === year);
+
+    renderActivityCards(filtered, 'galleryGridFull'); // Ensure we target the correct grid
+};
+
+function setupYearSelector() {
+    const container = document.querySelector('.year-selector-container');
+    if (!container) return;
+
+    container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('year-pill')) {
+            const year = e.target.dataset.year;
+            filterActivitiesByYear(year);
+        }
+    });
+}
+
+async function initGallery() {
+    console.log("Initializing Gallery...");
+
+    // 1. Setup UI Events
+    setupYearSelector();
+
+    // 2. Load Data
+    // We target 'galleryGridFull' which is the ID in gallery.html
+    await loadActivities('galleryGridFull');
+
+    // 3. Load Videos if element exists (it might not in this specific gallery view if separated)
+    if (document.getElementById('videosGrid')) {
+        loadVideos();
+    }
+
+    // 4. Update Admin UI based on role (needs auth state, so might delay or rely on onAuthStateChanged)
+    // auth.js handles onAuthStateChanged which calls updateUI, we can hook into that or just check here
+    setTimeout(updateAdminUI, 1000); // Retry after auth likely loaded
+}
+
+// Start when DOM is ready
+document.addEventListener('DOMContentLoaded', initGallery);
+
+// Also export for manual debugging
+export { initGallery, filterActivitiesByYear };
