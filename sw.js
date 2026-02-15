@@ -1,4 +1,4 @@
-const CACHE_NAME = 'green-force-v7';
+const CACHE_NAME = 'green-force-v8';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -39,10 +39,23 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network-first for Firebase/API calls (simplified check)
-  if (event.request.url.includes('firebase') || event.request.url.includes('googleapis') || event.request.url.includes('firestore')) {
+  // Network-first for HTML, JS and Firebase/API calls to avoid caching old logic
+  const isCritical = event.request.url.endsWith('.html') ||
+    event.request.url.endsWith('.js') ||
+    event.request.url.includes('firebase') ||
+    event.request.url.includes('googleapis');
+
+  if (isCritical) {
     event.respondWith(
       fetch(event.request)
+        .then(response => {
+          // Update cache with fresh version
+          if (response && response.status === 200 && event.request.method === 'GET') {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone));
+          }
+          return response;
+        })
         .catch(() => caches.match(event.request))
     );
     return;

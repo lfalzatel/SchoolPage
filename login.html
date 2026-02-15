@@ -49,8 +49,9 @@
         }
 
         .dark-mode .login-container {
-            background: rgba(30, 30, 30, 0.95);
-            color: white;
+            background: rgba(245, 245, 245, 0.95);
+            color: #1a1a1a;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
         }
 
         .login-logo img {
@@ -79,7 +80,7 @@
         }
 
         .dark-mode .login-subtitle {
-            color: #aaa;
+            color: #555;
         }
 
         .form-group {
@@ -96,7 +97,7 @@
         }
 
         .dark-mode .form-group label {
-            color: #eee;
+            color: #333;
         }
 
         .form-input {
@@ -114,9 +115,13 @@
         }
 
         .dark-mode .form-input {
-            background: #333;
-            border-color: #555;
-            color: white;
+            background: #fff;
+            border-color: #ccc;
+            color: #333;
+        }
+
+        .dark-mode .form-input::placeholder {
+            color: #999;
         }
 
         .btn-submit {
@@ -142,7 +147,7 @@
             /* Reduced margin */
             display: flex;
             align-items: center;
-            color: #555;
+            color: #333;
             font-size: 0.85rem;
         }
 
