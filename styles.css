@@ -2076,10 +2076,10 @@ footer a {
 }
 
 footer a {
-  color: #d1fae5 !important;
+  color: #ffffff !important;
   text-decoration: none;
   transition: opacity 0.2s;
-  opacity: 1 !important;
+  opacity: 0.9;
 }
 
 footer a:hover {
@@ -2207,6 +2207,25 @@ body.dark-mode .hero-tagline,
   background: #064e3b;
   /* Dark Emerald */
   border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode footer,
+.dark-mode footer p,
+.dark-mode footer a,
+.dark-mode footer span,
+.dark-mode footer div,
+.dark-mode footer h1,
+.dark-mode footer h2,
+.dark-mode footer h3,
+.dark-mode footer h4,
+.dark-mode footer h5,
+.dark-mode footer h6,
+.dark-mode .footer-text,
+.dark-mode .footer-brand,
+.dark-mode .footer-slogan {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
 }
 
 .footer-brand {
