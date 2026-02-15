@@ -18,8 +18,8 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
-            /* Better contrast background in light mode */
-            background-image: linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)), url('assets/images/10.%20Reforestaci%C3%B3n%20institucional%20-%201.jpg');
+            /* Impactful background with dark overlay to make form pop */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/images/10.%20Reforestaci%C3%B3n%20institucional%20-%204.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -29,23 +29,23 @@
             justify-content: center;
             margin: 0;
             padding: 1rem;
-            /* Padding for small mobile screens */
         }
 
         .dark-mode body {
-            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/images/10.%20Reforestaci%C3%B3n%20institucional%20-%201.jpg');
+            /* Same dark overlay in dark mode */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('assets/images/10.%20Reforestaci%C3%B3n%20institucional%20-%204.jpg');
         }
 
         .login-container {
-            background: rgba(255, 255, 255, 0.98);
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
             padding: 1.5rem;
-            /* Reduced padding for compactness */
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 380px;
             text-align: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(8px);
         }
 
         .dark-mode .login-container {
@@ -273,7 +273,7 @@
             <span>O continúa con</span>
         </div>
 
-        <button id="googleLoginBtn" class="google-btn" onclick="alert('Botón clickeado en HTML'); handleGoogleClick()">
+        <button id="googleLoginBtn" class="google-btn" onclick="handleGoogleClick()">
             <i class="fab fa-google" style="color: #DB4437;"></i> Google
         </button>
 
@@ -282,19 +282,18 @@
             <i class="fas fa-download"></i> Instalar Aplicación
         </button>
 
-        <div style="margin-top: 1.5rem; font-size: 0.9rem;">
-            <a href="#" id="createTestUserBtn" style="color: var(--secondary-color); text-decoration: none;">(Debug)
-                Crear Usuario de Prueba</a>
-        </div>
+        <div id="authStatus" style="margin-top: 1rem; font-size: 0.85rem; color: #555;"></div>
 
-        <div style="margin-top: 1rem; font-size: 0.7rem; color: #999;">
-            Versión: 1.2 (Debug Enabled)
+        <div style="margin-top: 2rem;">
+            <button onclick="localStorage.clear(); sessionStorage.clear(); location.reload(true);"
+                style="background: none; border: 1px solid #ccc; color: #666; padding: 0.5rem 1rem; border-radius: 5px; font-size: 0.8rem; cursor: pointer;">
+                Forzar Recarga Completa (Limpiar Caché)
+            </button>
             <br>
-            <a href="#" onclick="forceFullReload()" style="color: #999;">Forzar Recarga Completa</a>
+            <a href="#" id="createTestUserBtn"
+                style="color: #999; text-decoration: none; font-size: 0.7rem; display: block; margin-top: 10px;">(Debug:
+                Crear Usuario de Prueba)</a>
         </div>
-
-        <!-- Hidden back link just in case -->
-        <!-- <a href="index.html" class="back-link">Volver al Inicio</a> -->
     </div>
 
     <script>
