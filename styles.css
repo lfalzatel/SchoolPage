@@ -109,16 +109,7 @@ body {
   overflow: hidden;
 }
 
-.header-hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.6) 100%);
-  z-index: 0;
-}
+/* .header-hero::before removed per user request */
 
 .hero-content {
   position: relative;
@@ -178,11 +169,12 @@ body {
 }
 
 .hero-message {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   padding: 1.5rem 2rem;
   border-radius: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   margin: 2rem auto;
   max-width: 700px;
   opacity: 0;
@@ -193,6 +185,13 @@ body {
   font-size: 1.3rem;
   font-weight: 600;
   line-height: 1.8;
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.hero-message strong {
+  color: #ffffff !important;
+  font-weight: 800;
 }
 
 .hero-buttons {
@@ -1686,17 +1685,224 @@ body {
   }
 }
 
-/* Fix: Dropdown hereda color blanco del header verde */
-.profile-dropdown .dropdown-item {
-  color: #4b5563 !important;
+/* --- Phase 4: Theme Selector & Gallery Premium --- */
+.dropdown-theme-section {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.profile-dropdown .dropdown-item.text-red {
-  color: #ef4444 !important;
+.theme-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #9ca3af;
+  margin-bottom: 0.75rem;
+  letter-spacing: 1px;
 }
 
-.profile-dropdown .dropdown-item i {
-  color: #9ca3af !important;
+.theme-selector-group {
+  display: flex;
+  background: #f3f4f6;
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+}
+
+.theme-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  border-radius: 8px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.theme-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.theme-btn.active {
+  background: white;
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Gallery Premium Controls */
+.gallery-controls-premium {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.date-filter-wrapper {
+  background: white;
+  padding: 8px 16px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.date-filter-wrapper i {
+  color: var(--primary);
+}
+
+.premium-date-input {
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-weight: 600;
+  color: #374151;
+}
+
+.premium-action-btn {
+  background: linear-gradient(135deg, #10b981, #065f46);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.premium-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+/* Modal Premium Evento */
+.modal-container-premium {
+  background: white;
+  width: 90%;
+  max-width: 550px;
+  border-radius: 28px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: modalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalScaleUp {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-header-premium {
+  background: linear-gradient(135deg, #064e3b, #065f46);
+  padding: 1.5rem 2rem;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header-premium h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white !important;
+}
+
+.form-grid-premium {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  padding: 2rem;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.form-group-premium label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.form-group-premium input,
+.form-group-premium textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  transition: border 0.2s;
+}
+
+.form-group-premium input:focus,
+.form-group-premium textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.drop-zone-premium {
+  border: 2px dashed #d1d5db;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f9fafb;
+}
+
+.drop-zone-premium:hover {
+  background: #f0fdf4;
+  border-color: var(--primary);
+}
+
+.drop-zone-premium i {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.modal-actions-premium {
+  padding: 1.5rem 2rem;
+  background: #f9fafb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-save-premium {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-save-premium:hover {
+  background: #059669;
 }
 
 .profile-dropdown .dropdown-item:hover {

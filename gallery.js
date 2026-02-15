@@ -16,7 +16,8 @@ import {
     serverTimestamp,
     onSnapshot,
     runTransaction,
-    setDoc
+    setDoc,
+    Timestamp
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import {
     ref,
@@ -159,6 +160,79 @@ export async function loadActivities(targetId = 'activitiesGrid') {
         console.error("Error loading activities:", e);
         window.currentGalleryActivities = seedData.activities;
         renderActivityCards(seedData.activities, targetId);
+    }
+}
+
+/**
+ * Filtra las actividades cargadas por una fecha específica o año.
+ * @param {string} dateString - El valor del input date (YYYY-MM-DD).
+ */
+export function filterActivitiesByDate(dateString) {
+    if (!window.currentGalleryActivities) return;
+
+    if (!dateString) {
+        renderActivityCards(window.currentGalleryActivities);
+        return;
+    }
+
+    const filtered = window.currentGalleryActivities.filter(act => {
+        // Si hay una fecha en Firestore (como Timestamp)
+        if (act.date && act.date.toDate) {
+            const actDate = act.date.toDate().toISOString().split('T')[0];
+            return actDate === dateString;
+        }
+        // Si el título contiene la fecha (legacy) o el año coincide
+        const year = dateString.split('-')[0];
+        return act.title.toLowerCase().includes(dateString) || act.year === year;
+    });
+
+    renderActivityCards(filtered);
+}
+
+/**
+ * Crea una nueva actividad/evento en Firestore con soporte para múltiples fotos.
+ */
+export async function createActivity(data, photos) {
+    try {
+        const user = auth.currentUser;
+        if (!user) throw new Error("Debes iniciar sesión para crear eventos.");
+
+        const imageUrls = [];
+
+        // Subir fotos a Storage
+        for (let i = 0; i < photos.length; i++) {
+            const file = photos[i];
+            const storageRef = ref(storage, `activities/${Date.now()}_${file.name}`);
+            const snapshot = await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(snapshot.ref);
+            imageUrls.push(url);
+        }
+
+        const newActivity = {
+            title: data.title,
+            description: data.notes,
+            date: Timestamp.fromDate(new Date(data.date)),
+            year: data.date.split('-')[0],
+            thumbnail: imageUrls[0] || 'assets/images/placeholder.jpg',
+            images: imageUrls,
+            createdAt: serverTimestamp(),
+            createdBy: {
+                uid: user.uid,
+                name: user.displayName || user.email
+            },
+            status: 'published'
+        };
+
+        const docRef = await addDoc(collection(db, "activities"), newActivity);
+        console.log("Actividad creada con ID:", docRef.id);
+
+        // Recargar actividades
+        await loadActivities();
+        return docRef.id;
+
+    } catch (error) {
+        console.error("Error en createActivity:", error);
+        throw error;
     }
 }
 

@@ -127,17 +127,30 @@
                 <div class="menu-item-icon bg-green"><i class="fas fa-download"></i></div>
                 <span>Instalar Aplicación</span>
               </div>
-            </div>
+              <div class="dropdown-theme-section">
+                <span class="theme-label">TEMA</span>
+                <div class="theme-selector-group">
+                  <button class="theme-btn active" onclick="setTheme('light')" title="Modo Claro">
+                    <i class="fas fa-sun"></i>
+                  </button>
+                  <button class="theme-btn" onclick="setTheme('dark')" title="Modo Oscuro">
+                    <i class="fas fa-moon"></i>
+                  </button>
+                  <button class="theme-btn" onclick="setTheme('system')" title="Seguir Sistema">
+                    <i class="fas fa-desktop"></i>
+                  </button>
+                </div>
+              </div>
 
-            <div class="dropdown-footer">
-              <button class="logout-pill-btn" id="menuLoginBtn" onclick="handleAuthAction()">
-                <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
-              </button>
+              <div class="dropdown-footer">
+                <button class="logout-pill-btn" id="menuLoginBtn" onclick="handleAuthAction()">
+                  <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
   </header>
 
   <div id="content-to-pdf" class="main-content-wrapper">
@@ -154,6 +167,9 @@
             <p>
               Nuestro proyecto es <strong>inclusivo, transformador y sostenible</strong>.<br>
               Somos <strong>GREEN FORCE</strong> y estamos <strong>sembrando futuro</strong>.
+              <strong>Pequeñas acciones, grandes cambios: ¡Juntos por un planeta verde!
+                Guardianes del planeta desde la escuela</strong>
+
             </p>
           </div>
 
@@ -205,10 +221,17 @@
       <section id="galeria" class="relative-section">
         <h2><i class="fas fa-camera"></i> Galería de Actividades</h2>
 
-        <div class="admin-controls" style="display: none; text-align: center; margin-bottom: 2rem;">
-          <button class="cta-button" onclick="openUploadModal('activity')">
-            <i class="fas fa-plus"></i> Nueva Actividad
-          </button>
+        <div class="gallery-controls-premium">
+          <div class="date-filter-wrapper">
+            <i class="fas fa-calendar-day"></i>
+            <input type="date" id="galleryDateFilter" class="premium-date-input">
+          </div>
+
+          <div class="admin-controls" style="display: none;">
+            <button class="premium-action-btn" onclick="openEventModal()">
+              <i class="fas fa-plus-circle"></i> Crear Evento
+            </button>
+          </div>
         </div>
 
         <div id="galleryOverlay" class="protected-overlay">
@@ -532,383 +555,509 @@
           </button>
         </form>
       </div>
+      <!-- MODAL: Crear Evento Premium -->
+      <div id="eventModal" class="modal-overlay">
+        <div class="modal-container-premium">
+          <div class="modal-header-premium">
+            <h3><i class="fas fa-plus-circle"></i> Nuevo Evento</h3>
+            <button class="close-modal" onclick="closeEventModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="eventForm" onsubmit="handleEventSubmit(event)">
+              <div class="form-grid-premium">
+                <div class="form-group-premium">
+                  <label><i class="fas fa-tag"></i> Título del Evento</label>
+                  <input type="text" id="eventTitle" placeholder="Ej: Jornada de Reforestación" required>
+                </div>
+                <div class="form-group-premium">
+                  <label><i class="fas fa-calendar-alt"></i> Fecha</label>
+                  <input type="date" id="eventDate" required>
+                </div>
+                <div class="form-group-premium full-width">
+                  <label><i class="fas fa-sticky-note"></i> Notas / Descripción</label>
+                  <textarea id="eventNotes" placeholder="Detalles sobre la actividad..." rows="4"></textarea>
+                </div>
+                <div class="form-group-premium full-width">
+                  <label><i class="fas fa-images"></i> Cargar Fotos</label>
+                  <div class="drop-zone-premium" onclick="document.getElementById('eventPhotos').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Arrastra o haz clic para subir imágenes</span>
+                    <input type="file" id="eventPhotos" accept="image/*" multiple style="display: none;"
+                      onchange="updatePhotoCount()">
+                    <p id="photoCount"
+                      style="margin-top: 5px; font-size: 0.8rem; color: var(--primary); font-weight: 600;"></p>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-actions-premium">
+                <button type="button" class="btn-cancel" onclick="closeEventModal()">Cancelar</button>
+                <button type="submit" class="btn-save-premium">
+                  <i class="fas fa-check"></i> Publicar Evento
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="fab" onclick="scrollToSection('sobre')">
-    <i class="fas fa-arrow-up"></i>
-  </div>
+    <div class="fab" onclick="scrollToSection('sobre')">
+      <i class="fas fa-arrow-up"></i>
+    </div>
 
 
-  <script>
-    // --- PWA Installation Logic ---
-    let deferredPrompt;
+    <script>
+      // --- PWA Installation Logic ---
+      let deferredPrompt;
 
-    // Service Worker Registration
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('SW registered!', reg))
-          .catch(err => console.error('SW registration failed', err));
-      });
-    }
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const installBtn = document.getElementById('installAppBtn');
-      if (installBtn) installBtn.style.display = 'flex';
-      console.log('beforeinstallprompt fired');
-    });
-
-    async function installPWA() {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User response to the install prompt: ${outcome}`);
-      deferredPrompt = null;
-      document.getElementById('installAppBtn').style.display = 'none';
-    }
-
-    window.addEventListener('appinstalled', () => {
-      document.getElementById('installAppBtn').style.display = 'none';
-      deferredPrompt = null;
-      console.log('PWA was installed');
-    });
-
-  </script>
-  <script type="module">
-    // --- IMPORTS ---
-    import { loadActivities, loadVideos } from './gallery.js';
-    import { loadTimeline } from './timeline.js';
-    import { auth } from './auth.js';
-
-    // --- GLOBAL VARIABLES ---
-    // Moved gallery variables to gallery.js
-
-    // --- SPA Navigation & UI Logic ---
-
-    // Toggle Profile Dropdown
-    window.toggleProfileMenu = function () {
-      const menu = document.getElementById('profileDropdown');
-      if (menu) menu.classList.toggle('active');
-    }
-
-    // Toggle Dark Mode
-    window.toggleDarkMode = function () {
-      document.body.classList.toggle('dark-mode');
-    }
-
-    // Close menus on outside click
-    window.addEventListener('click', (e) => {
-      // Close Profile Dropdown
-      if (!e.target.closest('.profile-menu-container')) {
-        const menu = document.getElementById('profileDropdown');
-        if (menu) menu.classList.remove('active');
-      }
-    });
-
-    // View Switcher Function
-    window.showView = function (viewId) {
-      // 1. Hide all View Sections
-      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-
-      // 2. Show Target View
-      if (viewId === 'home' || viewId === 'sobre') {
-        document.querySelectorAll('.view-home').forEach(el => el.classList.add('active'));
-        window.history.replaceState(null, null, '#sobre');
-      } else {
-        const target = document.getElementById('view-' + viewId);
-        if (target) {
-          target.classList.add('active');
-          window.history.replaceState(null, null, '#' + viewId);
-        }
-      }
-
-      // 3. Update Bottom Nav State
-      document.querySelectorAll('.bottom-nav .nav-item').forEach(el => {
-        el.classList.remove('active');
-        const href = el.getAttribute('href').substring(1);
-        if (href === viewId || (viewId === 'home' && href === 'sobre')) {
-          el.classList.add('active');
-        }
-      });
-
-      // 4. Scroll to Top
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    }
-
-    // Register Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('Service Worker registered', reg))
-          .catch(err => console.log('Service Worker registration failed', err));
-      });
-    }
-
-    // Toggle Mobile Menu
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    if (hamburgerBtn) {
-      hamburgerBtn.addEventListener('click', () => {
-        const navMenu = document.getElementById('navMenu');
-        if (navMenu) navMenu.classList.toggle('active');
-      });
-    }
-
-    // Close menu when clicking a link
-    document.querySelectorAll('.nav-menu a').forEach(link => {
-      link.addEventListener('click', () => {
-        const navMenu = document.getElementById('navMenu');
-        if (navMenu) navMenu.classList.remove('active');
-      });
-    });
-
-    // --- DOCS & PDF LOGIC (Kept here for now) ---
-    window.openDocument = (src) => {
-      const viewer = document.getElementById('documentViewer');
-      const modal = document.getElementById('documentModal');
-      if (viewer && modal) {
-        viewer.src = src;
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-      }
-    }
-
-    window.closeDocumentModal = () => {
-      const viewer = document.getElementById('documentViewer');
-      const modal = document.getElementById('documentModal');
-      if (modal) modal.classList.remove('active');
-      if (viewer) viewer.src = '';
-      document.body.style.overflow = 'auto';
-    }
-
-    window.scrollToSection = (id) => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    // --- EVENT LISTENERS FOR MODALS ---
-    window.addEventListener('click', (e) => {
-      // Use global functions from gallery.js
-      if (e.target.id === 'videoModal') window.closeVideoModal();
-      if (e.target.id === 'galleryModal') window.closeGalleryModal();
-      if (e.target.id === 'lightboxModal') window.closeLightbox();
-      if (e.target.id === 'documentModal') window.closeDocumentModal();
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        if (window.closeGalleryModal) window.closeGalleryModal();
-        if (window.closeLightbox) window.closeLightbox();
-        if (window.closeDocumentModal) window.closeDocumentModal();
-        if (window.closeVideoModal) window.closeVideoModal();
-      }
-      if (e.key === 'ArrowLeft' && window.navigateLightbox) window.navigateLightbox(-1);
-      if (e.key === 'ArrowRight' && window.navigateLightbox) window.navigateLightbox(1);
-    });
-
-    window.addEventListener('scroll', () => {
-      const fab = document.querySelector('.fab');
-      if (fab) fab.style.opacity = window.scrollY > 100 ? '1' : '0';
-    });
-
-    document.getElementById('downloadPdfBtnMenu')?.addEventListener('click', async function () {
-      const btn = this;
-      const originalContent = btn.innerHTML;
-      btn.style.opacity = '0.5';
-      btn.innerHTML = '<i class="fas fa-spinner loading"></i>';
-
-      try {
-        const element = document.getElementById('content-to-pdf');
-
-        // Hide YouTube images temporarily (CORS)
-        const youtubeImages = element.querySelectorAll('.video-card-thumbnail img');
-        const originalSrcs = [];
-        youtubeImages.forEach((img, i) => {
-          originalSrcs[i] = img.src;
-          img.style.display = 'none';
+      // Service Worker Registration
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('SW registered!', reg))
+            .catch(err => console.error('SW registration failed', err));
         });
-
-        const options = {
-          margin: 10,
-          filename: 'Proyecto_Green_Force_2025.pdf',
-          image: { type: 'jpeg', quality: 0.95 },
-          html2canvas: {
-            scale: 2,
-            useCORS: false,
-            allowTaint: false,
-            logging: false,
-            letterRendering: true,
-            scrollY: 0,
-            scrollX: 0,
-            windowWidth: element.scrollWidth,
-            windowHeight: element.scrollHeight
-          },
-          jsPDF: {
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait',
-            compress: true
-          },
-          pagebreak: {
-            mode: ['avoid-all', 'css', 'legacy'],
-            before: '.section'
-          }
-        };
-
-        await html2pdf().set(options).from(element).save();
-
-        youtubeImages.forEach((img, i) => {
-          img.style.display = '';
-          img.src = originalSrcs[i];
-        });
-
-        btn.innerHTML = '<i class="fas fa-check"></i>';
-        setTimeout(() => {
-          btn.innerHTML = originalContent;
-          btn.style.opacity = '1';
-        }, 3000);
-
-      } catch (error) {
-        console.error('Error al generar PDF:', error);
-        btn.innerHTML = '<i class="fas fa-times"></i>';
-        setTimeout(() => {
-          btn.innerHTML = originalContent;
-          btn.style.opacity = '1';
-        }, 3000);
-      }
-    });
-
-    // --- Navigation Logic ---
-    function showView(viewName) {
-      // Hide all views
-      document.querySelectorAll('.view-section').forEach(el => {
-        el.classList.remove('active');
-        el.style.display = 'none'; // Ensure hidden
-      });
-
-      // Show target view
-      const targetId = viewName === 'home' ? 'view-home' : `view-${viewName}`;
-      let target;
-
-      if (viewName === 'home') {
-        // Show all sections that are part of home
-        document.querySelectorAll('.view-home').forEach(el => {
-          el.classList.add('active');
-          el.style.display = 'block';
-        });
-      } else {
-        target = document.getElementById(`view-${viewName}`);
-        if (target) {
-          target.classList.add('active');
-          target.style.display = 'block';
-          window.scrollTo(0, 0);
-        } else {
-          console.warn("View not found:", viewName);
-          showView('home');
-          return;
-        }
       }
 
-      // Update Bottom Nav State
-      const navLinks = document.querySelectorAll('.bottom-nav .nav-item');
-      navLinks.forEach(el => {
-        el.classList.remove('active');
-        const href = el.getAttribute('href').substring(1);
-        if (href === viewName || (viewName === 'home' && href === 'sobre')) {
-          el.classList.add('active');
-        }
-      });
-    }
-
-    function scrollToSection(sectionId) {
-      const section = document.getElementById(sectionId);
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-
-    // Expose to window
-    window.showView = showView;
-    window.scrollToSection = scrollToSection;
-
-    // Enhanced Navigation Handler (Mobile + Desktop)
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', function (e) {
+      window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
-        const href = this.getAttribute('href').substring(1);
+        deferredPrompt = e;
+        const installBtn = document.getElementById('installAppBtn');
+        if (installBtn) installBtn.style.display = 'flex';
+        console.log('beforeinstallprompt fired');
+      });
 
-        // Map specific sections to Views
-        if (['galeria', 'video', 'documentos', 'cronograma'].includes(href)) {
-          showView(href);
-        } else if (href === 'sobre') {
-          showView('home');
-        } else {
-          // For sections inside Home (e.g., #contacto, #siguenos)
-          if (!document.querySelector('.view-home.active')) {
-            showView('home');
-            // Wait for view to activate then scroll
-            setTimeout(() => scrollToSection(href), 100);
-          } else {
-            scrollToSection(href);
+      async function installPWA() {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+        deferredPrompt = null;
+        document.getElementById('installAppBtn').style.display = 'none';
+      }
+
+      window.addEventListener('appinstalled', () => {
+        document.getElementById('installAppBtn').style.display = 'none';
+        deferredPrompt = null;
+        console.log('PWA was installed');
+      });
+
+    </script>
+    <script type="module">
+      // --- IMPORTS ---
+      import { loadActivities, loadVideos, createActivity, filterActivitiesByDate } from './gallery.js';
+      import { loadTimeline } from './timeline.js';
+      import { auth } from './auth.js';
+
+      // --- GLOBAL VARIABLES ---
+      // Moved gallery variables to gallery.js
+
+      // --- SPA Navigation & UI Logic ---
+
+      // Toggle Profile Dropdown
+      window.toggleProfileMenu = function () {
+        const menu = document.getElementById('profileDropdown');
+        if (menu) menu.classList.toggle('active');
+      }
+
+      // --- Theme Management ---
+      window.setTheme = function (theme) {
+        document.body.classList.remove('dark-mode');
+
+        if (theme === 'dark') {
+          document.body.classList.add('dark-mode');
+        } else if (theme === 'system') {
+          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-mode');
           }
         }
+
+        localStorage.setItem('selected-theme', theme);
+
+        // Update active class on buttons
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+          btn.classList.remove('active');
+          if (btn.getAttribute('onclick').includes(`'${theme}'`)) {
+            btn.classList.add('active');
+          }
+        });
+      }
+
+      // Initialize Theme on Load
+      const savedTheme = localStorage.getItem('selected-theme') || 'light';
+      window.setTheme(savedTheme);
+
+      // --- Event Modal Logic ---
+      window.openEventModal = function () {
+        document.getElementById('eventModal').classList.add('active');
+      }
+
+      window.closeEventModal = function () {
+        document.getElementById('eventModal').classList.remove('active');
+      }
+
+      window.updatePhotoCount = function () {
+        const input = document.getElementById('eventPhotos');
+        const countDisplay = document.getElementById('photoCount');
+        const count = input.files.length;
+        countDisplay.textContent = count > 0 ? `${count} foto(s) seleccionada(s)` : '';
+      }
+
+      window.handleEventSubmit = async function (e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('.btn-save-premium');
+        const originalContent = btn.innerHTML;
+
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publicando...';
+        btn.disabled = true;
+
+        try {
+          const data = {
+            title: document.getElementById('eventTitle').value,
+            date: document.getElementById('eventDate').value,
+            notes: document.getElementById('eventNotes').value
+          };
+          const photos = document.getElementById('eventPhotos').files;
+
+          if (photos.length === 0) {
+            alert("Por favor selecciona al menos una foto.");
+            return;
+          }
+
+          await createActivity(data, photos);
+
+          alert("¡Evento publicado con éxito!");
+          closeEventModal();
+          e.target.reset();
+          document.getElementById('photoCount').textContent = '';
+
+        } catch (error) {
+          console.error("Error al publicar evento:", error);
+          alert("Hubo un error al publicar el evento: " + error.message);
+        } finally {
+          btn.innerHTML = originalContent;
+          btn.disabled = false;
+        }
+      }
+
+      // --- Gallery Filtering ---
+      const dateFilter = document.getElementById('galleryDateFilter');
+      if (dateFilter) {
+        dateFilter.addEventListener('change', (e) => {
+          filterActivitiesByDate(e.target.value);
+        });
+      }
+
+      // Close menus on outside click
+      window.addEventListener('click', (e) => {
+        // Close Profile Dropdown
+        if (!e.target.closest('.profile-menu-container')) {
+          const menu = document.getElementById('profileDropdown');
+          if (menu) menu.classList.remove('active');
+        }
       });
-    });
 
-    // Handle Deep Links on Load
-    window.addEventListener('load', () => {
-      const hash = window.location.hash.substring(1);
-      if (['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
-        showView(hash);
-      }
-    });
+      // View Switcher Function
+      window.showView = function (viewId) {
+        // 1. Hide all View Sections
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
 
-    // --- Secure Data Loading ---
-    window.loadSecureContent = async () => {
-      console.log("Loading secure content from Firestore...");
-      try {
-        if (typeof loadTimeline === 'function') await loadTimeline();
-        if (typeof loadActivities === 'function') await loadActivities();
-        if (typeof loadVideos === 'function') await loadVideos();
-      } catch (error) {
-        console.error("Error loading secure content:", error);
-      }
-    };
+        // 2. Show Target View
+        if (viewId === 'home' || viewId === 'sobre') {
+          document.querySelectorAll('.view-home').forEach(el => el.classList.add('active'));
+          window.history.replaceState(null, null, '#sobre');
+        } else {
+          const target = document.getElementById('view-' + viewId);
+          if (target) {
+            target.classList.add('active');
+            window.history.replaceState(null, null, '#' + viewId);
+          }
+        }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      // Check for hash
-      const hash = window.location.hash.substring(1);
-      if (hash && ['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
-        showView(hash);
-      } else {
-        // Default view
-        showView('home');
+        // 3. Update Bottom Nav State
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(el => {
+          el.classList.remove('active');
+          const href = el.getAttribute('href').substring(1);
+          if (href === viewId || (viewId === 'home' && href === 'sobre')) {
+            el.classList.add('active');
+          }
+        });
+
+        // 4. Scroll to Top
+        window.scrollTo({ top: 0, behavior: 'instant' });
       }
-    });
-  </script>
-  <nav class="bottom-nav">
-    <a href="#sobre" class="nav-item active">
-      <i class="fas fa-leaf"></i>
-      <span>Inicio</span>
-    </a>
-    <a href="#cronograma" class="nav-item">
-      <i class="fas fa-calendar-alt"></i>
-      <span>Agenda</span>
-    </a>
-    <a href="#galeria" class="nav-item">
-      <i class="fas fa-images"></i>
-      <span>Galería</span>
-    </a>
-    <a href="#video" class="nav-item">
-      <i class="fas fa-play-circle"></i>
-      <span>Videos</span>
-    </a>
-    <a href="#documentos" class="nav-item">
-      <i class="fas fa-file-pdf"></i>
-      <span>Docs</span>
-    </a>
-  </nav>
+
+      // Register Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('Service Worker registered', reg))
+            .catch(err => console.log('Service Worker registration failed', err));
+        });
+      }
+
+      // Toggle Mobile Menu
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      if (hamburgerBtn) {
+        hamburgerBtn.addEventListener('click', () => {
+          const navMenu = document.getElementById('navMenu');
+          if (navMenu) navMenu.classList.toggle('active');
+        });
+      }
+
+      // Close menu when clicking a link
+      document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+          const navMenu = document.getElementById('navMenu');
+          if (navMenu) navMenu.classList.remove('active');
+        });
+      });
+
+      // --- DOCS & PDF LOGIC (Kept here for now) ---
+      window.openDocument = (src) => {
+        const viewer = document.getElementById('documentViewer');
+        const modal = document.getElementById('documentModal');
+        if (viewer && modal) {
+          viewer.src = src;
+          modal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+      }
+
+      window.closeDocumentModal = () => {
+        const viewer = document.getElementById('documentViewer');
+        const modal = document.getElementById('documentModal');
+        if (modal) modal.classList.remove('active');
+        if (viewer) viewer.src = '';
+        document.body.style.overflow = 'auto';
+      }
+
+      window.scrollToSection = (id) => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // --- EVENT LISTENERS FOR MODALS ---
+      window.addEventListener('click', (e) => {
+        // Use global functions from gallery.js
+        if (e.target.id === 'videoModal') window.closeVideoModal();
+        if (e.target.id === 'galleryModal') window.closeGalleryModal();
+        if (e.target.id === 'lightboxModal') window.closeLightbox();
+        if (e.target.id === 'documentModal') window.closeDocumentModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (window.closeGalleryModal) window.closeGalleryModal();
+          if (window.closeLightbox) window.closeLightbox();
+          if (window.closeDocumentModal) window.closeDocumentModal();
+          if (window.closeVideoModal) window.closeVideoModal();
+        }
+        if (e.key === 'ArrowLeft' && window.navigateLightbox) window.navigateLightbox(-1);
+        if (e.key === 'ArrowRight' && window.navigateLightbox) window.navigateLightbox(1);
+      });
+
+      window.addEventListener('scroll', () => {
+        const fab = document.querySelector('.fab');
+        if (fab) fab.style.opacity = window.scrollY > 100 ? '1' : '0';
+      });
+
+      document.getElementById('downloadPdfBtnMenu')?.addEventListener('click', async function () {
+        const btn = this;
+        const originalContent = btn.innerHTML;
+        btn.style.opacity = '0.5';
+        btn.innerHTML = '<i class="fas fa-spinner loading"></i>';
+
+        try {
+          const element = document.getElementById('content-to-pdf');
+
+          // Hide YouTube images temporarily (CORS)
+          const youtubeImages = element.querySelectorAll('.video-card-thumbnail img');
+          const originalSrcs = [];
+          youtubeImages.forEach((img, i) => {
+            originalSrcs[i] = img.src;
+            img.style.display = 'none';
+          });
+
+          const options = {
+            margin: 10,
+            filename: 'Proyecto_Green_Force_2025.pdf',
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: {
+              scale: 2,
+              useCORS: false,
+              allowTaint: false,
+              logging: false,
+              letterRendering: true,
+              scrollY: 0,
+              scrollX: 0,
+              windowWidth: element.scrollWidth,
+              windowHeight: element.scrollHeight
+            },
+            jsPDF: {
+              unit: 'mm',
+              format: 'a4',
+              orientation: 'portrait',
+              compress: true
+            },
+            pagebreak: {
+              mode: ['avoid-all', 'css', 'legacy'],
+              before: '.section'
+            }
+          };
+
+          await html2pdf().set(options).from(element).save();
+
+          youtubeImages.forEach((img, i) => {
+            img.style.display = '';
+            img.src = originalSrcs[i];
+          });
+
+          btn.innerHTML = '<i class="fas fa-check"></i>';
+          setTimeout(() => {
+            btn.innerHTML = originalContent;
+            btn.style.opacity = '1';
+          }, 3000);
+
+        } catch (error) {
+          console.error('Error al generar PDF:', error);
+          btn.innerHTML = '<i class="fas fa-times"></i>';
+          setTimeout(() => {
+            btn.innerHTML = originalContent;
+            btn.style.opacity = '1';
+          }, 3000);
+        }
+      });
+
+      // --- Navigation Logic ---
+      function showView(viewName) {
+        // Hide all views
+        document.querySelectorAll('.view-section').forEach(el => {
+          el.classList.remove('active');
+          el.style.display = 'none'; // Ensure hidden
+        });
+
+        // Show target view
+        const targetId = viewName === 'home' ? 'view-home' : `view-${viewName}`;
+        let target;
+
+        if (viewName === 'home') {
+          // Show all sections that are part of home
+          document.querySelectorAll('.view-home').forEach(el => {
+            el.classList.add('active');
+            el.style.display = 'block';
+          });
+        } else {
+          target = document.getElementById(`view-${viewName}`);
+          if (target) {
+            target.classList.add('active');
+            target.style.display = 'block';
+            window.scrollTo(0, 0);
+          } else {
+            console.warn("View not found:", viewName);
+            showView('home');
+            return;
+          }
+        }
+
+        // Update Bottom Nav State
+        const navLinks = document.querySelectorAll('.bottom-nav .nav-item');
+        navLinks.forEach(el => {
+          el.classList.remove('active');
+          const href = el.getAttribute('href').substring(1);
+          if (href === viewName || (viewName === 'home' && href === 'sobre')) {
+            el.classList.add('active');
+          }
+        });
+      }
+
+      function scrollToSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+
+      // Expose to window
+      window.showView = showView;
+      window.scrollToSection = scrollToSection;
+
+      // Enhanced Navigation Handler (Mobile + Desktop)
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          const href = this.getAttribute('href').substring(1);
+
+          // Map specific sections to Views
+          if (['galeria', 'video', 'documentos', 'cronograma'].includes(href)) {
+            showView(href);
+          } else if (href === 'sobre') {
+            showView('home');
+          } else {
+            // For sections inside Home (e.g., #contacto, #siguenos)
+            if (!document.querySelector('.view-home.active')) {
+              showView('home');
+              // Wait for view to activate then scroll
+              setTimeout(() => scrollToSection(href), 100);
+            } else {
+              scrollToSection(href);
+            }
+          }
+        });
+      });
+
+      // Handle Deep Links on Load
+      window.addEventListener('load', () => {
+        const hash = window.location.hash.substring(1);
+        if (['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
+          showView(hash);
+        }
+      });
+
+      // --- Secure Data Loading ---
+      window.loadSecureContent = async () => {
+        console.log("Loading secure content from Firestore...");
+        try {
+          if (typeof loadTimeline === 'function') await loadTimeline();
+          if (typeof loadActivities === 'function') await loadActivities();
+          if (typeof loadVideos === 'function') await loadVideos();
+        } catch (error) {
+          console.error("Error loading secure content:", error);
+        }
+      };
+
+      document.addEventListener('DOMContentLoaded', () => {
+        // Check for hash
+        const hash = window.location.hash.substring(1);
+        if (hash && ['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
+          showView(hash);
+        } else {
+          // Default view
+          showView('home');
+        }
+      });
+    </script>
+    <nav class="bottom-nav">
+      <a href="#sobre" class="nav-item active">
+        <i class="fas fa-leaf"></i>
+        <span>Inicio</span>
+      </a>
+      <a href="#cronograma" class="nav-item">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Agenda</span>
+      </a>
+      <a href="#galeria" class="nav-item">
+        <i class="fas fa-images"></i>
+        <span>Galería</span>
+      </a>
+      <a href="#video" class="nav-item">
+        <i class="fas fa-play-circle"></i>
+        <span>Videos</span>
+      </a>
+      <a href="#documentos" class="nav-item">
+        <i class="fas fa-file-pdf"></i>
+        <span>Docs</span>
+      </a>
+    </nav>
 
 </body>
 
