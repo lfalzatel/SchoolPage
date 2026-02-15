@@ -418,19 +418,24 @@
     <script type="module">
         console.log('Login.html MODULE script starting...');
         import { auth } from './firebase-config.js';
-        import { loginWithEmail, loginWithGoogle, registerWithEmail, logout } from './auth.js';
+        import { loginWithEmail, loginWithGoogle, registerWithEmail, logout, handleRedirectAuth } from './auth.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
         // Exponer funciones globales para mayor compatibilidad
         window.loginWithGoogle = loginWithGoogle;
         window.loginWithEmail = loginWithEmail;
         window.registerWithEmail = registerWithEmail;
+        window.handleRedirectAuth = handleRedirectAuth;
+
+        // Check for Redirect Result on load to catch errors or finish sign-in
+        window.addEventListener('load', async () => {
+            await handleRedirectAuth();
+        });
 
         window.handleGoogleClick = async () => {
-            console.log("GOOGLE BUTTON CLICKED");
+            console.log("GOOGLE BUTTON CLICKED - Redirect Mode");
             const gBtn = document.getElementById('googleLoginBtn');
             const gBtnText = document.getElementById('googleBtnText');
-            const originalText = gBtnText.innerText;
 
             try {
                 if (typeof window.loginWithGoogle !== 'function') {
@@ -439,18 +444,16 @@
                 }
 
                 gBtn.disabled = true;
-                gBtnText.innerText = "Cargando...";
+                gBtnText.innerText = "Redirigiendo...";
 
                 await window.loginWithGoogle();
 
             } catch (err) {
                 console.error("DEBUG: Google Click Error:", err);
-                // Si el error no es cancelación del usuario, mostrar alerta
-                if (err.code !== 'auth/cancelled-popup-request' && err.code !== 'auth/popup-closed-by-user') {
-                    alert("Error de Google: " + err.message);
-                }
+                alert("Error de Google: " + err.message);
+
                 gBtn.disabled = false;
-                gBtnText.innerText = originalText;
+                gBtnText.innerText = "Iniciar con Google";
             }
         };
 
