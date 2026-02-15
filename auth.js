@@ -59,17 +59,29 @@ export const loginWithGoogle = async () => {
 
 // Nueva función para manejar el retorno del redireccionamiento
 export const handleRedirectAuth = async () => {
+    console.log("Checking Google Redirect result (handleRedirectAuth)...");
     try {
         const result = await getRedirectResult(auth);
-        if (result) {
+        if (result && result.user) {
             console.log("User logged in via Google Redirect:", result.user.displayName);
             await saveUserToFirestore(result.user);
-            // El onAuthStateChanged en index/login se encargará de la navegación
+
+            // Redirigir si estamos en login
+            if (window.location.pathname.includes('login') || window.location.pathname.endsWith('/')) {
+                console.log("Redirect result success, jumping to index.html");
+                window.location.href = 'index.html';
+            }
             return result.user;
+        } else {
+            console.log("No redirect result found (handleRedirectAuth).");
         }
     } catch (error) {
         console.error("Error returning from Redirect:", error);
-        alert("Error al completar el inicio de sesión: " + error.message);
+        if (error.code === 'auth/unauthorized-domain') {
+            alert("Dominio no autorizado: " + window.location.hostname);
+        } else if (error.code !== 'auth/cancelled-popup-request') {
+            alert("Error al completar el inicio de sesión: " + error.message);
+        }
     }
 };
 
@@ -165,36 +177,10 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
 
 // -----------------------------------------------------------
 //  MANEJAR EL RESULTADO DEL REDIRECT DE GOOGLE
-//  Se ejecuta cuando el navegador vuelve de accounts.google.com
+//  (Lógica centralizada en handleRedirectAuth exportada)
 // -----------------------------------------------------------
-async function handleRedirectResult() {
-    console.log("Checking Google Redirect result...");
-    try {
-        const result = await getRedirectResult(auth);
-        if (result && result.user) {
-            console.log("User logged in via Google:", result.user.displayName);
-            await saveUserToFirestore(result.user);
-            // Si estamos en login.html, redirigir a index
-            if (window.location.pathname.includes('login') || window.location.pathname.endsWith('/')) {
-                console.log("Redirect result found user, jumping to index.html");
-                window.location.href = 'index.html';
-            }
-        } else {
-            console.log("No redirect result found (normal page load).");
-        }
-    } catch (error) {
-        console.error("Redirect result error:", error.code, error.message);
-        // Mostrar alerta específica para el usuario
-        if (error.code === 'auth/unauthorized-domain') {
-            alert("Error: Este dominio no está autorizado en Firebase. Añade '" + window.location.hostname + "' en la consola de Firebase.");
-        } else if (error.code !== 'auth/cancelled-popup-request') {
-            alert("Error en el retorno de Google: " + error.message);
-        }
-    }
-}
-
-// Llamar al cargar la página
-handleRedirectResult();
+// handleRedirectResult eliminado para evitar llamadas duplicadas.
+// Usar handleRedirectAuth() explícitamente donde sea necesario.
 
 // -----------------------------------------------------------
 //  ACCIÓN GLOBAL (Dropdown header)
