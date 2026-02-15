@@ -280,6 +280,14 @@
     </div>
 
     <script>
+        window.onerror = function (msg, url, lineNo, columnNo, error) {
+            console.error('GLOBAL ERROR:', msg, 'at', url, 'line', lineNo);
+            alert('Error crítico de carga: ' + msg);
+            return false;
+        };
+        console.log('Login.html generic script starting...');
+    </script>
+    <script>
         // --- PWA Installation Logic ---
         let deferredPrompt;
         const installBtn = document.getElementById('installAppBtn');
@@ -308,6 +316,7 @@
     </script>
 
     <script type="module">
+        console.log('Login.html MODULE script starting...');
         import { auth } from './firebase-config.js';
         import { loginWithEmail, loginWithGoogle, registerWithEmail, logout } from './auth.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
@@ -329,19 +338,27 @@
         // Email Login
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log("Login form submitted");
+
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const btn = e.target.querySelector('button');
+
+            console.log("Attempting login for:", email);
 
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
             btn.disabled = true;
 
             try {
-                await loginWithEmail(email, password);
-                // Redirect handled by onAuthStateChanged
+                const user = await loginWithEmail(email, password);
+                console.log("Login successful, user:", user);
+                // Redirect handled by onAuthStateChanged, but let's force check
+                if (user) {
+                    window.location.href = 'index.html';
+                }
             } catch (error) {
-                console.error(error);
+                console.error("Login Error Catch:", error);
                 alert("Error: " + error.message);
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -350,11 +367,12 @@
 
         // Google Login
         document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            console.log("Google login clicked");
             try {
                 await loginWithGoogle();
                 // Redirect handled by onAuthStateChanged
             } catch (error) {
-                console.error(error);
+                console.error("Google Login Error:", error);
                 alert("Error con Google: " + error.message);
             }
         });
@@ -362,15 +380,19 @@
         // Quick Test User Creation (For Demo)
         document.getElementById('createTestUserBtn').addEventListener('click', async (e) => {
             e.preventDefault();
-            const email = "test@greenforce.com";
+            console.log("Create Test User clicked");
+            const email = "test" + Date.now() + "@greenforce.com";
             const password = "password123";
             const name = "Usuario de Prueba";
 
             if (confirm(`¿Crear usuario de prueba?\nEmail: ${email}\nPass: ${password}`)) {
                 try {
+                    console.log("Registering test user...");
                     await registerWithEmail(email, password, name);
-                    alert("Usuario creado! Iniciando sesion...");
+                    alert("Usuario creado! Iniciando sesión...");
+                    window.location.href = 'index.html';
                 } catch (err) {
+                    console.error("Registration Error:", err);
                     alert("Error: " + err.message);
                 }
             }
