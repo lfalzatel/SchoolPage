@@ -2064,9 +2064,13 @@ footer {
 }
 
 
-/* Reset info-cards and section text to white where required */
-/* Scoped white text for dark sections only */
+/* Default: Dark text for readability on light background */
 .view-section section>p {
+  color: var(--text-primary);
+}
+
+/* Dark Mode: White text */
+.dark-mode .view-section section>p {
   color: #ffffff !important;
 }
 
