@@ -103,7 +103,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--white);
+  color: #ffffff !important;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -174,6 +174,7 @@ body {
   opacity: 0;
   animation: fadeInUp 1s ease 0.6s forwards;
   font-weight: 400;
+  color: #ffffff !important;
 }
 
 .hero-message {
@@ -1116,6 +1117,14 @@ footer {
   /* Improve Readability */
   p {
     font-size: 1rem !important;
+    color: #374151 !important;
+    /* Force dark gray on light sections */
+  }
+
+  h2,
+  h3 {
+    color: #111827 !important;
+    /* Force dark headings on light sections */
   }
 
   /* Adjust FAB position */
@@ -1410,15 +1419,16 @@ footer {
   left: 0;
   width: 100%;
   height: 70px;
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(6, 78, 59, 0.95);
+  /* Verde Esmeralda Muy Oscuro */
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 1.5rem;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 2500;
   transition: all 0.3s ease;
 }
@@ -1439,9 +1449,9 @@ footer {
 .header-title {
   font-weight: 800;
   font-size: 1.25rem;
-  color: var(--primary);
+  color: #ffffff;
   letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #065f46, #10b981);
+  background: linear-gradient(135deg, #ffffff, #d1fae5);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1462,12 +1472,12 @@ footer {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 4px 12px 4px 4px;
   border-radius: 50px;
-  border: 1px solid var(--glass-border);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -1496,14 +1506,14 @@ footer {
 }
 
 .user-name-pill {
-  color: #1f2937;
+  color: #ffffff;
   font-size: 0.85rem;
   font-weight: 700;
   white-space: nowrap;
 }
 
 .user-role-pill {
-  color: var(--primary);
+  color: #d1fae5;
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -1518,6 +1528,10 @@ footer {
   width: 300px;
   z-index: 5001;
   animation: dropdownSlideIn 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+.profile-dropdown.active {
+  display: block !important;
 }
 
 @keyframes dropdownSlideIn {
