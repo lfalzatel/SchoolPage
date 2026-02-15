@@ -157,6 +157,13 @@ body {
   line-height: 1.1;
   opacity: 0;
   animation: fadeInUp 1s ease 0.3s forwards;
+  color: #ffffff !important;
+  /* Force white text */
+}
+
+/* Ensure tagline is also white */
+.hero-tagline {
+  color: #ffffff !important;
 }
 
 .hero-tagline {
@@ -2044,24 +2051,20 @@ footer {
 
 /* Reset info-cards and section text to white where required */
 /* Scoped white text for dark sections only */
-.hero-content h1,
-.hero-content p,
-.hero-tagline,
-.view-section h2,
 .view-section section>p {
   color: #ffffff !important;
 }
 
 /* Info cards should adapt to theme unless specifically dark */
+/* Light Mode: Dark Text */
 .info-card h2,
 .info-card p,
 .about-project h2,
 .about-project p {
   color: var(--text-primary);
-  /* Use variable to adapt */
 }
 
-/* Force white text in these cards ONLY when in dark mode */
+/* Dark Mode: White Text */
 .dark-mode .info-card h2,
 .dark-mode .info-card p,
 .dark-mode .about-project h2,
@@ -2070,23 +2073,33 @@ footer {
 }
 
 /* Ensure bottom nav is always on top and visible */
-/* Ensure bottom nav is always on top and visible */
 .bottom-nav {
+  position: fixed !important;
+  /* Force fixed positioning */
+  bottom: 2rem !important;
+  /* Ensure it's lifted from bottom */
+  left: 50% !important;
+  transform: translateX(-50%) !important;
   display: flex !important;
   visibility: visible !important;
   opacity: 1 !important;
-  z-index: 9999 !important;
-  background: rgba(255, 255, 255, 0.9);
-  /* Slightly more opaque for better contrast */
+  z-index: 2147483647 !important;
+  /* Max z-index */
+  background: rgba(255, 255, 255, 0.95);
+  /* High opacity for visibility */
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
+  width: auto;
+  min-width: 300px;
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 /* Dark Mode Bottom Nav */
 .dark-mode .bottom-nav {
-  background: rgba(31, 41, 55, 0.9);
-  /* Dark background for dark mode */
-  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(31, 41, 55, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .dark-mode .nav-item {
@@ -2099,7 +2112,8 @@ footer {
 
 footer p {
   color: #ffffff !important;
-  /* Override general p rule */
+  /* Force white footer text */
+  margin-top: 1rem;
   opacity: 0.9;
   margin: 0.5rem 0;
 }
