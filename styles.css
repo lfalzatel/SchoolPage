@@ -2102,47 +2102,7 @@ footer {
   color: #ffffff !important;
 }
 
-/* Ensure bottom nav is always on top and visible */
-.bottom-nav {
-  position: fixed !important;
-  bottom: 0px !important;
-  /* Changed from 20px to 0px to ensure visibility */
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  display: flex !important;
-  align-items: center;
-  justify-content: space-around;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 2147483647 !important;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  width: 100%;
-  /* Full width for better reliability */
-  max-width: 500px;
-  height: auto;
-  padding: 15px 20px;
-  /* Increased padding */
-  border-radius: 20px 20px 0 0;
-  /* Rounded only on top */
-  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
-  margin: 0 auto;
-}
 
-/* Dark Mode Bottom Nav */
-.dark-mode .bottom-nav {
-  background: rgba(31, 41, 55, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dark-mode .nav-item {
-  color: #9ca3af;
-}
-
-.dark-mode .nav-item.active {
-  color: var(--primary);
-}
 
 /* SUPER SPECIFIC FOOTER CONTRAST FIX */
 body footer p,
@@ -2155,17 +2115,152 @@ footer a {
   color: #ffffff !important;
   text-decoration: none;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  opacity: 1 !important;
+  /* Force full opacity */
+  mix-blend-mode: normal !important;
+  /* Prevent blending issues */
 }
 
 footer a {
   color: #d1fae5 !important;
   text-decoration: none;
   transition: opacity 0.2s;
+  opacity: 1 !important;
 }
 
 footer a:hover {
-  opacity: 0.8;
+  opacity: 0.8 !important;
+  /* Allow slight transparency only on hover */
   text-decoration: underline;
+}
+
+/* --- PREMIUM FLOATING MENU --- */
+.bottom-nav {
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  /* Spaced out nicely */
+  gap: 10px;
+
+  width: auto !important;
+  min-width: 320px;
+  max-width: 90%;
+  height: 65px;
+  /* Fixed height for consistency */
+  padding: 0 25px;
+
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+
+  border-radius: 50px;
+  /* Capsule shape */
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+
+  z-index: 10000 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-nav:hover {
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  transform: translateX(-50%) translateY(-2px) !important;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #555;
+  position: relative;
+  transition: all 0.3s ease;
+  flex: 1;
+  /* Share space */
+  padding: 5px 0;
+  border-radius: 12px;
+}
+
+.nav-item i {
+  font-size: 1.4rem;
+  margin-bottom: 2px;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.nav-item span {
+  font-size: 0.65rem;
+  font-weight: 600;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+/* Hover State */
+.nav-item:hover {
+  color: var(--primary);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.nav-item:hover i {
+  transform: translateY(-2px);
+}
+
+/* Active State */
+.nav-item.active {
+  color: var(--primary);
+}
+
+.nav-item.active i {
+  transform: scale(1.1);
+  filter: drop-shadow(0 4px 6px rgba(46, 125, 50, 0.3));
+}
+
+.nav-item.active span {
+  opacity: 1;
+  font-weight: 700;
+}
+
+/* Active Indicator Dot */
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  width: 4px;
+  height: 4px;
+  background: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--primary);
+}
+
+/* Dark Mode Overrides for Menu */
+.dark-mode .bottom-nav {
+  background: rgba(30, 30, 30, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .nav-item {
+  color: #a0a0a0;
+}
+
+.dark-mode .nav-item:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .nav-item.active {
+  color: #4ade80;
+  /* Brighter green for dark mode */
+}
+
+.dark-mode .nav-item.active::after {
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
 }
 
 /* Ensure tagline is also white - SUPER SPECIFIC TO FIX GRAY TEXT */

@@ -997,27 +997,28 @@
       });
     </script>
     <nav class="bottom-nav">
-      <a href="#sobre" class="nav-item active">
-        <i class="fas fa-leaf"></i>
-        <span>Inicio</span>
-      </a>
-      <a href="#cronograma" class="nav-item">
-        <i class="fas fa-calendar-alt"></i>
-        <span>Agenda</span>
-      </a>
-      <a href="#galeria" class="nav-item">
-        <i class="fas fa-images"></i>
-        <span>Galería</span>
-      </a>
-      <a href="#video" class="nav-item">
-        <i class="fas fa-play-circle"></i>
-        <span>Videos</span>
-      </a>
-      <a href="#documentos" class="nav-item">
-        <i class="fas fa-file-pdf"></i>
-        <span>Docs</span>
-      </a>
-    </nav>
+      <nav class="bottom-nav">
+        <a href="#home" class="nav-item active" onclick="showView('home')">
+          <i class="fas fa-home"></i>
+          <span>Inicio</span>
+        </a>
+        <a href="#about-project" class="nav-item" onclick="scrollToSection('about-project')">
+          <i class="fas fa-leaf"></i>
+          <span>Nosotros</span>
+        </a>
+        <a href="#galeria" class="nav-item" onclick="showView('galeria')">
+          <i class="fas fa-images"></i>
+          <span>Galería</span>
+        </a>
+        <a href="#video" class="nav-item" onclick="showView('video')">
+          <i class="fas fa-play-circle"></i>
+          <span>Videos</span>
+        </a>
+        <a href="#documentos" class="nav-item" onclick="showView('documentos')">
+          <i class="fas fa-file-alt"></i>
+          <span>Docs</span>
+        </a>
+      </nav>
 
 </body>
 
