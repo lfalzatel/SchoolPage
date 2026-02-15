@@ -275,6 +275,12 @@
                 Crear Usuario de Prueba</a>
         </div>
 
+        <div style="margin-top: 1rem; font-size: 0.7rem; color: #999;">
+            Versión: 1.2 (Debug Enabled)
+            <br>
+            <a href="#" onclick="forceFullReload()" style="color: #999;">Forzar Recarga Completa</a>
+        </div>
+
         <!-- Hidden back link just in case -->
         <!-- <a href="index.html" class="back-link">Volver al Inicio</a> -->
     </div>
@@ -296,8 +302,24 @@
             e.preventDefault();
             deferredPrompt = e;
             if (installBtn) installBtn.style.display = 'flex';
+            installBtn.style.display = 'flex';
             console.log('beforeinstallprompt fired');
         });
+
+        async function forceFullReload() {
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    await registration.unregister();
+                }
+            }
+            const cacheNames = await caches.keys();
+            for (let name of cacheNames) {
+                await caches.delete(name);
+            }
+            window.location.reload(true);
+        }
+        window.forceFullReload = forceFullReload;
 
         installBtn.addEventListener('click', async () => {
             if (!deferredPrompt) return;
