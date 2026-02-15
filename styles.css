@@ -2094,7 +2094,8 @@ footer {
 /* Ensure bottom nav is always on top and visible */
 .bottom-nav {
   position: fixed !important;
-  bottom: 20px !important;
+  bottom: 0px !important;
+  /* Changed from 20px to 0px to ensure visibility */
   left: 50% !important;
   transform: translateX(-50%) !important;
   display: flex !important;
@@ -2106,15 +2107,16 @@ footer {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  width: 90%;
-  /* Responsive width */
-  max-width: 400px;
+  width: 100%;
+  /* Full width for better reliability */
+  max-width: 500px;
   height: auto;
-  padding: 10px 20px;
-  border-radius: 50px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  padding: 15px 20px;
+  /* Increased padding */
+  border-radius: 20px 20px 0 0;
+  /* Rounded only on top */
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
   margin: 0 auto;
-  /* Safety centering */
 }
 
 /* Dark Mode Bottom Nav */
