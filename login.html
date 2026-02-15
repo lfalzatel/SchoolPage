@@ -49,10 +49,17 @@
             background-position: center;
             opacity: 0;
             transition: opacity 1.5s ease-in-out;
+            z-index: 0;
         }
 
         .bg-slide.active {
             opacity: 1;
+            z-index: 2;
+        }
+
+        .bg-slide.last-active {
+            opacity: 1;
+            z-index: 1;
         }
 
         .bg-overlay {
@@ -345,15 +352,14 @@
             alert('Error crítico de carga: ' + msg);
             return false;
         };
-        // Background Slideshow Logic
+        // Background Slideshow Logic - Exact user list (10 images)
         const images = [
-            '10. Reforestación institucional - 4.jpg',
             '12. Visita agrosavia 2025 - 8.jpg',
-            '14. Sembratón de 1000 árboles - 5.jpg',
-            '14. Sembratón de 1000 árboles - 16.jpg',
+            '14. Sembraton de 1000 árboles - 5.jpg',
+            '14. Sembraton de 1000 árboles - 16.jpg',
+            '16. Miroorganismos del suelo - 2.jpg',
             '15. Siembra y mantenimiento 5.jpg',
-            '16. Microorganismos del suelo - 2.jpg',
-            '16. Microorganismos del suelo - 3.jpg',
+            '16. Miroorganismos del suelo - 3.jpg',
             '17. Visita Microcuenca ARSA - 15.jpg',
             '19. Encuentro UCO - 4.jpg',
             '19. Encuentro UCO - 8.jpg',
@@ -376,7 +382,15 @@
 
         function nextSlide() {
             const slides = document.querySelectorAll('.bg-slide');
+
+            // Remove previous markers
+            slides.forEach(s => s.classList.remove('last-active'));
+
+            // Current becomes "last active" to stay underneath
+            slides[currentSlide].classList.add('last-active');
             slides[currentSlide].classList.remove('active');
+
+            // New slide becomes active and fades in ON TOP
             currentSlide = (currentSlide + 1) % slides.length;
             slides[currentSlide].classList.add('active');
         }
