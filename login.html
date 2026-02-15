@@ -261,7 +261,7 @@
             <span>O continúa con</span>
         </div>
 
-        <button id="googleLoginBtn" class="google-btn" onclick="handleGoogleClick()">
+        <button id="googleLoginBtn" class="google-btn" onclick="alert('Botón clickeado en HTML'); handleGoogleClick()">
             <i class="fab fa-google" style="color: #DB4437;"></i> Google
         </button>
 
@@ -350,8 +350,13 @@
 
         window.handleGoogleClick = async () => {
             console.log("GOOGLE BUTTON CLICKED (GLOBAL HANDLER)");
+            alert("Iniciando flujo de Google...");
             try {
-                await loginWithGoogle();
+                if (typeof window.loginWithGoogle !== 'function') {
+                    alert("Error: loginWithGoogle no está cargado todavía.");
+                    return;
+                }
+                await window.loginWithGoogle();
             } catch (err) {
                 console.error("DEBUG: Google Click Error:", err);
                 alert("Error de Google: " + err.message);
