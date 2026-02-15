@@ -103,20 +103,27 @@ export const logout = async () => {
 //  Se ejecuta cuando el navegador vuelve de accounts.google.com
 // -----------------------------------------------------------
 async function handleRedirectResult() {
+    console.log("Checking Google Redirect result...");
     try {
         const result = await getRedirectResult(auth);
         if (result && result.user) {
             console.log("User logged in via Google:", result.user.displayName);
             await saveUserToFirestore(result.user);
             // Si estamos en login.html, redirigir a index
-            if (window.location.pathname.includes('login')) {
+            if (window.location.pathname.includes('login') || window.location.pathname.endsWith('/')) {
+                console.log("Redirect result found user, jumping to index.html");
                 window.location.href = 'index.html';
             }
+        } else {
+            console.log("No redirect result found (normal page load).");
         }
     } catch (error) {
-        // auth/cancelled-popup-request puede aparecer aquí también — ignorar
-        if (error.code !== 'auth/cancelled-popup-request') {
-            console.error("Redirect result error:", error.code);
+        console.error("Redirect result error:", error.code, error.message);
+        // Mostrar alerta específica para el usuario
+        if (error.code === 'auth/unauthorized-domain') {
+            alert("Error: Este dominio no está autorizado en Firebase. Añade '" + window.location.hostname + "' en la consola de Firebase.");
+        } else if (error.code !== 'auth/cancelled-popup-request') {
+            alert("Error en el retorno de Google: " + error.message);
         }
     }
 }
@@ -139,19 +146,19 @@ window.handleAuthAction = () => {
 //  UI: Actualizar elementos según estado de sesión
 // -----------------------------------------------------------
 const uiIds = {
-    mobileAuthBtn:      'mobileAuthBtn',
-    headerProfileAvatar:'headerProfileAvatar',
-    menuProfileName:    'menuProfileName',
-    menuProfileEmail:   'menuProfileEmail',
-    menuLoginBtn:       'menuLoginBtn',
-    loginBtn:           'loginBtn',
-    logoutBtn:          'logoutBtn',
-    userProfile:        'userProfile',
-    userAvatar:         'userAvatar',
-    userName:           'userName',
-    galleryOverlay:     'galleryOverlay',
-    videoOverlay:       'videoOverlay',
-    docsOverlay:        'docsOverlay'
+    mobileAuthBtn: 'mobileAuthBtn',
+    headerProfileAvatar: 'headerProfileAvatar',
+    menuProfileName: 'menuProfileName',
+    menuProfileEmail: 'menuProfileEmail',
+    menuLoginBtn: 'menuLoginBtn',
+    loginBtn: 'loginBtn',
+    logoutBtn: 'logoutBtn',
+    userProfile: 'userProfile',
+    userAvatar: 'userAvatar',
+    userName: 'userName',
+    galleryOverlay: 'galleryOverlay',
+    videoOverlay: 'videoOverlay',
+    docsOverlay: 'docsOverlay'
 };
 
 const getEl = (id) => document.getElementById(id);
@@ -176,21 +183,21 @@ const updateUI = (user) => {
     }
 
     // 2. Header avatar y dropdown
-    const avatar   = getEl(uiIds.headerProfileAvatar);
-    const menuName  = getEl(uiIds.menuProfileName);
+    const avatar = getEl(uiIds.headerProfileAvatar);
+    const menuName = getEl(uiIds.menuProfileName);
     const menuEmail = getEl(uiIds.menuProfileEmail);
-    const menuBtn   = getEl(uiIds.menuLoginBtn);
+    const menuBtn = getEl(uiIds.menuLoginBtn);
 
     if (user) {
-        if (avatar)    avatar.src           = user.photoURL || 'assets/icons/icon-192.png';
-        if (menuName)  menuName.textContent  = user.displayName || 'Usuario';
+        if (avatar) avatar.src = user.photoURL || 'assets/icons/icon-192.png';
+        if (menuName) menuName.textContent = user.displayName || 'Usuario';
         if (menuEmail) menuEmail.textContent = user.email || '';
-        if (menuBtn)   menuBtn.innerHTML     = '<i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>';
+        if (menuBtn) menuBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>';
     } else {
-        if (avatar)    avatar.src           = 'assets/icons/icon-192.png';
-        if (menuName)  menuName.textContent  = 'Invitado';
+        if (avatar) avatar.src = 'assets/icons/icon-192.png';
+        if (menuName) menuName.textContent = 'Invitado';
         if (menuEmail) menuEmail.textContent = 'Inicia sesión para acceder';
-        if (menuBtn)   menuBtn.innerHTML     = '<i class="fas fa-sign-in-alt"></i> <span>Iniciar Sesión</span>';
+        if (menuBtn) menuBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> <span>Iniciar Sesión</span>';
     }
 
     // 3. Overlays de contenido protegido
@@ -200,18 +207,18 @@ const updateUI = (user) => {
     });
 
     // 4. Nav de escritorio (legacy)
-    const lBtn    = getEl(uiIds.loginBtn);
-    const uProf   = getEl(uiIds.userProfile);
-    const uName   = getEl(uiIds.userName);
+    const lBtn = getEl(uiIds.loginBtn);
+    const uProf = getEl(uiIds.userProfile);
+    const uName = getEl(uiIds.userName);
     const uAvatar = getEl(uiIds.userAvatar);
 
     if (user) {
-        if (lBtn)    lBtn.style.display  = 'none';
-        if (uProf)   uProf.style.display = 'flex';
-        if (uName)   uName.textContent   = (user.displayName || '').split(' ')[0];
-        if (uAvatar) uAvatar.src         = user.photoURL || '';
+        if (lBtn) lBtn.style.display = 'none';
+        if (uProf) uProf.style.display = 'flex';
+        if (uName) uName.textContent = (user.displayName || '').split(' ')[0];
+        if (uAvatar) uAvatar.src = user.photoURL || '';
     } else {
-        if (lBtn)  lBtn.style.display  = 'block';
+        if (lBtn) lBtn.style.display = 'block';
         if (uProf) uProf.style.display = 'none';
     }
 
