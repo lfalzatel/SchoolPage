@@ -93,20 +93,6 @@
               </div>
             </div>
 
-            <div class="theme-switcher-container">
-              <div class="segmented-control">
-                <input type="radio" name="theme" id="theme-light" value="light" onclick="setTheme('light')">
-                <label for="theme-light"><i class="fas fa-sun"></i></label>
-
-                <input type="radio" name="theme" id="theme-dark" value="dark" onclick="setTheme('dark')">
-                <label for="theme-dark"><i class="fas fa-moon"></i></label>
-
-                <input type="radio" name="theme" id="theme-system" value="system" onclick="setTheme('system')" checked>
-                <label for="theme-system"><i class="fas fa-desktop"></i></label>
-
-                <div class="segmented-glider"></div>
-              </div>
-            </div>
 
             <div class="dropdown-menu-list">
               <a href="gallery.html" class="menu-item">
@@ -660,32 +646,6 @@
         if (menu) menu.classList.toggle('active');
       }
 
-      // --- Theme Management ---
-      window.setTheme = function (theme) {
-        document.body.classList.remove('dark-mode');
-
-        if (theme === 'dark') {
-          document.body.classList.add('dark-mode');
-        } else if (theme === 'system') {
-          if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.body.classList.add('dark-mode');
-          }
-        }
-
-        localStorage.setItem('selected-theme', theme);
-
-        // Update active class on buttons
-        document.querySelectorAll('.theme-btn').forEach(btn => {
-          btn.classList.remove('active');
-          if (btn.getAttribute('onclick').includes(`'${theme}'`)) {
-            btn.classList.add('active');
-          }
-        });
-      }
-
-      // Initialize Theme on Load
-      const savedTheme = localStorage.getItem('selected-theme') || 'light';
-      window.setTheme(savedTheme);
 
       // --- Event Modal Logic ---
       window.openEventModal = function () {

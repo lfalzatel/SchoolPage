@@ -2028,3 +2028,38 @@ body {
 .profile-dropdown .text-gray {
   color: #6b7280 !important;
 }
+
+/* Footer Styles - Fix Contrast */
+footer {
+  padding: 3rem 1.5rem 5rem;
+  background: #064e3b;
+  /* Smoked Emerald to match header */
+  color: #ffffff !important;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 2rem;
+}
+
+footer p {
+  color: #ffffff !important;
+  /* Override general p rule */
+  opacity: 0.9;
+  margin: 0.5rem 0;
+}
+
+footer a {
+  color: #d1fae5 !important;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+footer a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+/* Dark Mode Footer */
+.dark-mode footer {
+  background: #064030;
+  border-top-color: rgba(255, 255, 255, 0.05);
+}

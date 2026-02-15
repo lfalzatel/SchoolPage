@@ -128,12 +128,25 @@ window.setTheme = (theme) => {
         }
     }
     localStorage.setItem('green-force-theme', theme);
+    // Compatibility with old key just in case
+    localStorage.setItem('selected-theme', theme);
+
     updateThemeSelector(theme);
 };
 
 const updateThemeSelector = (theme) => {
+    // 1. Update Radio buttons (if exist)
     const input = document.getElementById(`theme-${theme}`);
     if (input) input.checked = true;
+
+    // 2. Update Premium buttons (.theme-btn)
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.remove('active');
+        // Check if the onclick attribute or the button itself is related to this theme
+        if (btn.getAttribute('onclick')?.includes(`'${theme}'`)) {
+            btn.classList.add('active');
+        }
+    });
 };
 
 // Inicializar tema al cargar
