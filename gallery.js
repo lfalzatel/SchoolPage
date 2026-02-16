@@ -598,6 +598,8 @@ export function filterActivitiesByDate(dateString) {
 /**
  * Crea una nueva actividad/evento en Firestore con soporte para múltiples fotos.
  */
+// --- CREATE & UPDATE ACTIVITIES ---
+
 export async function createActivity(data, photos) {
     try {
         const user = auth.currentUser;
@@ -605,21 +607,31 @@ export async function createActivity(data, photos) {
 
         const imageUrls = [];
 
-        // Subir fotos a Storage
-        for (let i = 0; i < photos.length; i++) {
-            const file = photos[i];
-            const storageRef = ref(storage, `activities/${Date.now()}_${file.name}`);
-            const snapshot = await uploadBytes(storageRef, file);
-            const url = await getDownloadURL(snapshot.ref);
-            imageUrls.push(url);
+        // Subir fotos a Storage (Solo si hay fotos)
+        if (photos && photos.length > 0) {
+            for (let i = 0; i < photos.length; i++) {
+                const file = photos[i];
+                const storageRef = ref(storage, `activities/${Date.now()}_${file.name}`);
+                const snapshot = await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(snapshot.ref);
+                imageUrls.push(url);
+            }
+        }
+
+        // Create Date object with time if provided
+        let eventDate;
+        if (data.time) {
+            eventDate = new Date(`${data.date}T${data.time}`);
+        } else {
+            eventDate = new Date(`${data.date}T00:00:00`);
         }
 
         const newActivity = {
             title: data.title,
-            description: data.notes,
-            date: Timestamp.fromDate(new Date(data.date)),
+            description: data.notes || '',
+            date: Timestamp.fromDate(eventDate),
             year: data.date.split('-')[0],
-            thumbnail: imageUrls[0] || 'assets/images/placeholder.jpg',
+            thumbnail: imageUrls[0] || 'assets/images/1. logo 1.jpg',
             images: imageUrls,
             createdAt: serverTimestamp(),
             createdBy: {
@@ -632,12 +644,71 @@ export async function createActivity(data, photos) {
         const docRef = await addDoc(collection(db, "activities"), newActivity);
         console.log("Actividad creada con ID:", docRef.id);
 
-        // Recargar actividades
+        // Recargar actividades y cronograma
         await loadActivities();
+        await loadCronograma();
         return docRef.id;
 
     } catch (error) {
         console.error("Error en createActivity:", error);
+        throw error;
+    }
+}
+
+export async function updateActivity(id, data, newPhotos) {
+    try {
+        const user = auth.currentUser;
+        if (!user) throw new Error("Debes iniciar sesión para editar eventos.");
+
+        const imageUrls = data.existingImages || [];
+
+        // Subir fotos nuevas a Storage (Solo si hay fotos)
+        if (newPhotos && newPhotos.length > 0) {
+            for (let i = 0; i < newPhotos.length; i++) {
+                const file = newPhotos[i];
+                const storageRef = ref(storage, `activities/${Date.now()}_${file.name}`);
+                const snapshot = await uploadBytes(storageRef, file);
+                const url = await getDownloadURL(snapshot.ref);
+                imageUrls.push(url);
+            }
+        }
+
+        // Create Date object with time if provided
+        let eventDate;
+        if (data.time) {
+            eventDate = new Date(`${data.date}T${data.time}`);
+        } else {
+            eventDate = new Date(`${data.date}T00:00:00`);
+        }
+
+        const updatedData = {
+            title: data.title,
+            description: data.notes || '',
+            date: Timestamp.fromDate(eventDate),
+            year: data.date.split('-')[0],
+            updatedAt: serverTimestamp(),
+            updatedBy: {
+                uid: user.uid,
+                name: user.displayName || user.email
+            }
+        };
+
+        if (imageUrls.length > 0) {
+            updatedData.images = imageUrls;
+            updatedData.thumbnail = imageUrls[0];
+        }
+
+        const docRef = doc(db, "activities", id);
+        await updateDoc(docRef, updatedData);
+        console.log("Actividad actualizada con ID:", id);
+
+        // Recargar actividades y cronograma
+        await loadActivities();
+        await loadCronograma();
+        return id;
+
+    } catch (error) {
+        console.error("Error en updateActivity:", error);
         throw error;
     }
 }
@@ -1305,6 +1376,102 @@ window.filterActivitiesByYear = (year) => {
 
 // --- CRONOGRAMA LOGIC ---
 
+// Calendar Component Logic
+let currentCalendarDate = new Date();
+
+export function renderCalendar() {
+    const container = document.getElementById('calendar-container');
+    if (!container) return;
+
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+
+    // First and last day of month
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    // Day of week of first day (0-6, Adjust to start on Monday if needed, but standard is Sunday 0)
+    let startingDay = firstDay.getDay();
+
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+
+    // Prepare events for this month
+    const monthEvents = (window.currentCronogramaItems || []).filter(item => {
+        let d = null;
+        if (item.date && item.date.toDate) d = item.date.toDate();
+        else if (item.date) d = new Date(item.date);
+        return d && d.getFullYear() === year && d.getMonth() === month;
+    });
+
+    let html = `
+        <div class="calendar-header">
+            <h3>${monthNames[month]} ${year}</h3>
+            <div class="calendar-nav">
+                <button class="cal-btn" onclick="window.changeCalendarMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="cal-btn" onclick="window.changeCalendarMonth(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        <div class="calendar-grid">
+            <div class="cal-weekday">Dom</div>
+            <div class="cal-weekday">Lun</div>
+            <div class="cal-weekday">Mar</div>
+            <div class="cal-weekday">Mié</div>
+            <div class="cal-weekday">Jue</div>
+            <div class="cal-weekday">Vie</div>
+            <div class="cal-weekday">Sáb</div>
+    `;
+
+    // Fill empty days
+    for (let i = 0; i < startingDay; i++) {
+        html += `<div class="cal-day empty"></div>`;
+    }
+
+    // Fill actual days
+    const today = new Date();
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+        const dateObj = new Date(year, month, day);
+        const isToday = dateObj.toDateString() === today.toDateString() ? 'today' : '';
+
+        // Check for events on this day
+        const dayEvents = (window.currentCronogramaItems || []).filter(item => {
+            let d = null;
+            if (item.date && item.date.toDate) d = item.date.toDate();
+            else if (item.date) d = new Date(item.date);
+            // Compare components to avoid timezone shifts
+            return d && d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+        });
+
+        const hasEvent = dayEvents.length > 0 ? 'has-event' : '';
+        const eventStatus = hasEvent ? (dateObj < today ? 'done' : 'upcoming') : '';
+
+        html += `
+            <div class="cal-day ${isToday} ${hasEvent} ${eventStatus}" onclick="window.scrollToEventOnDay(${day})">
+                ${day}
+                ${hasEvent ? '<div class="event-dot"></div>' : ''}
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+// Global window functions for calendar interaction
+window.changeCalendarMonth = (offset) => {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+    renderCalendar();
+};
+
+window.scrollToEventOnDay = (day) => {
+    // Optional: filter the timeline or scroll to specific item
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    console.log(`Searching for events on ${day}/${month + 1}/${year}`);
+    // Here we could implement a smooth scroll to the event in the timeline
+};
+
 export async function loadCronograma() {
     const container = document.getElementById('timeline-container');
     if (!container) return;
@@ -1312,8 +1479,7 @@ export async function loadCronograma() {
     container.innerHTML = '<div class="loader"><i class="fas fa-spinner fa-spin"></i> Cargando cronograma...</div>';
 
     try {
-        // Query activities ordered by date (Ascending for timeline)
-        const q = query(collection(db, "activities"), orderBy("date", "asc"));
+        const q = query(collection(db, "activities"), orderBy("date", "desc"));
         const querySnapshot = await getDocs(q);
 
         const events = [];
@@ -1323,8 +1489,12 @@ export async function loadCronograma() {
 
         window.currentCronogramaItems = events;
 
-        // Apply default filter to 2025
-        filterCronogramaByYear('2025');
+        // Render both components
+        renderCalendar();
+
+        // Default filter for the timeline view (using current year)
+        const currentYear = new Date().getFullYear().toString();
+        filterCronogramaByYear(currentYear);
 
     } catch (e) {
         console.error("Error loading timeline:", e);
@@ -1368,43 +1538,95 @@ function renderCronogramaItems(events) {
 
     const now = new Date();
 
-    const eventsHtml = events.map((event, index) => {
+    const eventsHtml = events.map((event) => {
         let eventDate = null;
         if (event.date && event.date.toDate) {
             eventDate = event.date.toDate();
         } else if (event.date) {
-            eventDate = new Date(event.date);
+            // Ensure we parse without timezone shift if it's a string from input
+            eventDate = typeof event.date === 'string' ? new Date(event.date + "T00:00:00") : new Date(event.date);
         } else {
             eventDate = event.createdAt?.toDate() || new Date();
         }
 
         const isPast = eventDate < now;
         const statusClass = isPast ? 'status-done' : 'status-upcoming';
-        const statusText = isPast ? 'Realizada' : 'Próxima';
-        const statusIcon = isPast ? 'fas fa-check-circle' : 'fas fa-calendar-alt';
-        const dateStr = eventDate.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
-        const alignmentClass = index % 2 === 0 ? 'left' : 'right';
+        const dateStr = eventDate.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        // Check if user is admin
+        const admins = ['greenforceiebb@gmail.com', 'lfalzatel@gmail.com'];
+        const isAdmin = auth.currentUser && admins.includes(auth.currentUser.email);
+
+        const editBtnHtml = isAdmin ? `
+            <button class="edit-activity-btn" onclick="event.stopPropagation(); window.openEditActivityModal('${event.id}')">
+                <i class="fas fa-edit"></i>
+            </button>
+        ` : '';
 
         return `
-            <div class="timeline-item ${alignmentClass} ${statusClass}">
-                <div class="timeline-badge">${dateStr}</div>
-                <div class="timeline-content">
-                    <div class="timeline-status"><i class="${statusIcon}"></i> ${statusText}</div>
+            <div class="activity-card cronograma-card ${statusClass}" onclick="window.openGalleryModalFromId('${event.id}')">
+                ${editBtnHtml}
+                <div class="activity-card-image">
+                    <img src="${event.thumbnail || 'assets/images/1. logo 1.jpg'}" alt="${event.title}">
+                    <div class="image-count"><i class="fas fa-calendar-day"></i></div>
+                </div>
+                <div class="activity-card-content">
+                    <div class="card-status-pill ${statusClass}">
+                        <i class="${isPast ? 'fas fa-check-circle' : 'fas fa-clock'}"></i>
+                        ${isPast ? 'Realizada' : 'Próxima'}
+                    </div>
                     <h3>${event.title}</h3>
                     <p>${event.description}</p>
-                    ${event.thumbnail || (event.images && event.images.length > 0) ?
-                `<button class="btn-timeline-gallery" onclick="window.openGalleryModalFromId('${event.id}')">
-                            <i class="fas fa-images"></i> Ver Fotos
-                         </button>` : ''
-            }
-                    ${event.createdBy && event.createdBy.name ? `<div class="timeline-author"><small>Por: ${event.createdBy.name}</small></div>` : ''}
+                    <div class="activity-card-footer">
+                        <span class="activity-year"><i class="fas fa-calendar-alt"></i> ${dateStr}</span>
+                    </div>
                 </div>
             </div>
         `;
     }).join('');
 
-    container.innerHTML = `<div class="timeline">${eventsHtml}</div>`;
+    container.innerHTML = `<div class="cronograma-grid">${eventsHtml}</div>`;
 }
+
+// --- EDIT MODAL LOGIC ---
+
+window.openEditActivityModal = (id) => {
+    const event = (window.currentCronogramaItems || []).find(e => e.id === id);
+    if (!event) return;
+
+    const modal = document.getElementById('eventModal');
+    if (!modal) return;
+
+    // Set Modal Title
+    const modalTitle = modal.querySelector('.modal-header-premium h3');
+    if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-edit"></i> Editar Evento';
+
+    // Fill form
+    document.getElementById('eventId').value = event.id;
+    document.getElementById('eventTitle').value = event.title;
+
+    let dateStr = '';
+    let timeStr = '';
+
+    if (event.date) {
+        let d = event.date.toDate ? event.date.toDate() : new Date(event.date);
+        // Date in YYYY-MM-DD
+        dateStr = d.toISOString().split('T')[0];
+        // Time in HH:MM
+        timeStr = d.toTimeString().split(' ')[0].substring(0, 5);
+    }
+
+    document.getElementById('eventDate').value = dateStr;
+    document.getElementById('eventTime').value = timeStr;
+    document.getElementById('eventNotes').value = event.description || '';
+
+    // Clear photos
+    document.getElementById('eventPhotos').value = '';
+    const photoCount = document.getElementById('photoCount');
+    if (photoCount) photoCount.innerText = '';
+
+    modal.classList.add('active');
+};
 
 // Helper to open gallery modal by ID
 window.openGalleryModalFromId = async (id) => {

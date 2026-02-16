@@ -388,17 +388,21 @@
         <!-- Year Selector and Admin Controls for Cronograma -->
         <div class="year-selector-container">
           <div class="year-scroll" id="cronogramaYearTrack">
-            <button class="year-pill active" data-year="2025" onclick="filterCronogramaByYear('2025')">2025</button>
+            <button class="year-pill active" data-year="2026" onclick="filterCronogramaByYear('2026')">2026</button>
+            <button class="year-pill" data-year="2025" onclick="filterCronogramaByYear('2025')">2025</button>
             <button class="year-pill" data-year="2024" onclick="filterCronogramaByYear('2024')">2024</button>
-            <button class="year-pill" data-year="2023" onclick="filterCronogramaByYear('2023')">2023</button>
           </div>
 
           <div class="admin-controls" id="cronogramaAdminPanel" style="display: none;">
-            <button class="premium-action-btn" onclick="openUploadModal('event')"
-              style="padding: 6px 16px; font-size: 0.9rem;">
+            <button class="premium-action-btn" onclick="openEventModal()" style="padding: 6px 16px; font-size: 0.9rem;">
               <i class="fas fa-plus-circle"></i> Nuevo
             </button>
           </div>
+        </div>
+
+        <!-- Dynamic Calendar Container -->
+        <div id="calendar-wrapper" class="calendar-wrapper">
+          <div id="calendar-container"></div>
         </div>
 
         <div id="timeline-container"></div>
@@ -417,6 +421,7 @@
         <div class="year-selector-container">
           <div class="year-scroll" id="yearTrack">
             <button class="year-pill active" data-year="all">Todos</button>
+            <button class="year-pill" data-year="2026">2026</button>
             <button class="year-pill" data-year="2025">2025</button>
             <button class="year-pill" data-year="2024">2024</button>
             <button class="year-pill" data-year="2023">2023</button>
@@ -500,8 +505,6 @@
         </div>
       </section>
     </div>
-
-    <!-- PROTECTED SECTION: Documentos -->
     <!-- PROTECTED SECTION: Documentos -->
     <div id="view-documentos" class="view-section" style="display: none;">
       <section id="documentos" class="relative-section">
@@ -513,6 +516,7 @@
         <div class="year-selector-container">
           <div class="year-scroll" id="docsYearSelector">
             <button class="year-pill active" data-year="all" onclick="filterDocumentsByYear('all')">Todos</button>
+            <button class="year-pill" data-year="2026" onclick="filterDocumentsByYear('2026')">2026</button>
             <button class="year-pill" data-year="2025" onclick="filterDocumentsByYear('2025')">2025</button>
             <button class="year-pill" data-year="2024" onclick="filterDocumentsByYear('2024')">2024</button>
             <button class="year-pill" data-year="2023" onclick="filterDocumentsByYear('2023')">2023</button>
@@ -768,6 +772,7 @@
       </div>
       <div class="modal-body">
         <form id="eventForm" onsubmit="handleEventSubmit(event)">
+          <input type="hidden" id="eventId">
           <div class="form-grid-premium">
             <div class="form-group-premium">
               <label><i class="fas fa-tag"></i> Título del Evento</label>
@@ -777,18 +782,24 @@
               <label><i class="fas fa-calendar-alt"></i> Fecha</label>
               <input type="date" id="eventDate" required>
             </div>
+            <div class="form-group-premium">
+              <label><i class="fas fa-clock"></i> Hora</label>
+              <input type="time" id="eventTime">
+            </div>
             <div class="form-group-premium full-width">
               <label><i class="fas fa-sticky-note"></i> Notas / Descripción</label>
               <textarea id="eventNotes" placeholder="Detalles sobre la actividad..." rows="4"></textarea>
             </div>
             <div class="form-group-premium full-width">
-              <label><i class="fas fa-images"></i> Cargar Fotos</label>
-              <div class="drop-zone-premium" onclick="document.getElementById('eventPhotos').click()">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <span>Arrastra o haz clic para subir imágenes</span>
+              <label><i class="fas fa-images"></i> Cargar Fotos (Opcional)</label>
+              <div class="drop-zone-premium" onclick="document.getElementById('eventPhotos').click()"
+                style="padding: 1rem;">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 1.5rem;"></i>
+                <span style="font-size: 0.9rem;">Haz clic para subir imágenes</span>
                 <input type="file" id="eventPhotos" accept="image/*" multiple style="display: none;"
                   onchange="updatePhotoCount()">
-                <p id="photoCount" style="margin-top: 5px; font-size: 0.8rem; color: var(--primary); font-weight: 600;">
+                <p id="photoCount"
+                  style="margin-top: 5px; font-size: 0.75rem; color: var(--primary); font-weight: 600;">
                 </p>
               </div>
             </div>
@@ -821,8 +832,9 @@
 
         if (user) {
           overlay.style.display = 'none';
-          // Simulación de rol admin (igual que en auth.js)
-          if (user.email === 'greenforceiebb@gmail.com') {
+          // Simulación de rol admin (consistente con auth.js)
+          const admins = ['greenforceiebb@gmail.com', 'lfalzatel@gmail.com'];
+          if (admins.includes(user.email)) {
             adminPanel.style.display = 'flex';
           }
           if (window.loadActivities) window.loadActivities('activitiesGrid');
@@ -873,7 +885,7 @@
   </script>
   <script type="module">
     // --- IMPORTS ---
-    import { loadActivities, loadVideos, createActivity, filterActivitiesByDate } from './gallery.js';
+    import { loadActivities, loadVideos, createActivity, updateActivity, filterActivitiesByDate } from './gallery.js';
     import { auth } from './auth.js';
 
     // --- GLOBAL VARIABLES ---
@@ -953,33 +965,37 @@
       e.preventDefault();
       const btn = e.target.querySelector('.btn-save-premium');
       const originalContent = btn.innerHTML;
+      const eventId = document.getElementById('eventId').value;
+      const isEditing = !!eventId;
 
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publicando...';
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${isEditing ? 'Guardando...' : 'Publicando...'}`;
       btn.disabled = true;
 
       try {
         const data = {
           title: document.getElementById('eventTitle').value,
           date: document.getElementById('eventDate').value,
+          time: document.getElementById('eventTime').value,
           notes: document.getElementById('eventNotes').value
         };
         const photos = document.getElementById('eventPhotos').files;
 
-        if (photos.length === 0) {
-          alert("Por favor selecciona al menos una foto.");
-          return;
+        if (isEditing) {
+          await updateActivity(eventId, data, photos);
+          alert("¡Evento actualizado con éxito!");
+        } else {
+          await createActivity(data, photos);
+          alert("¡Evento publicado con éxito!");
         }
 
-        await createActivity(data, photos);
-
-        alert("¡Evento publicado con éxito!");
         closeEventModal();
         e.target.reset();
         document.getElementById('photoCount').textContent = '';
+        document.getElementById('eventId').value = ''; // Clear ID
 
       } catch (error) {
-        console.error("Error al publicar evento:", error);
-        alert("Hubo un error al publicar el evento: " + error.message);
+        console.error("Error al procesar evento:", error);
+        alert("Hubo un error: " + error.message);
       } finally {
         btn.innerHTML = originalContent;
         btn.disabled = false;

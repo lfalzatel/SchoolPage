@@ -30,10 +30,16 @@ provider.setCustomParameters({ prompt: 'select_account' });
 async function saveUserToFirestore(user) {
     try {
         const userRef = doc(db, 'users', user.uid);
+
+        // Define Admins list (consistent with updateUI)
+        const admins = ['greenforceiebb@gmail.com', 'lfalzatel@gmail.com'];
+        const role = admins.includes(user.email) ? 'admin' : 'miembro';
+
         await setDoc(userRef, {
             name: user.displayName,
             email: user.email,
             photo: user.photoURL,
+            role: role, // Persist role for Firestore Rules
             lastLogin: serverTimestamp()
         }, { merge: true });
     } catch (e) {

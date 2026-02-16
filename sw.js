@@ -1,4 +1,4 @@
-const CACHE_NAME = 'green-force-v27';
+const CACHE_NAME = 'green-force-v28';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -6,7 +6,6 @@ const ASSETS_TO_CACHE = [
   './manifest.json',
   './auth.js',
   './gallery.js',
-  './timeline.js',
   './firebase-config.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',

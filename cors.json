@@ -1,0 +1,21 @@
+[
+    {
+        "origin": [
+            "*"
+        ],
+        "method": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "HEAD"
+        ],
+        "responseHeader": [
+            "Content-Type",
+            "Authorization",
+            "x-goog-meta-command",
+            "x-goog-meta-project"
+        ],
+        "maxAgeSeconds": 3600
+    }
+]
