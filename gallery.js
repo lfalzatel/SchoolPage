@@ -1501,7 +1501,8 @@ export async function loadCronograma() {
     container.innerHTML = '<div class="loader"><i class="fas fa-spinner fa-spin"></i> Cargando cronograma...</div>';
 
     try {
-        const q = query(collection(db, "activities"), orderBy("date", "desc"));
+        // Ordenamos por fecha ASCENDENTE para ver lo más próximo primero
+        const q = query(collection(db, "activities"), orderBy("date", "asc"));
         const querySnapshot = await getDocs(q);
 
         const events = [];
@@ -1594,7 +1595,13 @@ function renderCronogramaItems(events) {
                             ${isPast ? 'Realizada' : 'Próxima'}
                         </div>
                     </div>
-                    ${editBtnHtml}
+                    <div class="agenda-actions">
+                        <button class="agenda-action-btn calendar-add-btn" title="Añadir a mi Calendario" 
+                                onclick="event.stopPropagation(); window.addToGoogleCalendar('${event.id}')">
+                            <i class="fab fa-google"></i>
+                        </button>
+                        ${editBtnHtml}
+                    </div>
                 </div>
                 
                 <div class="agenda-body">
@@ -1726,9 +1733,11 @@ async function initGallery() {
         loadVideos();
     }
 
-    // Initial Video Filter (default 'all' or '2025'?)
-    // The HTML has 'all' as active.
+    // Initial Video Filter
     filterVideosByYear('all');
+
+    // Initialize Notifications
+    setTimeout(updateNotifications, 1500);
 
     setTimeout(updateAdminUI, 1000);
 }
@@ -1790,7 +1799,93 @@ export function initYearSelector() {
     });
 }
 
-// Global Exposures
+// --- NOTIFICATIONS & CALENDAR LOGIC ---
+
+export function toggleNotifications() {
+    const dropdown = document.getElementById('notificationsDropdown');
+    if (dropdown) dropdown.classList.toggle('active');
+
+    // Cerrar el de perfil si está abierto
+    const profileDropdown = document.getElementById('profileDropdown');
+    if (profileDropdown) profileDropdown.classList.remove('active');
+}
+
+export async function updateNotifications() {
+    const badge = document.getElementById('notificationBadge');
+    const list = document.getElementById('notificationList');
+    if (!badge || !list) return;
+
+    const now = new Date();
+    // Próximos 30 días
+    const nextMonth = new Date();
+    nextMonth.setDate(now.getDate() + 30);
+
+    const upcomingEvents = (window.currentCronogramaItems || []).filter(item => {
+        let d = null;
+        if (item.date && item.date.toDate) d = item.date.toDate();
+        else if (item.date) d = new Date(item.date);
+        return d && d >= now && d <= nextMonth;
+    }).sort((a, b) => {
+        let da = a.date?.toDate ? a.date.toDate() : new Date(a.date);
+        let db = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+        return da - db;
+    });
+
+    // Actualizar badge
+    if (upcomingEvents.length > 0) {
+        badge.textContent = upcomingEvents.length;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+
+    // Poblar lista
+    if (upcomingEvents.length === 0) {
+        list.innerHTML = '<div class="no-notifications">No hay eventos próximos en 30 días</div>';
+    } else {
+        list.innerHTML = upcomingEvents.map(event => {
+            let d = event.date?.toDate ? event.date.toDate() : new Date(event.date);
+            const dateStr = d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+            return `
+                <div class="notification-item" onclick="window.scrollToEventOnDay(${d.getDate()})">
+                    <div class="notification-icon"><i class="fas fa-calendar-star"></i></div>
+                    <div class="notification-content">
+                        <span class="notification-title">${event.title}</span>
+                        <span class="notification-date">${dateStr} • ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+export function addToGoogleCalendar(eventId) {
+    const event = window.currentCronogramaItems.find(e => e.id === eventId);
+    if (!event) return;
+
+    let d = event.date?.toDate ? event.date.toDate() : new Date(event.date);
+
+    // Formatear fechas para Google Calendar (YYYYMMDDTHHMMSSZ)
+    const formatDate = (date) => date.toISOString().replace(/-|:|\.\d+/g, "");
+    const dateStart = formatDate(d);
+    const endDate = new Date(d.getTime() + (60 * 60 * 1000)); // +1 hora aprox
+    const dateEnd = formatDate(endDate);
+
+    const title = encodeURIComponent(event.title);
+    const details = encodeURIComponent(event.description || '');
+    const location = encodeURIComponent("IE Barro Blanco, Rionegro");
+
+    const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateStart}/${dateEnd}&details=${details}&location=${location}&sf=true&output=xml`;
+
+    window.open(url, '_blank');
+}
+
+// Global exposure
+window.toggleNotifications = toggleNotifications;
+window.updateNotifications = updateNotifications;
+window.addToGoogleCalendar = addToGoogleCalendar;
+
+// Exports
 window.filterCronogramaByYear = filterCronogramaByYear;
 window.filterVideosByYear = filterVideosByYear;
 window.loadCronograma = loadCronograma;

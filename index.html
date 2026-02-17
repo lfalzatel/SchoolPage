@@ -258,71 +258,85 @@
         <span class="header-subtitle">Sembrando Futuro</span>
       </div>
     </div>
-    <div class="header-right">
-      <div class="profile-menu-container">
-        <!-- Premium Profile Pill -->
-        <div class="header-avatar-container" onclick="toggleProfileMenu()">
-          <img src="assets/icons/icon-192.png" alt="Profile" id="headerProfileAvatar" class="header-avatar">
-          <div class="user-info-pill">
-            <span id="headerUserName" class="user-name-pill">Invitado</span>
-            <span id="headerUserRole" class="user-role-pill">Visitante</span>
-          </div>
-          <i class="fas fa-chevron-down pill-chevron"></i>
+    <div class="notifications-wrapper">
+      <div class="notification-bell-btn" onclick="toggleNotifications()">
+        <i class="fas fa-bell"></i>
+        <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+      </div>
+      <div id="notificationsDropdown" class="notifications-dropdown">
+        <div class="notifications-header">
+          <h3>Próximos Eventos</h3>
         </div>
+        <div id="notificationList" class="notification-list">
+          <div class="notification-loader"><i class="fas fa-spinner fa-spin"></i></div>
+        </div>
+      </div>
+    </div>
 
-        <div id="profileDropdown" class="profile-dropdown">
-          <div class="dropdown-card">
-            <div class="user-card-header">
-              <div class="user-card-info">
-                <span id="menuProfileName" class="user-card-name">Invitado</span>
-                <span id="menuProfileEmail" class="user-card-email">Inicia sesión para más</span>
+    <div class="profile-menu-container">
+      <!-- Premium Profile Pill -->
+      <div class="header-avatar-container" onclick="toggleProfileMenu()">
+        <img src="assets/icons/icon-192.png" alt="Profile" id="headerProfileAvatar" class="header-avatar">
+        <div class="user-info-pill">
+          <span id="headerUserName" class="user-name-pill">Invitado</span>
+          <span id="headerUserRole" class="user-role-pill">Visitante</span>
+        </div>
+        <i class="fas fa-chevron-down pill-chevron"></i>
+      </div>
+
+      <div id="profileDropdown" class="profile-dropdown">
+        <div class="dropdown-card">
+          <div class="user-card-header">
+            <div class="user-card-info">
+              <span id="menuProfileName" class="user-card-name">Invitado</span>
+              <span id="menuProfileEmail" class="user-card-email">Inicia sesión para más</span>
+            </div>
+          </div>
+
+
+          <div class="dropdown-menu-list">
+            <a href="#galeria" class="menu-item">
+              <div class="menu-item-icon bg-blue"><i class="fas fa-images"></i></div>
+              <span>Gestionar Galería</span>
+              <i class="fas fa-chevron-right arrow-link"></i>
+            </a>
+            <div class="menu-item" onclick="alert('Configuración próximamente')">
+              <div class="menu-item-icon bg-gray"><i class="fas fa-cog"></i></div>
+              <span>Configuración</span>
+              <i class="fas fa-chevron-right arrow-link"></i>
+            </div>
+            <div class="menu-item" id="downloadPdfBtnMenu">
+              <div class="menu-item-icon bg-red"><i class="fas fa-file-pdf"></i></div>
+              <span>Descargar Informe PDF</span>
+            </div>
+            <div class="menu-item" id="installAppBtn" style="display: none;" onclick="installPWA()">
+              <div class="menu-item-icon bg-green"><i class="fas fa-download"></i></div>
+              <span>Instalar Aplicación</span>
+            </div>
+            <div class="dropdown-theme-section">
+              <span class="theme-label">TEMA</span>
+              <div class="theme-selector-group">
+                <button class="theme-btn active" onclick="setTheme('light')" title="Modo Claro">
+                  <i class="fas fa-sun"></i>
+                </button>
+                <button class="theme-btn" onclick="setTheme('dark')" title="Modo Oscuro">
+                  <i class="fas fa-moon"></i>
+                </button>
+                <button class="theme-btn" onclick="setTheme('system')" title="Seguir Sistema">
+                  <i class="fas fa-desktop"></i>
+                </button>
               </div>
             </div>
 
-
-            <div class="dropdown-menu-list">
-              <a href="#galeria" class="menu-item">
-                <div class="menu-item-icon bg-blue"><i class="fas fa-images"></i></div>
-                <span>Gestionar Galería</span>
-                <i class="fas fa-chevron-right arrow-link"></i>
-              </a>
-              <div class="menu-item" onclick="alert('Configuración próximamente')">
-                <div class="menu-item-icon bg-gray"><i class="fas fa-cog"></i></div>
-                <span>Configuración</span>
-                <i class="fas fa-chevron-right arrow-link"></i>
-              </div>
-              <div class="menu-item" id="downloadPdfBtnMenu">
-                <div class="menu-item-icon bg-red"><i class="fas fa-file-pdf"></i></div>
-                <span>Descargar Informe PDF</span>
-              </div>
-              <div class="menu-item" id="installAppBtn" style="display: none;" onclick="installPWA()">
-                <div class="menu-item-icon bg-green"><i class="fas fa-download"></i></div>
-                <span>Instalar Aplicación</span>
-              </div>
-              <div class="dropdown-theme-section">
-                <span class="theme-label">TEMA</span>
-                <div class="theme-selector-group">
-                  <button class="theme-btn active" onclick="setTheme('light')" title="Modo Claro">
-                    <i class="fas fa-sun"></i>
-                  </button>
-                  <button class="theme-btn" onclick="setTheme('dark')" title="Modo Oscuro">
-                    <i class="fas fa-moon"></i>
-                  </button>
-                  <button class="theme-btn" onclick="setTheme('system')" title="Seguir Sistema">
-                    <i class="fas fa-desktop"></i>
-                  </button>
-                </div>
-              </div>
-
-              <div class="dropdown-footer">
-                <button class="logout-pill-btn" id="menuLoginBtn" onclick="handleAuthAction()">
-                  <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
-                </button>
-              </div>
+            <div class="dropdown-footer">
+              <button class="logout-pill-btn" id="menuLoginBtn" onclick="handleAuthAction()">
+                <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
+    </div>
   </header>
 
   <div id="content-to-pdf" class="main-content-wrapper">
@@ -897,24 +911,30 @@
     window.toggleProfileMenu = function () {
       const menu = document.getElementById('profileDropdown');
       if (menu) menu.classList.toggle('active');
+
+      // Cerrar notificaciones si el perfil se abre
+      const notifMenu = document.getElementById('notificationsDropdown');
+      if (notifMenu) notifMenu.classList.remove('active');
     }
 
-    // Close Dropdown when clicking outside or selection an option
+    // Close Dropdowns when clicking outside
     document.addEventListener('click', function (e) {
-      const menu = document.getElementById('profileDropdown');
-      const trigger = document.querySelector('.header-avatar-container');
+      const profileMenu = document.getElementById('profileDropdown');
+      const profileTrigger = document.querySelector('.header-avatar-container');
+      const notifMenu = document.getElementById('notificationsDropdown');
+      const notifTrigger = document.querySelector('.notification-bell-btn');
 
-      if (!menu || !trigger) return;
-
-      // Close if clicking outside
-      if (menu.classList.contains('active') && !menu.contains(e.target) && !trigger.contains(e.target)) {
-        menu.classList.remove('active');
+      // Profile Menu logic
+      if (profileMenu && profileTrigger) {
+        if (profileMenu.classList.contains('active') && !profileMenu.contains(e.target) && !profileTrigger.contains(e.target)) {
+          profileMenu.classList.remove('active');
+        }
       }
 
-      // Close if clicking an option inside
-      if (menu.classList.contains('active') && menu.contains(e.target)) {
-        if (e.target.closest('.menu-item') || e.target.closest('a') || e.target.tagName === 'BUTTON') {
-          menu.classList.remove('active');
+      // Notifications Menu logic
+      if (notifMenu && notifTrigger) {
+        if (notifMenu.classList.contains('active') && !notifMenu.contains(e.target) && !notifTrigger.contains(e.target)) {
+          notifMenu.classList.remove('active');
         }
       }
     });
