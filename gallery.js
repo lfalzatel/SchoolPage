@@ -2088,16 +2088,8 @@ function toggleYearDropdown() {
     // The year selection is now handled directly by clicking on the year pills.
 }
 
-// Select Year from Pills
+// Select Year from Dropdown
 function selectYear(year) {
-    // Update active state in pills
-    document.querySelectorAll('.year-pill').forEach(pill => {
-        pill.classList.remove('active');
-        if (pill.dataset.year === year) {
-            pill.classList.add('active');
-        }
-    });
-
     // Filter cronograma by year
     filterCronogramaByYear(year);
 }

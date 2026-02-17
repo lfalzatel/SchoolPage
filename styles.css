@@ -2296,12 +2296,40 @@ footer a:hover {
 }
 
 /* Cronograma Controls - Dropdown + Buttons */
-.cronograma-controls {
+.cronograma-controls,
+.year-selector-container {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 2rem;
   flex-wrap: wrap;
+}
+
+/* Year Dropdown Select */
+.year-dropdown-select {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: white;
+  font-family: var(--font-main, 'Poppins', sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.year-dropdown-select:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.year-dropdown-select option {
+  background: #1a1a1a;
+  color: white;
 }
 
 /* Year Dropdown Container */
@@ -2446,6 +2474,12 @@ footer a:hover {
 @media (max-width: 768px) {
   .cronograma-controls {
     align-items: stretch;
+  }
+
+  .year-pill {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    min-width: auto;
   }
 
   .year-dropdown-btn,
@@ -2629,7 +2663,7 @@ body {
   background: linear-gradient(135deg, #10b981, #065f46);
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 6px 16px;
   border-radius: 14px;
   font-weight: 700;
   display: flex;
