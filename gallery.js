@@ -1932,62 +1932,143 @@ export function addToGoogleCalendar(eventId) {
     window.open(url, '_blank');
 }
 
-// Download Cronograma PDF
+// Download Cronograma as PDF
 function downloadCronogramaPDF() {
     // Get currently selected year
     const activeYearBtn = document.querySelector('#cronogramaYearTrack .year-pill.active');
-    const selectedYear = activeYearBtn ? activeYearBtn.dataset.year : 'all';
+    const oldSelectedYear = activeYearBtn ? activeYearBtn.dataset.year : 'all';
 
-    // Get filtered events
-    let events = window.currentCronogramaItems || [];
-    if (selectedYear !== 'all') {
-        events = events.filter(event => {
-            if (event.year && event.year.toString() === selectedYear) return true;
-            if (event.date && event.date.toDate) {
-                return event.date.toDate().getFullYear().toString() === selectedYear;
-            }
-            return false;
+    // Get selected year from dropdown
+    const selectedYearText = document.getElementById('selectedYearText');
+    const selectedYear = selectedYearText ? selectedYearText.textContent : '2026';
+
+    // Filter events by selected year
+    let filteredEvents = window.currentCronogramaItems; // Use window.currentCronogramaItems
+    if (selectedYear !== 'Todos') {
+        filteredEvents = filteredEvents.filter(event => {
+            const eventYear = new Date(event.date).getFullYear().toString();
+            return eventYear === selectedYear;
         });
     }
 
-    if (events.length === 0) {
-        alert('No hay eventos para descargar en el año seleccionado.');
+    // Sort by date
+    filteredEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    if (filteredEvents.length === 0) {
+        alert('No hay eventos para el año seleccionado');
         return;
     }
 
-    // Sort events by date
-    events.sort((a, b) => {
-        const dateA = a.date && a.date.toDate ? a.date.toDate() : new Date(a.date);
-        const dateB = b.date && b.date.toDate ? b.date.toDate() : new Date(b.date);
-        return dateA - dateB;
+    // Check if jsPDF is available
+    if (typeof window.jspdf === 'undefined') {
+        console.error('jsPDF library not loaded');
+        // Fallback to text file
+        downloadAsTextFile(filteredEvents, selectedYear);
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Title
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`CRONOGRAMA DE ACTIVIDADES ${selectedYear}`, 105, 20, { align: 'center' });
+
+    // Subtitle
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('IE Barro Blanco - Rionegro', 105, 28, { align: 'center' });
+
+    // Date generated
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    const today = new Date().toLocaleDateString('es-CO');
+    doc.text(`Generado: ${today}`, 105, 35, { align: 'center' });
+
+    // Reset color
+    doc.setTextColor(0);
+
+    let yPosition = 45;
+    const pageHeight = doc.internal.pageSize.height;
+    const margin = 20;
+
+    filteredEvents.forEach((event, index) => {
+        // Check if we need a new page
+        if (yPosition > pageHeight - 40) {
+            doc.addPage();
+            yPosition = 20;
+        }
+
+        // Event number
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`${index + 1}. ${event.title}`, margin, yPosition);
+        yPosition += 7;
+
+        // Date and time
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        const eventDate = new Date(event.date);
+        const formattedDate = eventDate.toLocaleDateString('es-CO', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        doc.text(`Fecha: ${formattedDate}`, margin + 5, yPosition);
+        yPosition += 5;
+
+        if (event.time) {
+            doc.text(`Hora: ${event.time}`, margin + 5, yPosition);
+            yPosition += 5;
+        }
+
+        // Description
+        if (event.description) {
+            doc.setFont('helvetica', 'italic');
+            const splitDescription = doc.splitTextToSize(event.description, 170);
+            doc.text(splitDescription, margin + 5, yPosition);
+            yPosition += splitDescription.length * 5;
+        }
+
+        // Separator
+        yPosition += 3;
+        doc.setDrawColor(200);
+        doc.line(margin, yPosition, 190, yPosition);
+        yPosition += 8;
     });
 
-    // Create simple text-based PDF content
-    let content = `CRONOGRAMA DE ACTIVIDADES ${selectedYear === 'all' ? 'TODOS LOS AÑOS' : selectedYear}\n`;
+    // Save PDF
+    doc.save(`Cronograma_${selectedYear}_${today.replace(/\//g, '-')}.pdf`);
+}
+
+// Fallback function to download as text file
+function downloadAsTextFile(events, year) {
+    let content = `CRONOGRAMA DE ACTIVIDADES ${year}\n`;
     content += `IE Barro Blanco - Rionegro\n`;
     content += `Generado: ${new Date().toLocaleDateString('es-CO')}\n\n`;
-    content += '='.repeat(80) + '\n\n';
+    content += `${'='.repeat(80)}\n\n`;
 
     events.forEach((event, index) => {
-        const date = event.date && event.date.toDate ? event.date.toDate() : new Date(event.date);
-        const dateStr = date.toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        const timeStr = event.time || 'Sin hora especificada';
-
         content += `${index + 1}. ${event.title}\n`;
-        content += `   Fecha: ${dateStr}\n`;
-        content += `   Hora: ${timeStr}\n`;
-        if (event.description) {
-            content += `   Descripción: ${event.description}\n`;
-        }
-        content += '\n' + '-'.repeat(80) + '\n\n';
+        const eventDate = new Date(event.date);
+        content += `   Fecha: ${eventDate.toLocaleDateString('es-CO', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        })}\n`;
+        if (event.time) content += `   Hora: ${event.time}\n`;
+        if (event.description) content += `   Descripción: ${event.description}\n`;
+        content += `\n${'-'.repeat(80)}\n\n`;
     });
 
-    // Create blob and download
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `cronograma_${selectedYear}_${new Date().getTime()}.txt`;
+    a.download = `Cronograma_${year}_${new Date().toLocaleDateString('es-CO').replace(/\//g, '-')}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

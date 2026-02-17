@@ -860,7 +860,10 @@
           // Simulación de rol admin (consistente con auth.js)
           const admins = ['greenforceiebb@gmail.com', 'lfalzatel@gmail.com'];
           if (admins.includes(user.email)) {
-            adminPanel.style.display = 'flex';
+            if (adminPanel) adminPanel.style.display = 'flex';
+            // Show cronograma new button
+            const cronogramaNewBtn = document.getElementById('cronogramaNewBtn');
+            if (cronogramaNewBtn) cronogramaNewBtn.style.display = 'flex';
           }
           if (window.loadActivities) window.loadActivities('activitiesGrid');
         } else {
