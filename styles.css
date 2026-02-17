@@ -1990,33 +1990,42 @@ section h2 {
   max-width: 38px !important;
   max-height: 38px !important;
   border-radius: 50% !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  background: rgba(0, 0, 0, 0.5) !important;
-  backdrop-filter: blur(5px) !important;
-  -webkit-backdrop-filter: blur(5px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   color: white !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
-  transition: all 0.3s ease !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
   padding: 0 !important;
   margin: 0 !important;
   overflow: hidden !important;
   flex-shrink: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .agenda-action-btn i {
-  font-size: 1rem !important;
-  line-height: 1 !important;
+  font-size: 1.1rem !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.calendar-add-btn {
+  background: #db4437 !important;
+  /* Rojo Google permanente para visibilidad */
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .calendar-add-btn:hover {
-  background: #db4437 !important;
-  transform: scale(1.1) !important;
+  background: #c53929 !important;
+  transform: scale(1.15) rotate(8deg) !important;
+  box-shadow: 0 6px 20px rgba(219, 68, 55, 0.4) !important;
 }
 
 .edit-activity-btn {
