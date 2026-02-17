@@ -1544,8 +1544,8 @@ export async function loadCronograma() {
         // Render both components
         renderCalendar();
 
-        // Default filter for the timeline view (using current year)
-        const currentYear = new Date().getFullYear().toString();
+        // Default filter for the timeline view (2026 by default)
+        const currentYear = '2026';
         filterCronogramaByYear(currentYear);
 
     } catch (e) {
@@ -1834,6 +1834,19 @@ export function initYearSelector() {
 
 // --- NOTIFICATIONS & CALENDAR LOGIC ---
 
+export function closeNotificationDropdown() {
+    const notificationDropdown = document.getElementById('notificationsDropdown');
+    if (notificationDropdown) notificationDropdown.classList.remove('active');
+    const profileDropdown = document.getElementById('profileDropdown');
+    if (profileDropdown) profileDropdown.classList.remove('active');
+}
+
+// Close profile dropdown
+function closeProfileDropdown() {
+    const profileDropdown = document.getElementById('profileDropdown');
+    if (profileDropdown) profileDropdown.classList.remove('active');
+}
+
 export function toggleNotifications() {
     const dropdown = document.getElementById('notificationsDropdown');
     if (dropdown) dropdown.classList.toggle('active');
@@ -1919,6 +1932,68 @@ export function addToGoogleCalendar(eventId) {
     window.open(url, '_blank');
 }
 
+// Download Cronograma PDF
+function downloadCronogramaPDF() {
+    // Get currently selected year
+    const activeYearBtn = document.querySelector('#cronogramaYearTrack .year-pill.active');
+    const selectedYear = activeYearBtn ? activeYearBtn.dataset.year : 'all';
+
+    // Get filtered events
+    let events = window.currentCronogramaItems || [];
+    if (selectedYear !== 'all') {
+        events = events.filter(event => {
+            if (event.year && event.year.toString() === selectedYear) return true;
+            if (event.date && event.date.toDate) {
+                return event.date.toDate().getFullYear().toString() === selectedYear;
+            }
+            return false;
+        });
+    }
+
+    if (events.length === 0) {
+        alert('No hay eventos para descargar en el año seleccionado.');
+        return;
+    }
+
+    // Sort events by date
+    events.sort((a, b) => {
+        const dateA = a.date && a.date.toDate ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date && b.date.toDate ? b.date.toDate() : new Date(b.date);
+        return dateA - dateB;
+    });
+
+    // Create simple text-based PDF content
+    let content = `CRONOGRAMA DE ACTIVIDADES ${selectedYear === 'all' ? 'TODOS LOS AÑOS' : selectedYear}\n`;
+    content += `IE Barro Blanco - Rionegro\n`;
+    content += `Generado: ${new Date().toLocaleDateString('es-CO')}\n\n`;
+    content += '='.repeat(80) + '\n\n';
+
+    events.forEach((event, index) => {
+        const date = event.date && event.date.toDate ? event.date.toDate() : new Date(event.date);
+        const dateStr = date.toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const timeStr = event.time || 'Sin hora especificada';
+
+        content += `${index + 1}. ${event.title}\n`;
+        content += `   Fecha: ${dateStr}\n`;
+        content += `   Hora: ${timeStr}\n`;
+        if (event.description) {
+            content += `   Descripción: ${event.description}\n`;
+        }
+        content += '\n' + '-'.repeat(80) + '\n\n';
+    });
+
+    // Create blob and download
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cronograma_${selectedYear}_${new Date().getTime()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
 // Global exposure
 window.toggleNotifications = toggleNotifications;
 window.updateNotifications = updateNotifications;
@@ -1926,6 +2001,8 @@ window.addToGoogleCalendar = addToGoogleCalendar;
 
 // Exports
 window.filterCronogramaByYear = filterCronogramaByYear;
+window.closeProfileDropdown = closeProfileDropdown;
+window.downloadCronogramaPDF = downloadCronogramaPDF;
 window.filterVideosByYear = filterVideosByYear;
 window.loadCronograma = loadCronograma;
 window.filterActivitiesByYear = filterActivitiesByYear;

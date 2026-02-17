@@ -2295,6 +2295,26 @@ footer a:hover {
   color: #374151;
 }
 
+.year-pill.active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.year-pill.pdf-download-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  font-weight: 700;
+  margin-left: 8px;
+}
+
+.year-pill.pdf-download-btn:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
 .btn-login {
   background: linear-gradient(135deg, #10b981, #059669) !important;
   color: #ffffff !important;

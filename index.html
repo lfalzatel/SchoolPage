@@ -295,21 +295,22 @@
 
 
           <div class="dropdown-menu-list">
-            <a href="#galeria" class="menu-item">
+            <a href="#galeria" class="menu-item" onclick="closeProfileDropdown()">
               <div class="menu-item-icon bg-blue"><i class="fas fa-images"></i></div>
               <span>Gestionar Galería</span>
               <i class="fas fa-chevron-right arrow-link"></i>
             </a>
-            <div class="menu-item" onclick="alert('Configuración próximamente')">
+            <div class="menu-item" onclick="alert('Configuración próximamente'); closeProfileDropdown();">
               <div class="menu-item-icon bg-gray"><i class="fas fa-cog"></i></div>
               <span>Configuración</span>
               <i class="fas fa-chevron-right arrow-link"></i>
             </div>
-            <div class="menu-item" id="downloadPdfBtnMenu">
+            <div class="menu-item" id="downloadPdfBtnMenu" onclick="closeProfileDropdown()">
               <div class="menu-item-icon bg-red"><i class="fas fa-file-pdf"></i></div>
               <span>Descargar Informe PDF</span>
             </div>
-            <div class="menu-item" id="installAppBtn" style="display: none;" onclick="installPWA()">
+            <div class="menu-item" id="installAppBtn" style="display: none;"
+              onclick="installPWA(); closeProfileDropdown();">
               <div class="menu-item-icon bg-green"><i class="fas fa-download"></i></div>
               <span>Instalar Aplicación</span>
             </div>
@@ -402,9 +403,14 @@
         <!-- Year Selector and Admin Controls for Cronograma -->
         <div class="year-selector-container">
           <div class="year-scroll" id="cronogramaYearTrack">
+            <button class="year-pill" data-year="all" onclick="filterCronogramaByYear('all')">Todos</button>
             <button class="year-pill active" data-year="2026" onclick="filterCronogramaByYear('2026')">2026</button>
             <button class="year-pill" data-year="2025" onclick="filterCronogramaByYear('2025')">2025</button>
             <button class="year-pill" data-year="2024" onclick="filterCronogramaByYear('2024')">2024</button>
+            <button class="year-pill" data-year="2023" onclick="filterCronogramaByYear('2023')">2023</button>
+            <button class="year-pill pdf-download-btn" onclick="downloadCronogramaPDF()" title="Descargar PDF">
+              <i class="fas fa-file-pdf"></i>
+            </button>
           </div>
 
           <div class="admin-controls" id="cronogramaAdminPanel" style="display: none;">
