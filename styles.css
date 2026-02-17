@@ -2302,28 +2302,34 @@ footer a:hover {
   align-items: center;
   gap: 12px;
   margin-bottom: 2rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  /* Evitar que se envuelvan en múltiples líneas */
 }
 
 /* Year Dropdown Select */
 .year-dropdown-select {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 255, 255, 0.3);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  padding: 10px 16px;
+  padding: 8px 12px;
+  /* Reducido para que quepa en una línea */
   color: white;
   font-family: var(--font-main, 'Poppins', sans-serif);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  /* Reducido ligeramente */
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 150px;
+  min-width: 120px;
+  /* Reducido de 150px */
+  max-width: 140px;
+  /* Limitar ancho máximo */
 }
 
 .year-dropdown-select:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 255, 255, 0.4);
   border-color: rgba(255, 255, 255, 0.3);
 }
 
@@ -2472,14 +2478,23 @@ footer a:hover {
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-  .cronograma-controls {
-    align-items: stretch;
+
+  .cronograma-controls,
+  .year-selector-container {
+    flex-wrap: wrap;
+    /* En móvil sí permitir wrap */
   }
 
   .year-pill {
     padding: 8px 12px;
     font-size: 0.8rem;
     min-width: auto;
+  }
+
+  .year-dropdown-select {
+    min-width: 100px;
+    font-size: 0.8rem;
+    padding: 6px 10px;
   }
 
   .year-dropdown-btn,
