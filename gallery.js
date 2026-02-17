@@ -385,7 +385,7 @@ window.currentDocuments = [];
 // --- DOCUMENTS LOGIC ---
 
 const staticDocuments = [
-    { title: 'Reconocimiento Oficial Grupo Ambiental 2024', type: 'pdf', year: '2024', url: 'assets/documents/1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf', fileName: '1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf', backgroundImage: 'assets/images/1. logo 1.jpg' },
+    { title: 'Reconocimiento Oficial Grupo Ambiental 2024', type: 'pdf', year: '2024', url: 'assets/documents/1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf', fileName: '1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf', backgroundImage: 'assets/images/1. logo 3.jpg' },
     { title: 'Solicitud vinculación CORNARE', type: 'pdf', year: '2025', url: 'assets/documents/1.10. 6. Carta Solicitud de vinculación a prácticas ambientales y visitas pedagógicas CAM CORNARE.pdf', fileName: '1.10. 6. Carta Solicitud de vinculación.pdf', backgroundImage: 'assets/images/10. Capacitación CORNARE - 1.jpg' },
     { title: 'Solicitud visita Planta Tratamiento', type: 'pdf', year: '2025', url: 'assets/documents/1.11. 11. Carta Solicitud de pedagógica a la planta de tratamiento y participación en jornada de siembra de árboles.pdf', fileName: '1.11. 11. Carta Solicitud visita.pdf', backgroundImage: 'assets/images/13. Segunda siembra - 1.jpg' },
     { title: 'Solicitud permiso evento UCO (Sep 2025)', type: 'pdf', year: '2025', url: 'assets/documents/1.12. 12. Carta Solicitud de permiso para participación en evento académico de 22 al 26 de septiembre de 2025 en la UCO.pdf', fileName: '1.12. 12. Solicitud UCO.pdf', backgroundImage: 'assets/images/19. Encuentro UCO - 1.jpg' },
@@ -631,7 +631,7 @@ export async function createActivity(data, photos) {
             description: data.notes || '',
             date: Timestamp.fromDate(eventDate),
             year: data.date.split('-')[0],
-            thumbnail: imageUrls[0] || 'assets/images/1. logo 1.jpg',
+            thumbnail: imageUrls[0] || 'assets/images/1. logo 3.jpg',
             images: imageUrls,
             createdAt: serverTimestamp(),
             createdBy: {
@@ -806,7 +806,7 @@ function renderActivityCards(activities, targetId = 'activitiesGrid') {
     grid.innerHTML = activities.map((a, i) => `
         <div class="activity-card" onclick="openGalleryModal(${i})">
           <div class="activity-card-image">
-            <img src="${a.thumbnail}" alt="${a.title}">
+            <img src="${a.thumbnail || 'assets/images/1. logo 3.jpg'}" onerror="this.src='assets/images/1. logo 3.jpg'" alt="${a.title}">
             <div class="image-count"><i class="fas fa-images"></i> ${a.images ? a.images.length : 0}</div>
             ${isAdmin ? `<button class="delete-btn" onclick="event.stopPropagation(); deleteActivity('${a.id}')"><i class="fas fa-trash"></i></button>` : ''}
           </div>
@@ -829,7 +829,7 @@ function renderVideoCards(videos) {
     grid.innerHTML = videos.map((v, i) => `
         <div class="video-card" onclick="openVideoModal(${i})">
           <div class="video-thumbnail">
-            <img src="${v.thumbnail}" alt="${v.title}">
+            <img src="${v.thumbnail || 'assets/images/1. logo 3.jpg'}" onerror="this.src='assets/images/1. logo 3.jpg'" alt="${v.title}">
             <div class="play-icon"><i class="fas fa-play-circle"></i></div>
             ${isAdmin ? `<button class="delete-btn" onclick="event.stopPropagation(); deleteVideo('${v.id}')"><i class="fas fa-trash"></i></button>` : ''}
           </div>
@@ -1567,7 +1567,7 @@ function renderCronogramaItems(events) {
             <div class="activity-card cronograma-card ${statusClass}" onclick="window.openGalleryModalFromId('${event.id}')">
                 ${editBtnHtml}
                 <div class="activity-card-image">
-                    <img src="${event.thumbnail || 'assets/images/1. logo 1.jpg'}" alt="${event.title}">
+                    <img src="${event.thumbnail || 'assets/images/1. logo 3.jpg'}" onerror="this.src='assets/images/1. logo 3.jpg'" alt="${event.title}">
                     <div class="image-count"><i class="fas fa-calendar-day"></i></div>
                 </div>
                 <div class="activity-card-content">
