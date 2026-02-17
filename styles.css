@@ -1603,6 +1603,11 @@ section h2 {
   transition: all 0.3s ease;
 }
 
+.agenda-item-card .edit-activity-btn {
+  position: static;
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .edit-activity-btn:hover {
   background: var(--primary);
   transform: scale(1.1);
@@ -1876,7 +1881,7 @@ section h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #064e3b;
+  /* border: 2px solid #064e3b; */
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
 }
 
@@ -1884,7 +1889,7 @@ section h2 {
   display: none;
   position: absolute;
   top: 55px;
-  right: -50px;
+  right: 0;
   width: 320px;
   background: rgba(26, 26, 26, 0.95);
   backdrop-filter: blur(20px);
@@ -1894,6 +1899,20 @@ section h2 {
   z-index: 5002;
   overflow: hidden;
   animation: dropdownSlideIn 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+@media (max-width: 480px) {
+  .notifications-dropdown {
+    right: -80px;
+    width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .notifications-dropdown {
+    right: -80px;
+    width: 280px;
+  }
 }
 
 .notifications-dropdown.active {
