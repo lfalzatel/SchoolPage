@@ -1597,9 +1597,9 @@ function renderCronogramaItems(events) {
                         </div>
                     </div>
                     <div class="agenda-actions">
-                        <button class="agenda-action-btn calendar-add-btn" title="Añadir a mi Calendario" 
+                        <button class="agenda-action-btn calendar-add-btn" title="Añadir a Google Calendar" 
                                 onclick="event.stopPropagation(); window.addToGoogleCalendar('${event.id}')">
-                            <i class="fab fa-google"></i>
+                            <i class="fas fa-calendar-plus"></i>
                         </button>
                         ${editBtnHtml}
                     </div>
