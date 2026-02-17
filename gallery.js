@@ -1846,13 +1846,19 @@ export async function updateNotifications() {
     } else {
         list.innerHTML = upcomingEvents.map(event => {
             let d = event.date?.toDate ? event.date.toDate() : new Date(event.date);
-            const dateStr = d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
+            const day = d.getDate();
+            const month = d.toLocaleDateString('es-CO', { month: 'short' }).toUpperCase().replace('.', '');
+            const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
             return `
-                <div class="notification-item" onclick="window.scrollToEventOnDay(${d.getDate()})">
-                    <div class="notification-icon"><i class="fas fa-calendar-star"></i></div>
+                <div class="notification-item" onclick="window.scrollToEventOnDay(${day})">
+                    <div class="notification-date-box">
+                        <span class="noti-day">${day}</span>
+                        <span class="noti-month">${month}</span>
+                    </div>
                     <div class="notification-content">
                         <span class="notification-title">${event.title}</span>
-                        <span class="notification-date">${dateStr} • ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span class="notification-date">${timeStr} • IE Barro Blanco</span>
                     </div>
                 </div>
             `;

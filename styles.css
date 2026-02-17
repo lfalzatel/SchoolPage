@@ -1926,16 +1926,30 @@ section h2 {
   background: rgba(16, 185, 129, 0.1);
 }
 
-.notification-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, var(--primary), #065f46);
-  border-radius: 12px;
+.notification-date-box {
+  width: 45px;
+  height: 45px;
+  background: var(--primary);
+  border-radius: 10px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   color: white;
   flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+}
+
+.noti-day {
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.noti-month {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .notification-content {
@@ -2017,15 +2031,15 @@ section h2 {
 }
 
 .calendar-add-btn {
-  background: #db4437 !important;
-  /* Rojo Google permanente para visibilidad */
+  background: var(--primary) !important;
+  /* Verde esmeralda solicitado */
   border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .calendar-add-btn:hover {
-  background: #c53929 !important;
+  background: var(--secondary) !important;
   transform: scale(1.15) rotate(8deg) !important;
-  box-shadow: 0 6px 20px rgba(219, 68, 55, 0.4) !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
 }
 
 .edit-activity-btn {
