@@ -2322,10 +2322,12 @@ footer a:hover {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-width: 120px;
-  /* Reducido de 150px */
-  max-width: 140px;
-  /* Limitar ancho máximo */
+  min-width: 70px;
+  /* Reducido de 120px */
+  max-width: 90px;
+  /* Reducido de 140px */
+  flex-shrink: 0;
+  /* No permitir que se encoja */
 }
 
 .year-dropdown-select:hover {
@@ -2687,6 +2689,10 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  flex-shrink: 0;
+  /* No permitir que se encojan */
+  white-space: nowrap;
+  /* Evitar que el texto se envuelva */
 }
 
 .premium-action-btn:hover {
