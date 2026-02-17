@@ -2084,33 +2084,21 @@ function downloadAsTextFile(events, year) {
 // Toggle Year Dropdown
 function toggleYearDropdown() {
     const dropdown = document.getElementById('yearDropdownMenu');
-    if (dropdown) {
-        dropdown.classList.toggle('active');
-    }
+    // This function is no longer needed as we are using pills instead of a dropdown.
+    // The year selection is now handled directly by clicking on the year pills.
 }
 
-// Select Year from Dropdown
+// Select Year from Pills
 function selectYear(year) {
-    // Update selected text
-    const selectedText = document.getElementById('selectedYearText');
-    if (selectedText) {
-        selectedText.textContent = year === 'all' ? 'Todos' : year;
-    }
-
-    // Update active state in dropdown
-    document.querySelectorAll('.year-option').forEach(option => {
-        if (option.dataset.year === year) {
-            option.classList.add('active');
-        } else {
-            option.classList.remove('active');
+    // Update active state in pills
+    document.querySelectorAll('.year-pill').forEach(pill => {
+        pill.classList.remove('active');
+        if (pill.dataset.year === year) {
+            pill.classList.add('active');
         }
     });
 
-    // Close dropdown
-    const dropdown = document.getElementById('yearDropdownMenu');
-    if (dropdown) dropdown.classList.remove('active');
-
-    // Filter events
+    // Filter cronograma by year
     filterCronogramaByYear(year);
 }
 

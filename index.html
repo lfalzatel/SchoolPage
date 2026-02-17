@@ -401,28 +401,24 @@
         <h2><i class="fas fa-calendar-alt"></i> Cronograma de Actividades</h2>
 
         <!-- Year Selector and Action Buttons -->
-        <div class="cronograma-controls">
-          <div class="year-dropdown-container">
-            <button class="year-dropdown-btn" onclick="toggleYearDropdown()">
-              <span id="selectedYearText">2026</span>
-              <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="year-dropdown-menu" id="yearDropdownMenu">
-              <div class="year-option" data-year="all" onclick="selectYear('all')">Todos</div>
-              <div class="year-option active" data-year="2026" onclick="selectYear('2026')">2026</div>
-              <div class="year-option" data-year="2025" onclick="selectYear('2025')">2025</div>
-              <div class="year-option" data-year="2024" onclick="selectYear('2024')">2024</div>
-              <div class="year-option" data-year="2023" onclick="selectYear('2023')">2023</div>
-            </div>
+        <div class="year-selector-container">
+          <div class="year-scroll">
+            <button class="year-pill" data-year="all" onclick="selectYear('all')">Todos</button>
+            <button class="year-pill active" data-year="2026" onclick="selectYear('2026')">2026</button>
+            <button class="year-pill" data-year="2025" onclick="selectYear('2025')">2025</button>
+            <button class="year-pill" data-year="2024" onclick="selectYear('2024')">2024</button>
+            <button class="year-pill" data-year="2023" onclick="selectYear('2023')">2023</button>
           </div>
 
-          <button class="action-btn pdf-btn" onclick="downloadCronogramaPDF()" title="Descargar PDF">
-            <i class="fas fa-file-pdf"></i> PDF
-          </button>
+          <div class="admin-controls" style="display: flex; gap: 8px;">
+            <button class="premium-action-btn pdf-variant" onclick="downloadCronogramaPDF()" title="Descargar PDF">
+              <i class="fas fa-file-pdf"></i> PDF
+            </button>
 
-          <button class="action-btn new-btn" onclick="openEventModal()" id="cronogramaNewBtn" style="display: none;">
-            <i class="fas fa-plus-circle"></i> Nuevo
-          </button>
+            <button class="premium-action-btn" onclick="openEventModal()" id="cronogramaNewBtn" style="display: none;">
+              <i class="fas fa-plus-circle"></i> Nuevo
+            </button>
+          </div>
         </div>
 
         <!-- Dynamic Calendar Container -->

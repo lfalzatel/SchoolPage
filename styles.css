@@ -2645,6 +2645,16 @@ body {
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
+/* PDF Variant - Red */
+.premium-action-btn.pdf-variant {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.premium-action-btn.pdf-variant:hover {
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
 /* Modal Overlay - High z-index to prevent menu overlap */
 .modal-overlay {
   position: fixed;
@@ -2697,7 +2707,10 @@ body {
 }
 
 .modal-header-premium {
-  background: linear-gradient(135deg, #064e3b, #065f46);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding: 1rem 1.5rem;
   color: white;
   display: flex;
