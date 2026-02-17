@@ -385,7 +385,7 @@ window.currentDocuments = [];
 // --- DOCUMENTS LOGIC ---
 
 const staticDocuments = [
-    { title: 'Reconocimiento Oficial Grupo Ambiental 2024', type: 'pdf', year: '2024', url: 'assets/documents/1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf', fileName: '1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf', backgroundImage: 'assets/images/1. logo 3.jpg' },
+    { title: 'Reconocimiento Oficial Grupo Ambiental 2024', type: 'pdf', year: '2024', url: 'assets/documents/1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf', fileName: '1.1 Reconocimiento Oficial del Grupo Ambiental 2024.pdf', backgroundImage: 'assets/images/1. logo 1.jpg' },
     { title: 'Solicitud vinculación CORNARE', type: 'pdf', year: '2025', url: 'assets/documents/1.10. 6. Carta Solicitud de vinculación a prácticas ambientales y visitas pedagógicas CAM CORNARE.pdf', fileName: '1.10. 6. Carta Solicitud de vinculación.pdf', backgroundImage: 'assets/images/10. Capacitación CORNARE - 1.jpg' },
     { title: 'Solicitud visita Planta Tratamiento', type: 'pdf', year: '2025', url: 'assets/documents/1.11. 11. Carta Solicitud de pedagógica a la planta de tratamiento y participación en jornada de siembra de árboles.pdf', fileName: '1.11. 11. Carta Solicitud visita.pdf', backgroundImage: 'assets/images/13. Segunda siembra - 1.jpg' },
     { title: 'Solicitud permiso evento UCO (Sep 2025)', type: 'pdf', year: '2025', url: 'assets/documents/1.12. 12. Carta Solicitud de permiso para participación en evento académico de 22 al 26 de septiembre de 2025 en la UCO.pdf', fileName: '1.12. 12. Solicitud UCO.pdf', backgroundImage: 'assets/images/19. Encuentro UCO - 1.jpg' },
@@ -556,8 +556,11 @@ export async function loadActivities(targetId = 'galleryGridFull') {
         // Luego sobreescribimos/añadimos con los de Firestore (más recientes o editados)
         activities.forEach(act => activitiesMap.set(act.title, act));
 
-        const finalActivities = Array.from(activitiesMap.values())
+        const finalActivitiesRaw = Array.from(activitiesMap.values())
             .sort((a, b) => (b.year || '0').localeCompare(a.year || '0'));
+
+        // FILTRO CRÍTICO: La Galería (Álbum) solo muestra eventos con fotos
+        const finalActivities = finalActivitiesRaw.filter(act => act.images && act.images.length > 0);
 
         window.currentGalleryActivities = finalActivities;
         renderActivityCards(finalActivities, targetId);
@@ -631,7 +634,7 @@ export async function createActivity(data, photos) {
             description: data.notes || '',
             date: Timestamp.fromDate(eventDate),
             year: data.date.split('-')[0],
-            thumbnail: imageUrls[0] || 'assets/images/1. logo 3.jpg',
+            thumbnail: imageUrls[0] || 'assets/images/1. logo 1.jpg',
             images: imageUrls,
             createdAt: serverTimestamp(),
             createdBy: {
@@ -800,26 +803,45 @@ function renderActivityCards(activities, targetId = 'activitiesGrid') {
     const grid = document.getElementById(targetId);
     if (!grid) return;
 
-    // Simular rol admin (mejorar si hay sistema de roles real)
-    const isAdmin = window.currentUserEmail === 'greenforceiebb@gmail.com';
+    // Check if user is admin
+    const admins = ['greenforceiebb@gmail.com', 'lfalzatel@gmail.com'];
+    const isAdmin = auth.currentUser && admins.includes(auth.currentUser.email);
 
-    grid.innerHTML = activities.map((a, i) => `
-        <div class="activity-card" onclick="openGalleryModal(${i})">
-          <div class="activity-card-image">
-            <img src="${a.thumbnail || 'assets/images/1. logo 3.jpg'}" onerror="this.src='assets/images/1. logo 3.jpg'" alt="${a.title}">
-            <div class="image-count"><i class="fas fa-images"></i> ${a.images ? a.images.length : 0}</div>
-            ${isAdmin ? `<button class="delete-btn" onclick="event.stopPropagation(); deleteActivity('${a.id}')"><i class="fas fa-trash"></i></button>` : ''}
-          </div>
-          <div class="activity-card-content">
-            <h3>${a.title}</h3>
-            <p>${a.description}</p>
-            <div class="activity-card-footer">
-              <span class="activity-year"><i class="fas fa-calendar-alt"></i> ${a.year || '2025'}</span>
-              <button class="view-gallery-btn">Ver Galería <i class="fas fa-arrow-right"></i></button>
+    grid.innerHTML = activities.map((a, i) => {
+        const photoCount = a.images ? a.images.length : 0;
+
+        // Admin buttons for Gallery (Album mode)
+        const adminLayer = isAdmin ? `
+            <div class="admin-card-overlay">
+                <button class="admin-action-btn edit-photos-btn" title="Añadir/Gestionar Fotos" onclick="event.stopPropagation(); window.openEditActivityModal('${a.id}')">
+                    <i class="fas fa-camera-retro"></i>
+                </button>
+                <button class="admin-action-btn delete-activity-btn" title="Eliminar Álbum" onclick="event.stopPropagation(); deleteActivity('${a.id}')">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             </div>
-          </div>
-        </div>
-    `).join('');
+        ` : '';
+
+        return `
+            <div class="activity-card gallery-album-card" onclick="openGalleryModal(${i})">
+                <div class="activity-card-image">
+                    <img src="${a.thumbnail || 'assets/images/1. logo 1.jpg'}" onerror="this.src='assets/images/1. logo 1.jpg'" alt="${a.title}">
+                    <div class="image-count-badge">
+                        <i class="fas fa-images"></i> ${photoCount}
+                    </div>
+                    ${adminLayer}
+                </div>
+                <div class="activity-card-content">
+                    <span class="activity-tag">Álbum ${a.year || '2025'}</span>
+                    <h3>${a.title}</h3>
+                    <p>${a.description || ''}</p>
+                    <div class="activity-card-footer">
+                        <button class="view-album-btn">Ver Fotos <i class="fas fa-expand-alt"></i></button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function renderVideoCards(videos) {
@@ -829,7 +851,7 @@ function renderVideoCards(videos) {
     grid.innerHTML = videos.map((v, i) => `
         <div class="video-card" onclick="openVideoModal(${i})">
           <div class="video-thumbnail">
-            <img src="${v.thumbnail || 'assets/images/1. logo 3.jpg'}" onerror="this.src='assets/images/1. logo 3.jpg'" alt="${v.title}">
+            <img src="${v.thumbnail || 'assets/images/1. logo 1.jpg'}" onerror="this.src='assets/images/1. logo 1.jpg'" alt="${v.title}">
             <div class="play-icon"><i class="fas fa-play-circle"></i></div>
             ${isAdmin ? `<button class="delete-btn" onclick="event.stopPropagation(); deleteVideo('${v.id}')"><i class="fas fa-trash"></i></button>` : ''}
           </div>
@@ -1564,28 +1586,42 @@ function renderCronogramaItems(events) {
         ` : '';
 
         return `
-            <div class="activity-card cronograma-card ${statusClass}" onclick="window.openGalleryModalFromId('${event.id}')">
-                ${editBtnHtml}
-                <div class="activity-card-image">
-                    <img src="${event.thumbnail || 'assets/images/1. logo 3.jpg'}" onerror="this.src='assets/images/1. logo 3.jpg'" alt="${event.title}">
-                    <div class="image-count"><i class="fas fa-calendar-day"></i></div>
-                </div>
-                <div class="activity-card-content">
-                    <div class="card-status-pill ${statusClass}">
-                        <i class="${isPast ? 'fas fa-check-circle' : 'fas fa-clock'}"></i>
-                        ${isPast ? 'Realizada' : 'Próxima'}
+            <div class="activity-card agenda-item-card ${statusClass}">
+                <div class="agenda-header">
+                    <div class="agenda-status">
+                        <div class="card-status-pill ${statusClass}">
+                            <i class="${isPast ? 'fas fa-check-circle' : 'fas fa-clock'}"></i>
+                            ${isPast ? 'Realizada' : 'Próxima'}
+                        </div>
                     </div>
-                    <h3>${event.title}</h3>
-                    <p>${event.description}</p>
-                    <div class="activity-card-footer">
-                        <span class="activity-year"><i class="fas fa-calendar-alt"></i> ${dateStr}</span>
+                    ${editBtnHtml}
+                </div>
+                
+                <div class="agenda-body">
+                    <div class="agenda-date-box">
+                        <span class="agenda-day">${eventDate.getDate()}</span>
+                        <span class="agenda-month">${eventDate.toLocaleDateString('es-CO', { month: 'short' }).toUpperCase()}</span>
+                    </div>
+                    <div class="agenda-details">
+                        <h3>${event.title}</h3>
+                        <p>${event.description || 'Sin descripción adicional.'}</p>
+                        <div class="agenda-meta">
+                            <span><i class="far fa-clock"></i> ${eventDate.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</span>
+                            <span><i class="fas fa-map-marker-alt"></i> IE Barro Blanco</span>
+                        </div>
                     </div>
                 </div>
+
+                ${event.images && event.images.length > 0 ? `
+                    <button class="btn-view-photos-link" onclick="window.openGalleryModalFromId('${event.id}')">
+                        <i class="fas fa-images"></i> Ver fotos de este evento
+                    </button>
+                ` : ''}
             </div>
         `;
     }).join('');
 
-    container.innerHTML = `<div class="cronograma-grid">${eventsHtml}</div>`;
+    container.innerHTML = `<div class="agenda-list-container">${eventsHtml}</div>`;
 }
 
 // --- EDIT MODAL LOGIC ---
