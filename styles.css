@@ -1607,7 +1607,7 @@ section h2 {
 }
 
 .calendar-header h3 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 800;
   background: linear-gradient(135deg, #fff, #10b981);
   -webkit-background-clip: text;
@@ -2295,24 +2295,151 @@ footer a:hover {
   color: #374151;
 }
 
-.year-pill.active {
+/* Cronograma Controls - Dropdown + Buttons */
+.cronograma-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Year Dropdown Container */
+.year-dropdown-container {
+  position: relative;
+}
+
+.year-dropdown-btn {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: white;
+  font-family: var(--font-main, 'Poppins', sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  justify-content: space-between;
+}
+
+.year-dropdown-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.year-dropdown-btn i {
+  font-size: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.year-dropdown-menu.active+.year-dropdown-btn i,
+.year-dropdown-btn:hover i {
+  transform: rotate(180deg);
+}
+
+/* Year Dropdown Menu */
+.year-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  min-width: 120px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.year-dropdown-menu.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.year-option {
+  padding: 10px 16px;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.year-option:last-child {
+  border-bottom: none;
+}
+
+.year-option:hover {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--primary);
+}
+
+.year-option.active {
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-.year-pill.pdf-download-btn {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+/* Action Buttons */
+.action-btn {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px 20px;
   color: white;
-  font-weight: 700;
-  margin-left: 8px;
+  font-family: var(--font-main, 'Poppins', sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
 }
 
-.year-pill.pdf-download-btn:hover {
-  background: linear-gradient(135deg, #dc2626, #b91c1c);
+.action-btn:hover {
   transform: translateY(-2px);
+}
+
+.action-btn i {
+  font-size: 1rem;
+}
+
+.pdf-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.pdf-btn:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
   box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+.new-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.new-btn:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
 }
 
 .btn-login {

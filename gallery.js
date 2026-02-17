@@ -1994,6 +1994,39 @@ function downloadCronogramaPDF() {
     URL.revokeObjectURL(url);
 }
 
+// Toggle Year Dropdown
+function toggleYearDropdown() {
+    const dropdown = document.getElementById('yearDropdownMenu');
+    if (dropdown) {
+        dropdown.classList.toggle('active');
+    }
+}
+
+// Select Year from Dropdown
+function selectYear(year) {
+    // Update selected text
+    const selectedText = document.getElementById('selectedYearText');
+    if (selectedText) {
+        selectedText.textContent = year === 'all' ? 'Todos' : year;
+    }
+
+    // Update active state in dropdown
+    document.querySelectorAll('.year-option').forEach(option => {
+        if (option.dataset.year === year) {
+            option.classList.add('active');
+        } else {
+            option.classList.remove('active');
+        }
+    });
+
+    // Close dropdown
+    const dropdown = document.getElementById('yearDropdownMenu');
+    if (dropdown) dropdown.classList.remove('active');
+
+    // Filter events
+    filterCronogramaByYear(year);
+}
+
 // Global exposure
 window.toggleNotifications = toggleNotifications;
 window.updateNotifications = updateNotifications;
@@ -2003,6 +2036,8 @@ window.addToGoogleCalendar = addToGoogleCalendar;
 window.filterCronogramaByYear = filterCronogramaByYear;
 window.closeProfileDropdown = closeProfileDropdown;
 window.downloadCronogramaPDF = downloadCronogramaPDF;
+window.toggleYearDropdown = toggleYearDropdown;
+window.selectYear = selectYear;
 window.filterVideosByYear = filterVideosByYear;
 window.loadCronograma = loadCronograma;
 window.filterActivitiesByYear = filterActivitiesByYear;
