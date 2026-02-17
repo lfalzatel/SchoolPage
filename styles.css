@@ -2442,6 +2442,19 @@ footer a:hover {
   box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
 }
 
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .cronograma-controls {
+    align-items: stretch;
+  }
+
+  .year-dropdown-btn,
+  .action-btn {
+    height: 44px;
+    min-height: 44px;
+  }
+}
+
 .btn-login {
   background: linear-gradient(135deg, #10b981, #059669) !important;
   color: #ffffff !important;

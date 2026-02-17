@@ -1934,25 +1934,29 @@ export function addToGoogleCalendar(eventId) {
 
 // Download Cronograma as PDF
 function downloadCronogramaPDF() {
-    // Get currently selected year
-    const activeYearBtn = document.querySelector('#cronogramaYearTrack .year-pill.active');
-    const oldSelectedYear = activeYearBtn ? activeYearBtn.dataset.year : 'all';
-
     // Get selected year from dropdown
     const selectedYearText = document.getElementById('selectedYearText');
     const selectedYear = selectedYearText ? selectedYearText.textContent : '2026';
 
+    // Get all events
+    let filteredEvents = window.currentCronogramaItems || [];
+
     // Filter events by selected year
-    let filteredEvents = window.currentCronogramaItems; // Use window.currentCronogramaItems
     if (selectedYear !== 'Todos') {
         filteredEvents = filteredEvents.filter(event => {
-            const eventYear = new Date(event.date).getFullYear().toString();
+            // Handle Firestore Timestamp
+            const eventDate = event.date && event.date.toDate ? event.date.toDate() : new Date(event.date);
+            const eventYear = eventDate.getFullYear().toString();
             return eventYear === selectedYear;
         });
     }
 
     // Sort by date
-    filteredEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+    filteredEvents.sort((a, b) => {
+        const dateA = a.date && a.date.toDate ? a.date.toDate() : new Date(a.date);
+        const dateB = b.date && b.date.toDate ? b.date.toDate() : new Date(b.date);
+        return dateA - dateB;
+    });
 
     if (filteredEvents.length === 0) {
         alert('No hay eventos para el año seleccionado');
@@ -2009,7 +2013,8 @@ function downloadCronogramaPDF() {
         // Date and time
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        const eventDate = new Date(event.date);
+        // Handle Firestore Timestamp
+        const eventDate = event.date && event.date.toDate ? event.date.toDate() : new Date(event.date);
         const formattedDate = eventDate.toLocaleDateString('es-CO', {
             weekday: 'long',
             year: 'numeric',
@@ -2052,7 +2057,8 @@ function downloadAsTextFile(events, year) {
 
     events.forEach((event, index) => {
         content += `${index + 1}. ${event.title}\n`;
-        const eventDate = new Date(event.date);
+        // Handle Firestore Timestamp
+        const eventDate = event.date && event.date.toDate ? event.date.toDate() : new Date(event.date);
         content += `   Fecha: ${eventDate.toLocaleDateString('es-CO', {
             weekday: 'long',
             year: 'numeric',
