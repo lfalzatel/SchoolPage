@@ -2842,7 +2842,7 @@ body {
 
 .modal-actions-premium {
   padding: 1rem 1.5rem;
-  background: rgba(249, 250, 251, 0.8);
+  /* background: rgba(249, 250, 251, 0.8); */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   display: flex;
