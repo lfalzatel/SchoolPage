@@ -1584,35 +1584,7 @@ section h2 {
   color: white;
 }
 
-.edit-activity-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  transition: all 0.3s ease;
-}
-
-.agenda-item-card .edit-activity-btn {
-  position: static;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.edit-activity-btn:hover {
-  background: var(--primary);
-  transform: scale(1.1);
-  border-color: var(--primary);
-}
+/* Unificado con .agenda-actions a partir de la línea 2000 */
 
 
 /* CALENDAR STYLES */
@@ -1997,55 +1969,64 @@ section h2 {
   color: var(--primary);
 }
 
-/* Agenda Actions (Buttons in row) */
+/* Agenda Actions (Container for Google/Edit buttons) */
 .agenda-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+  position: absolute !important;
+  top: 15px !important;
+  right: 15px !important;
+  display: flex !important;
+  gap: 8px !important;
+  z-index: 50 !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
 }
 
+/* Reset and unify action buttons */
 .agenda-action-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  padding: 0;
-  font-size: 1rem;
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  max-width: 38px !important;
+  max-height: 38px !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
 }
 
 .agenda-action-btn i {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .calendar-add-btn:hover {
-  background: #db4437;
-  /* Google Red */
-  border-color: #db4437;
-  transform: scale(1.15) rotate(5deg);
-  box-shadow: 0 5px 15px rgba(219, 68, 55, 0.3);
+  background: #db4437 !important;
+  transform: scale(1.1) !important;
 }
 
-.agenda-item-card .edit-activity-btn {
-  position: static;
-  background: rgba(255, 255, 255, 0.08);
+.edit-activity-btn {
+  position: static !important;
+  background: rgba(0, 0, 0, 0.5) !important;
 }
 
-.agenda-item-card .edit-activity-btn:hover {
-  background: var(--primary);
-  border-color: var(--primary);
-  transform: scale(1.15) rotate(-5deg);
-  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+.edit-activity-btn:hover {
+  background: var(--primary) !important;
+  transform: scale(1.1) !important;
 }
 
 /* Profile Dropdown */
