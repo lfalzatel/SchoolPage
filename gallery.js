@@ -1400,6 +1400,7 @@ window.filterActivitiesByYear = (year) => {
 
 // Calendar Component Logic
 let currentCalendarDate = new Date();
+let selectedCalendarDay = null; // Track selected day for filtering
 
 export function renderCalendar() {
     const container = document.getElementById('calendar-container');
@@ -1468,8 +1469,9 @@ export function renderCalendar() {
         const hasEvent = dayEvents.length > 0 ? 'has-event' : '';
         const eventStatus = hasEvent ? (dateObj < today ? 'done' : 'upcoming') : '';
 
+        const isSelected = selectedCalendarDay === day ? 'selected' : '';
         html += `
-            <div class="cal-day ${isToday} ${hasEvent} ${eventStatus}" onclick="window.scrollToEventOnDay(${day})">
+            <div class="cal-day ${isToday} ${hasEvent} ${eventStatus} ${isSelected}" onclick="window.scrollToEventOnDay(${day})">
                 ${day}
                 ${hasEvent ? '<div class="event-dot"></div>' : ''}
             </div>
@@ -1487,11 +1489,38 @@ window.changeCalendarMonth = (offset) => {
 };
 
 window.scrollToEventOnDay = (day) => {
-    // Optional: filter the timeline or scroll to specific item
     const year = currentCalendarDate.getFullYear();
     const month = currentCalendarDate.getMonth();
-    console.log(`Searching for events on ${day}/${month + 1}/${year}`);
-    // Here we could implement a smooth scroll to the event in the timeline
+
+    // Toggle selection: if clicking the same day, clear filter
+    if (selectedCalendarDay === day) {
+        selectedCalendarDay = null;
+        loadCronograma(); // Reload all events
+        renderCalendar(); // Re-render calendar to remove selection
+        return;
+    }
+
+    selectedCalendarDay = day;
+
+    // Filter events for this specific day
+    const filteredEvents = (window.currentCronogramaItems || []).filter(item => {
+        let d = null;
+        if (item.date && item.date.toDate) d = item.date.toDate();
+        else if (item.date) d = new Date(item.date);
+        return d && d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+    });
+
+    // Render filtered events
+    renderCronogramaItems(filteredEvents, true);
+
+    // Re-render calendar to show selection
+    renderCalendar();
+
+    // Scroll to timeline container
+    const container = document.getElementById('timeline-container');
+    if (container) {
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 };
 
 export async function loadCronograma() {
@@ -1550,12 +1579,15 @@ export function filterCronogramaByYear(year) {
     renderCronogramaItems(filtered);
 }
 
-function renderCronogramaItems(events) {
+function renderCronogramaItems(events, isFiltered = false) {
     const container = document.getElementById('timeline-container');
     if (!container) return;
 
     if (events.length === 0) {
-        container.innerHTML = '<p class="text-center" style="padding: 2rem; color: #aaa;">No hay actividades para este año.</p>';
+        const message = isFiltered
+            ? '<p class="text-center" style="padding: 2rem; color: #aaa;">No hay eventos en este día. <button onclick="selectedCalendarDay = null; loadCronograma(); renderCalendar();" style="color: var(--primary); text-decoration: underline; background: none; border: none; cursor: pointer; font-weight: 700;">Ver todos</button></p>'
+            : '<p class="text-center" style="padding: 2rem; color: #aaa;">No hay actividades para este año.</p>';
+        container.innerHTML = message;
         return;
     }
 

@@ -1647,6 +1647,13 @@ section h2 {
   gap: 8px;
 }
 
+/* Responsive: Reduce gap on mobile to prevent overflow */
+@media (max-width: 480px) {
+  .calendar-grid {
+    gap: 4px;
+  }
+}
+
 .cal-weekday {
   text-align: center;
   font-weight: 700;
@@ -1726,6 +1733,13 @@ section h2 {
     transform: scale(1);
     opacity: 1;
   }
+}
+
+.cal-day.selected {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border: 2px solid var(--primary) !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
 }
 
 .view-section.active {
