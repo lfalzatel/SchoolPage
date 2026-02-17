@@ -1581,7 +1581,8 @@ function renderCronogramaItems(events) {
         const isAdmin = auth.currentUser && admins.includes(auth.currentUser.email);
 
         const editBtnHtml = isAdmin ? `
-            <button class="edit-activity-btn" onclick="event.stopPropagation(); window.openEditActivityModal('${event.id}')">
+            <button class="agenda-action-btn edit-activity-btn" title="Editar Evento" 
+                    onclick="event.stopPropagation(); window.openEditActivityModal('${event.id}')">
                 <i class="fas fa-edit"></i>
             </button>
         ` : '';
