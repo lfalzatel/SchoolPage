@@ -1115,6 +1115,75 @@ section h2::after {
   border-radius: 10px;
 }
 
+/* Chat-bubble style for album comments */
+.comment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.comment-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #059669, #047857);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.comment-bubble {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 0 12px 12px 12px;
+  padding: 7px 11px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.comment-author {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.comment-text-inner {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.comment-date {
+  font-size: 0.68rem;
+  color: #475569;
+  margin-top: 2px;
+}
+
+.comment-delete {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  align-self: flex-start;
+  flex-shrink: 0;
+}
+
+.comment-delete:hover {
+  opacity: 1;
+}
+
 .comment-form {
   display: flex;
   gap: 8px;
