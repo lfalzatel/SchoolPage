@@ -3917,3 +3917,208 @@ body.dark-mode .hero-tagline,
 .delete-btn-doc:hover {
   background: rgba(220, 38, 38, 1);
 }
+
+/* ============================================================
+   LIGHTBOX — Social Bar (per-photo likes & comments)
+   ============================================================ */
+
+.lb-social-bar {
+  width: 100%;
+  max-width: 640px;
+  margin: 0.8rem auto 0;
+  background: rgba(15, 25, 35, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 16px;
+  padding: 0.8rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* Like + comment counters row */
+.lb-social-top {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.lb-like-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.05rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.lb-like-btn:hover {
+  color: #f43f5e;
+  background: rgba(244, 63, 94, 0.1);
+}
+
+.lb-like-btn.liked {
+  color: #f43f5e;
+}
+
+.lb-like-btn.liked i {
+  animation: lb-heartbeat 0.3s ease;
+}
+
+@keyframes lb-heartbeat {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.4);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.lb-comments-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.9rem;
+}
+
+/* Comments list */
+.lb-comments-list {
+  max-height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
+}
+
+.lb-no-comments {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 4px 0;
+}
+
+.lb-comment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.lb-comment-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #a3e635);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.lb-comment-bubble {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.4;
+  flex: 1;
+  position: relative;
+}
+
+.lb-comment-bubble b {
+  color: #10b981;
+  margin-right: 4px;
+}
+
+.lb-comment-delete {
+  background: none;
+  border: none;
+  color: rgba(239, 68, 68, 0.6);
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 0.7rem;
+  margin-left: 4px;
+  transition: color 0.2s;
+}
+
+.lb-comment-delete:hover {
+  color: #ef4444;
+}
+
+/* Comment input form */
+.lb-comment-form {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.lb-comment-form input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: #fff;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.lb-comment-form input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.lb-comment-form input:focus {
+  border-color: #10b981;
+}
+
+.lb-comment-form button {
+  background: linear-gradient(135deg, #10b981, #a3e635);
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: opacity 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+
+.lb-comment-form button:hover {
+  opacity: 0.9;
+  transform: scale(1.08);
+}
+
+/* Mobile: collapse social bar height */
+@media (max-width: 600px) {
+  .lb-social-bar {
+    max-width: 100%;
+    border-radius: 12px;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .lb-comments-list {
+    max-height: 90px;
+  }
+}

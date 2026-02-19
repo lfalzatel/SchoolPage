@@ -698,8 +698,23 @@
 
     <!-- Caption bottom -->
     <div class="lb-caption" id="lightboxCaption"></div>
-  </div>
 
+    <!-- Social bar per photo -->
+    <div class="lb-social-bar" id="lbSocialBar">
+      <div class="lb-social-top">
+        <button class="lb-like-btn" id="lbBtnLike" onclick="togglePhotoLike()">
+          <i class="far fa-heart"></i>
+          <span id="lbLikeCount">0</span>
+        </button>
+        <span class="lb-comments-label"><i class="fas fa-comment"></i> <span id="lbCommentCount">0</span></span>
+      </div>
+      <div class="lb-comments-list" id="lbCommentsList"></div>
+      <form class="lb-comment-form" id="lbCommentForm" onsubmit="handlePhotoCommentSubmit(event)">
+        <input type="text" id="lbCommentInput" placeholder="Comentar esta foto..." autocomplete="off">
+        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </div>
 
   <div id="videoModal" class="video-modal">
     <div class="video-modal-content">

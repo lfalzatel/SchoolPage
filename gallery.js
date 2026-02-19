@@ -1087,8 +1087,8 @@ window.openGalleryModal = (index) => {
     initSocialFeatures(activity.id);
 
     if (modal) {
-        modal.classList.add('active'); // Use class instead of display: block for animation consistency
-        modal.style.display = 'block'; // Keep ensuring display for safety
+        modal.classList.add('active');
+        modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
 };
@@ -1187,6 +1187,8 @@ window.openLightbox = (index) => {
     }
 
     lbUpdateUI();
+    // Load per-photo social data
+    if (currentActivityId) initPhotoSocial(currentActivityId, currentLightboxIndex);
 
     // Touch swipe events
     if (modal && !modal._lbSwipeInit) {
@@ -1206,6 +1208,9 @@ window.closeLightbox = () => {
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
     }
+    // Cleanup per-photo listeners
+    if (lbUnsubLikes) { lbUnsubLikes(); lbUnsubLikes = null; }
+    if (lbUnsubComments) { lbUnsubComments(); lbUnsubComments = null; }
 };
 
 window.navigateLightbox = (dir) => {
@@ -1214,6 +1219,8 @@ window.navigateLightbox = (dir) => {
     if (currentLightboxIndex < 0) currentLightboxIndex = images.length - 1;
     if (currentLightboxIndex >= images.length) currentLightboxIndex = 0;
     lbUpdateUI();
+    // Reload per-photo social for new photo
+    if (currentActivityId) initPhotoSocial(currentActivityId, currentLightboxIndex);
 };
 
 window.downloadLightboxImage = () => {
@@ -1236,7 +1243,10 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') window.navigateLightbox(-1);
 });
 
-// --- SOCIAL INTERACTIONS ---
+
+// ============================================================
+// ALBUM-LEVEL SOCIAL (likes + comments sobre el álbum completo)
+// ============================================================
 
 let currentActivityId = null;
 let unsubscribeLikes = null;
@@ -1246,9 +1256,12 @@ function initSocialFeatures(activityId) {
     currentActivityId = activityId;
 
     // Reset UI
-    document.getElementById('btnLike').classList.remove('liked');
-    document.getElementById('likeCount').textContent = '0';
-    document.getElementById('commentsList').innerHTML = '<p class="text-center">Cargando comentarios...</p>';
+    const btnLike = document.getElementById('btnLike');
+    const likeCount = document.getElementById('likeCount');
+    const commentsList = document.getElementById('commentsList');
+    if (btnLike) { btnLike.classList.remove('liked'); btnLike.querySelector('i').className = 'far fa-heart'; }
+    if (likeCount) likeCount.textContent = '0';
+    if (commentsList) commentsList.innerHTML = '<p class="no-comments">Cargando...</p>';
 
     // Unsubscribe previous listeners
     if (unsubscribeLikes) unsubscribeLikes();
@@ -1256,169 +1269,244 @@ function initSocialFeatures(activityId) {
 
     if (!activityId) return;
 
-    const user = auth.currentUser;
+    // 1. Listen to like count in real-time (always)
+    unsubscribeLikes = onSnapshot(doc(db, 'activities', activityId), (docSnap) => {
+        if (docSnap.exists() && likeCount) {
+            likeCount.textContent = docSnap.data().likeCount || 0;
+        }
+    });
 
-    // 1. Listen to Likes (Real-time)
-    // We will use a subcollection 'social_stats' or just a separate 'likes' collection?
-    // Plan said: Collection 'likes' with docId = {activityId}_{userId} OR just counting in activity doc.
-    // Better: Helper collection 'likes' for status and counter on activity doc? 
-    // Simplest: 'activities/{id}/likes' subcollection usually costs reads. The prompt didn't specify architecture.
-    // Let's go with: 
-    // - Collection `activity_likes` (docId: activityId_userId) to track who liked what.
-    // - Field `likeCount` in activity document for aggregation.
-
-    // Check if current user liked it
-    if (user) {
+    // 2. Check if current user liked it — wait for auth to be ready
+    const checkMyLike = (user) => {
+        if (!user || !btnLike) return;
         const likeDocId = `${activityId}_${user.uid}`;
-        // Verify if I liked it. Since we want real-time update of the COUNT, we listen to the activity doc.
-        // But for "My Like Status", a single get or snapshot on the like doc is enough.
-
-        // Listen to Activity Doc for Like Count
-        unsubscribeLikes = onSnapshot(doc(db, "activities", activityId), (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                document.getElementById('likeCount').textContent = data.likeCount || 0;
-            }
-        });
-
-        // Check if *I* liked it
-        const likeRef = doc(db, "activity_likes", likeDocId);
-        getDoc(likeRef).then(snap => {
+        getDoc(doc(db, 'activity_likes', likeDocId)).then(snap => {
             if (snap.exists()) {
-                document.getElementById('btnLike').classList.add('liked');
-                document.getElementById('btnLike').querySelector('i').className = 'fas fa-heart';
+                btnLike.classList.add('liked');
+                btnLike.querySelector('i').className = 'fas fa-heart';
             } else {
-                document.getElementById('btnLike').classList.remove('liked');
-                document.getElementById('btnLike').querySelector('i').className = 'far fa-heart';
+                btnLike.classList.remove('liked');
+                btnLike.querySelector('i').className = 'far fa-heart';
             }
-        });
+        }).catch(() => { });
+    };
 
+    // If auth is already resolved use current user, otherwise wait for it
+    if (auth.currentUser) {
+        checkMyLike(auth.currentUser);
     } else {
-        // Just listen to count
-        unsubscribeLikes = onSnapshot(doc(db, "activities", activityId), (docSnap) => {
-            if (docSnap.exists()) {
-                document.getElementById('likeCount').textContent = docSnap.data().likeCount || 0;
-            }
+        const unsubAuth = auth.onAuthStateChanged(user => {
+            checkMyLike(user);
+            unsubAuth(); // one-time
         });
     }
 
-    // 2. Listen to Comments (Real-time)
-    const qComments = query(collection(db, `activities/${activityId}/comments`), orderBy('createdAt', 'desc'));
+    // 3. Listen to album-level comments in real-time
+    const qComments = query(
+        collection(db, `activities/${activityId}/comments`),
+        orderBy('createdAt', 'desc')
+    );
     unsubscribeComments = onSnapshot(qComments, (snapshot) => {
-        const container = document.getElementById('commentsList');
+        if (!commentsList) return;
+        const user = auth.currentUser;
         if (snapshot.empty) {
-            container.innerHTML = '<p class="no-comments">Sé el primero en comentar.</p>';
+            commentsList.innerHTML = '<p class="no-comments">Sé el primero en comentar.</p>';
             return;
         }
-
-        container.innerHTML = snapshot.docs.map(doc => {
-            const c = doc.data();
+        commentsList.innerHTML = snapshot.docs.map(d => {
+            const c = d.data();
             const isMyComment = user && c.userId === user.uid;
             const isAdmin = window.currentUserRole === 'admin';
-            const date = c.createdAt ? c.createdAt.toDate().toLocaleDateString() : '';
-
+            const date = c.createdAt ? c.createdAt.toDate().toLocaleDateString('es-CO') : '';
+            const initial = (c.userName || '?')[0].toUpperCase();
             return `
                 <div class="comment-item">
-                    <div class="comment-header">
+                    <div class="comment-avatar">${initial}</div>
+                    <div class="comment-bubble">
                         <span class="comment-author">${c.userName}</span>
+                        <span class="comment-text-inner">${c.text}</span>
                         <span class="comment-date">${date}</span>
                     </div>
-                    <div class="comment-text">
-                        ${c.text}
-                        ${(isMyComment || isAdmin) ?
-                    `<button class="comment-delete" onclick="deleteComment('${activityId}', '${doc.id}')"><i class="fas fa-trash"></i></button>`
+                    ${(isMyComment || isAdmin)
+                    ? `<button class="comment-delete" onclick="deleteComment('${activityId}','${d.id}')"><i class="fas fa-trash"></i></button>`
                     : ''}
-                    </div>
-                </div>
-            `;
+                </div>`;
         }).join('');
     });
 }
 
 window.toggleLike = async () => {
     const user = auth.currentUser;
-    if (!user) {
-        alert("Debes iniciar sesión para dar like.");
-        return;
-    }
+    if (!user) { alert('Debes iniciar sesión para dar like.'); return; }
     if (!currentActivityId) return;
 
     const likeDocId = `${currentActivityId}_${user.uid}`;
-    const activityRef = doc(db, "activities", currentActivityId);
-    const likeRef = doc(db, "activity_likes", likeDocId);
+    const activityRef = doc(db, 'activities', currentActivityId);
+    const likeRef = doc(db, 'activity_likes', likeDocId);
+    const btnLike = document.getElementById('btnLike');
 
     try {
-        await runTransaction(db, async (transaction) => {
-            const likeDoc = await transaction.get(likeRef);
-            const activityDoc = await transaction.get(activityRef);
-
-            if (!activityDoc.exists()) throw "Activity does not exist!";
-
-            let newCount = (activityDoc.data().likeCount || 0);
-
+        await runTransaction(db, async (tx) => {
+            const likeDoc = await tx.get(likeRef);
+            const actDoc = await tx.get(activityRef);
+            if (!actDoc.exists()) throw new Error('Activity not found');
+            let count = actDoc.data().likeCount || 0;
             if (likeDoc.exists()) {
-                // Unlike
-                transaction.delete(likeRef);
-                newCount = Math.max(0, newCount - 1);
-                transaction.update(activityRef, { likeCount: newCount });
-
-                // Optimistic UI update (outside transaction ideally, but ok here)
-                document.getElementById('btnLike').classList.remove('liked');
-                document.getElementById('btnLike').querySelector('i').className = 'far fa-heart';
+                tx.delete(likeRef);
+                tx.update(activityRef, { likeCount: Math.max(0, count - 1) });
+                if (btnLike) { btnLike.classList.remove('liked'); btnLike.querySelector('i').className = 'far fa-heart'; }
             } else {
-                // Like
-                transaction.set(likeRef, {
-                    userId: user.uid,
-                    activityId: currentActivityId,
-                    createdAt: serverTimestamp()
-                });
-                newCount += 1;
-                transaction.update(activityRef, { likeCount: newCount });
-
-                document.getElementById('btnLike').classList.add('liked');
-                document.getElementById('btnLike').querySelector('i').className = 'fas fa-heart';
+                tx.set(likeRef, { userId: user.uid, activityId: currentActivityId, createdAt: serverTimestamp() });
+                tx.update(activityRef, { likeCount: count + 1 });
+                if (btnLike) { btnLike.classList.add('liked'); btnLike.querySelector('i').className = 'fas fa-heart'; }
             }
         });
-    } catch (e) {
-        console.error("Like transaction failed: ", e);
-    }
+    } catch (e) { console.error('Like failed:', e); }
 };
 
 window.handleCommentSubmit = async (e) => {
     e.preventDefault();
     const user = auth.currentUser;
-    if (!user) {
-        alert("Debes iniciar sesión para comentar.");
-        return;
-    }
-
+    if (!user) { alert('Debes iniciar sesión para comentar.'); return; }
     const input = document.getElementById('commentInput');
-    const text = input.value.trim();
+    const text = input?.value.trim();
     if (!text) return;
-
     try {
         await addDoc(collection(db, `activities/${currentActivityId}/comments`), {
-            text: text,
-            userId: user.uid,
+            text, userId: user.uid,
             userName: user.displayName || user.email.split('@')[0],
             createdAt: serverTimestamp()
         });
-        input.value = ''; // Clear input
-    } catch (error) {
-        console.error("Error posting comment: ", error);
-        alert("Error al publicar comentario.");
-    }
+        if (input) input.value = '';
+    } catch (err) { console.error('Comment error:', err); }
 };
 
 window.deleteComment = async (activityId, commentId) => {
-    if (!confirm("¿Borrar comentario?")) return;
-    try {
-        await deleteDoc(doc(db, `activities/${activityId}/comments`, commentId));
-    } catch (e) {
-        console.error("Error deleting comment:", e);
-    }
+    if (!confirm('¿Borrar comentario?')) return;
+    try { await deleteDoc(doc(db, `activities/${activityId}/comments`, commentId)); }
+    catch (e) { console.error('Delete error:', e); }
 };
 
+// ============================================================
+// PER-PHOTO SOCIAL (likes + comments sobre una foto individual)
+// ============================================================
+
+let lbUnsubLikes = null;
+let lbUnsubComments = null;
+
+function initPhotoSocial(activityId, photoIndex) {
+    // Cleanup previous listeners
+    if (lbUnsubLikes) lbUnsubLikes();
+    if (lbUnsubComments) lbUnsubComments();
+
+    const photoRef = doc(db, `activities/${activityId}/photoStats`, String(photoIndex));
+    const likesCol = collection(db, `activities/${activityId}/photoStats/${photoIndex}/likes`);
+    const commentsCol = collection(db, `activities/${activityId}/photoStats/${photoIndex}/comments`);
+
+    // Reset UI
+    const lbBtnLike = document.getElementById('lbBtnLike');
+    const lbLikeCount = document.getElementById('lbLikeCount');
+    const lbCommentCount = document.getElementById('lbCommentCount');
+    const lbCommentsList = document.getElementById('lbCommentsList');
+    if (lbBtnLike) { lbBtnLike.classList.remove('liked'); lbBtnLike.querySelector('i').className = 'far fa-heart'; }
+    if (lbLikeCount) lbLikeCount.textContent = '0';
+    if (lbCommentCount) lbCommentCount.textContent = '0';
+    if (lbCommentsList) lbCommentsList.innerHTML = '';
+
+    // Listen to likes count
+    lbUnsubLikes = onSnapshot(likesCol, (snap) => {
+        if (lbLikeCount) lbLikeCount.textContent = snap.size;
+        const user = auth.currentUser;
+        if (user && lbBtnLike) {
+            const myLike = snap.docs.find(d => d.id === user.uid);
+            if (myLike) {
+                lbBtnLike.classList.add('liked');
+                lbBtnLike.querySelector('i').className = 'fas fa-heart';
+            } else {
+                lbBtnLike.classList.remove('liked');
+                lbBtnLike.querySelector('i').className = 'far fa-heart';
+            }
+        }
+    });
+
+    // Listen to comments
+    const qPhotoComments = query(commentsCol, orderBy('createdAt', 'asc'));
+    lbUnsubComments = onSnapshot(qPhotoComments, (snap) => {
+        const user = auth.currentUser;
+        if (lbCommentCount) lbCommentCount.textContent = snap.size;
+        if (!lbCommentsList) return;
+        if (snap.empty) {
+            lbCommentsList.innerHTML = '<p class="lb-no-comments">Sé el primero en comentar esta foto.</p>';
+            return;
+        }
+        lbCommentsList.innerHTML = snap.docs.map(d => {
+            const c = d.data();
+            const isAdmin = window.currentUserRole === 'admin';
+            const isMe = user && c.userId === user.uid;
+            const initial = (c.userName || '?')[0].toUpperCase();
+            return `
+                <div class="lb-comment-item">
+                    <div class="lb-comment-avatar">${initial}</div>
+                    <div class="lb-comment-bubble">
+                        <b>${c.userName}</b> ${c.text}
+                        ${(isMe || isAdmin)
+                    ? `<button class="lb-comment-delete" onclick="deletePhotoComment('${activityId}','${photoIndex}','${d.id}')"><i class="fas fa-times"></i></button>`
+                    : ''}
+                    </div>
+                </div>`;
+        }).join('');
+        // Auto-scroll to bottom
+        lbCommentsList.scrollTop = lbCommentsList.scrollHeight;
+    });
+}
+
+window.togglePhotoLike = async () => {
+    const user = auth.currentUser;
+    if (!user) { alert('Debes iniciar sesión para dar like.'); return; }
+    if (!currentActivityId) return;
+
+    const likeRef = doc(db, `activities/${currentActivityId}/photoStats/${currentLightboxIndex}/likes`, user.uid);
+    const lbBtnLike = document.getElementById('lbBtnLike');
+
+    try {
+        const snap = await getDoc(likeRef);
+        if (snap.exists()) {
+            await deleteDoc(likeRef);
+            if (lbBtnLike) { lbBtnLike.classList.remove('liked'); lbBtnLike.querySelector('i').className = 'far fa-heart'; }
+        } else {
+            await setDoc(likeRef, { userId: user.uid, createdAt: serverTimestamp() });
+            if (lbBtnLike) {
+                lbBtnLike.classList.add('liked');
+                lbBtnLike.querySelector('i').className = 'fas fa-heart';
+                // Heartbeat animation
+                lbBtnLike.style.transform = 'scale(1.35)';
+                setTimeout(() => { lbBtnLike.style.transform = ''; }, 300);
+            }
+        }
+    } catch (e) { console.error('Photo like error:', e); }
+};
+
+window.handlePhotoCommentSubmit = async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) { alert('Debes iniciar sesión para comentar.'); return; }
+    const input = document.getElementById('lbCommentInput');
+    const text = input?.value.trim();
+    if (!text || !currentActivityId) return;
+    try {
+        await addDoc(
+            collection(db, `activities/${currentActivityId}/photoStats/${currentLightboxIndex}/comments`),
+            { text, userId: user.uid, userName: user.displayName || user.email.split('@')[0], createdAt: serverTimestamp() }
+        );
+        if (input) input.value = '';
+    } catch (err) { console.error('Photo comment error:', err); }
+};
+
+window.deletePhotoComment = async (activityId, photoIndex, commentId) => {
+    if (!confirm('¿Borrar comentario?')) return;
+    try { await deleteDoc(doc(db, `activities/${activityId}/photoStats/${photoIndex}/comments`, commentId)); }
+    catch (e) { console.error('Delete error:', e); }
+};
 
 // --- INITIALIZATION ---
 window.currentYearFilter = 'all';
