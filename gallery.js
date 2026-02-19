@@ -1149,19 +1149,53 @@ window.closeVideoModal = () => {
 };
 
 // --- LIGHTBOX LOGIC ---
+// Swipe support
+let lbTouchStartX = 0;
+
+function lbUpdateUI() {
+    const images = window.currentActivityImages || [];
+    const total = images.length;
+    const idx = currentLightboxIndex;
+
+    const counter = document.getElementById('lightboxCounter');
+    if (counter) counter.textContent = `${idx + 1} / ${total}`;
+
+    const caption = document.getElementById('lightboxCaption');
+    if (caption) {
+        // Show alt/title text if available, else empty
+        caption.textContent = (window.currentActivityImageCaptions && window.currentActivityImageCaptions[idx]) || '';
+    }
+
+    const img = document.getElementById('lightboxImage');
+    if (img && images[idx]) {
+        // Re-trigger animation
+        img.style.animation = 'none';
+        requestAnimationFrame(() => { img.style.animation = ''; });
+        img.src = images[idx];
+        img.alt = `Foto ${idx + 1} de ${total}`;
+    }
+}
+
 window.openLightbox = (index) => {
     currentLightboxIndex = index;
     const modal = document.getElementById('lightboxModal');
-    const img = document.getElementById('lightboxImage');
-
-    if (img && window.currentActivityImages[index]) {
-        img.src = window.currentActivityImages[index];
-    }
 
     if (modal) {
         modal.classList.add('active');
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+    }
+
+    lbUpdateUI();
+
+    // Touch swipe events
+    if (modal && !modal._lbSwipeInit) {
+        modal._lbSwipeInit = true;
+        modal.addEventListener('touchstart', (e) => { lbTouchStartX = e.touches[0].clientX; }, { passive: true });
+        modal.addEventListener('touchend', (e) => {
+            const diff = lbTouchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 40) window.navigateLightbox(diff > 0 ? 1 : -1);
+        }, { passive: true });
     }
 };
 
@@ -1175,20 +1209,33 @@ window.closeLightbox = () => {
 };
 
 window.navigateLightbox = (dir) => {
-    currentLightboxIndex += dir;
     const images = window.currentActivityImages || [];
-
+    currentLightboxIndex += dir;
     if (currentLightboxIndex < 0) currentLightboxIndex = images.length - 1;
     if (currentLightboxIndex >= images.length) currentLightboxIndex = 0;
-
-    const img = document.getElementById('lightboxImage');
-    if (img && images[currentLightboxIndex]) {
-        img.src = images[currentLightboxIndex];
-    }
+    lbUpdateUI();
 };
 
-// Expose lightbox array for global access if needed
-window.currentActivityImages = [];
+window.downloadLightboxImage = () => {
+    const images = window.currentActivityImages || [];
+    const src = images[currentLightboxIndex];
+    if (!src) return;
+    const a = document.createElement('a');
+    a.href = src;
+    a.download = `foto-actividad-${currentLightboxIndex + 1}.jpg`;
+    a.target = '_blank';
+    a.click();
+};
+
+// Keyboard navigation for lightbox
+document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById('lightboxModal');
+    if (!modal || !modal.classList.contains('active')) return;
+    if (e.key === 'Escape') window.closeLightbox();
+    if (e.key === 'ArrowRight') window.navigateLightbox(1);
+    if (e.key === 'ArrowLeft') window.navigateLightbox(-1);
+});
+
 // --- SOCIAL INTERACTIONS ---
 
 let currentActivityId = null;

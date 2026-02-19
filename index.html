@@ -668,19 +668,38 @@
   </div>
 
   <div id="lightboxModal" class="lightbox-modal">
-    <div class="lightbox-content">
-      <button class="lightbox-close" onclick="closeLightbox()">
-        <i class="fas fa-times"></i>
-      </button>
-      <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1)">
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <img id="lightboxImage" src="" alt="">
-      <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(1)">
-        <i class="fas fa-chevron-right"></i>
-      </button>
+    <!-- Top bar: counter + close -->
+    <div class="lb-topbar">
+      <div class="lb-counter" id="lightboxCounter">1 / 1</div>
+      <div class="lb-topbar-actions">
+        <button class="lb-action-btn" id="lightboxDownloadBtn" onclick="downloadLightboxImage()" title="Descargar foto">
+          <i class="fas fa-download"></i>
+        </button>
+        <button class="lb-action-btn lb-close-btn" onclick="closeLightbox()" title="Cerrar (Esc)">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
     </div>
+
+    <!-- Navigation prev -->
+    <button class="lb-nav lb-prev" onclick="navigateLightbox(-1)" aria-label="Anterior">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <!-- Image area -->
+    <div class="lb-image-wrap" id="lightboxImageWrap">
+      <img id="lightboxImage" src="" alt="Foto de la actividad">
+    </div>
+
+    <!-- Navigation next -->
+    <button class="lb-nav lb-next" onclick="navigateLightbox(1)" aria-label="Siguiente">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+
+    <!-- Caption bottom -->
+    <div class="lb-caption" id="lightboxCaption"></div>
   </div>
+
 
   <div id="videoModal" class="video-modal">
     <div class="video-modal-content">
