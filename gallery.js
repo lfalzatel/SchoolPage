@@ -823,7 +823,7 @@ function renderActivityCards(activities, targetId = 'activitiesGrid') {
         ` : '';
 
         return `
-            <div class="activity-card gallery-album-card" onclick="openGalleryModal(${i})">
+            <div class="activity-card gallery-album-card" onclick="openGalleryModalById('${a.id}')">
                 <div class="activity-card-image">
                     <img src="${a.thumbnail || 'assets/images/1. logo 1.jpg'}" onerror="this.src='assets/images/1. logo 1.jpg'" alt="${a.title}">
                     <div class="image-count-badge">
@@ -1090,6 +1090,17 @@ window.openGalleryModal = (index) => {
         modal.classList.add('active');
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+    }
+};
+
+// Open modal by activity ID — safe against filtered arrays
+window.openGalleryModalById = (activityId) => {
+    const activities = window.currentGalleryActivities || [];
+    const index = activities.findIndex(a => a.id === activityId);
+    if (index !== -1) {
+        window.openGalleryModal(index);
+    } else {
+        console.warn('openGalleryModalById: activity not found:', activityId);
     }
 };
 
