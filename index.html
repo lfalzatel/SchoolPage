@@ -613,37 +613,57 @@
 
   <div id="galleryModal" class="gallery-modal">
     <div class="gallery-modal-content">
+
+      <!-- Header premium -->
       <div class="gallery-modal-header">
-        <h3 id="galleryModalHeaderTitle"></h3>
+        <div class="gallery-modal-header-left">
+          <div class="gallery-modal-header-icon">
+            <i class="fas fa-images"></i>
+          </div>
+          <div>
+            <div class="gallery-modal-header-label">Álbum fotográfico</div>
+            <h3 id="galleryModalHeaderTitle"></h3>
+          </div>
+        </div>
         <button class="gallery-modal-close" onclick="closeGalleryModal()">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      <div class="gallery-modal-info">
-        <h3 id="galleryModalTitle">Titulo</h3>
-        <p id="galleryModalDescription">Descripción</p>
-        <div id="galleryModalDate" class="gallery-date">Fecha</div>
 
-        <!-- Social Interaction Section -->
-        <div class="social-actions">
-          <button id="btnLike" class="btn-like" onclick="toggleLike()">
-            <i class="far fa-heart"></i> <span id="likeCount">0</span> Me gusta
-          </button>
-        </div>
+      <!-- Cuerpo en dos paneles -->
+      <div class="gallery-modal-panels">
 
-        <div class="comments-section">
-          <h4>Comentarios</h4>
-          <div id="commentsList" class="comments-list">
-            <!-- Comments will be loaded here -->
-            <p class="no-comments">Sé el primero en comentar.</p>
+        <!-- Panel izquierdo: Info + Social -->
+        <div class="gallery-modal-info">
+          <div class="gallery-info-badge" id="galleryModalDate">2025</div>
+          <h3 id="galleryModalTitle">Título</h3>
+          <p id="galleryModalDescription">Descripción</p>
+
+          <!-- Social Interaction Section -->
+          <div class="social-actions">
+            <button id="btnLike" class="btn-like" onclick="toggleLike()">
+              <i class="far fa-heart"></i>
+              <span id="likeCount">0</span>
+              <span class="like-label">Me gusta</span>
+            </button>
           </div>
-          <form id="commentForm" class="comment-form" onsubmit="handleCommentSubmit(event)">
-            <input type="text" id="commentInput" placeholder="Escribe un comentario..." required autocomplete="off">
-            <button type="submit"><i class="fas fa-paper-plane"></i></button>
-          </form>
+
+          <div class="comments-section">
+            <h4><i class="fas fa-comments"></i> Comentarios</h4>
+            <div id="commentsList" class="comments-list">
+              <p class="no-comments">Sé el primero en comentar.</p>
+            </div>
+            <form id="commentForm" class="comment-form" onsubmit="handleCommentSubmit(event)">
+              <input type="text" id="commentInput" placeholder="Escribe un comentario..." required autocomplete="off">
+              <button type="submit"><i class="fas fa-paper-plane"></i></button>
+            </form>
+          </div>
         </div>
+
+        <!-- Panel derecho: Fotos -->
+        <div class="gallery-modal-body" id="galleryModalBody"></div>
+
       </div>
-      <div class="gallery-modal-body" id="galleryModalBody"></div>
     </div>
   </div>
 
