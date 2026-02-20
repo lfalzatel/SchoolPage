@@ -1073,35 +1073,7 @@
       }
     });
 
-    // View Switcher Function
-    window.showView = function (viewId) {
-      // 1. Hide all View Sections
-      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-
-      // 2. Show Target View
-      if (viewId === 'home' || viewId === 'sobre') {
-        document.querySelectorAll('.view-home').forEach(el => el.classList.add('active'));
-        window.history.replaceState(null, null, '#sobre');
-      } else {
-        const target = document.getElementById('view-' + viewId);
-        if (target) {
-          target.classList.add('active');
-          window.history.replaceState(null, null, '#' + viewId);
-        }
-      }
-
-      // 3. Update Bottom Nav State
-      document.querySelectorAll('.bottom-nav .nav-item').forEach(el => {
-        el.classList.remove('active');
-        const href = el.getAttribute('href').substring(1);
-        if (href === viewId || (viewId === 'home' && href === 'sobre')) {
-          el.classList.add('active');
-        }
-      });
-
-      // 4. Scroll to Top
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    }
+    // View Switcher logic is handled by showView defined later in the script
 
     // Register Service Worker
     if ('serviceWorker' in navigator) {
@@ -1148,9 +1120,7 @@
       document.body.style.overflow = 'auto';
     }
 
-    window.scrollToSection = (id) => {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // scrollToSection is defined and exposed later
 
     // --- EVENT LISTENERS FOR MODALS ---
     window.addEventListener('click', (e) => {
@@ -1251,6 +1221,14 @@
 
     // --- Navigation Logic ---
     function showView(viewName) {
+      // Auto-close any open modals when switching views
+      if (window.closeLightbox) window.closeLightbox();
+      if (window.closeGalleryModal) window.closeGalleryModal();
+      if (window.closeVideoModal) window.closeVideoModal();
+      if (window.closeDocumentModal) window.closeDocumentModal();
+      if (window.closeUploadModal) window.closeUploadModal();
+      if (window.closeEventModal) window.closeEventModal();
+
       // Hide all views
       document.querySelectorAll('.view-section').forEach(el => {
         el.classList.remove('active');
