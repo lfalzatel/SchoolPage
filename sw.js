@@ -1,4 +1,4 @@
-const CACHE_NAME = 'green-force-v28';
+const CACHE_NAME = 'green-force-v29';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -6,7 +6,6 @@ const ASSETS_TO_CACHE = [
   './manifest.json',
   './auth.js',
   './gallery.js',
-  './firebase-config.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',

@@ -1,50 +1,59 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if user is admin
     function isAdmin() {
       return request.auth != null && 
              exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Users: Users can read/write their own profile
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Activities: Public read, Admin write
-    // --- ACTIVITIES Collection ---
+    // --- ACTIVITIES (ROOT) ---
     match /activities/{activityId} {
       allow read: if true;
-      allow create, delete: if isAdmin();
-      allow update: if isAdmin() || (request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount']));
-      
-      // Comments Subcollection
+      allow write: if request.auth != null;
+
+      // Activities comments
       match /comments/{commentId} {
         allow read: if true;
-        allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-        allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
+        allow write: if request.auth != null;
+      }
+
+      // Per-photo social (photoStats)
+      match /photoStats/{photoIndex} {
+        allow read: if true;
+        allow write: if request.auth != null;
+
+        // Photo likes
+        match /likes/{userId} {
+          allow read: if true;
+          allow write: if request.auth != null;
+        }
+
+        // Photo comments
+        match /comments/{commentId} {
+          allow read: if true;
+          allow write: if request.auth != null;
+        }
       }
     }
 
-    // --- ACTIVITY LIKES Collection (Helper) ---
     match /activity_likes/{likeId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read: if true;
+      allow write: if request.auth != null;
     }
 
-    // --- VIDEOS Collection ---
     match /videos/{document=**} {
-      allow read: if true; // Public videos
-      allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if request.auth != null;
     }
 
-    // --- DOCUMENTS Collection ---
     match /documents/{documentId} {
-      allow read: if true; // Public documents
-      allow create, update, delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin() || (request.auth != null);
     }
   }
 }

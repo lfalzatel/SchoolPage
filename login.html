@@ -390,17 +390,28 @@
         });
 
         async function forceFullReload() {
-            if ('serviceWorker' in navigator) {
-                const registrations = await navigator.serviceWorker.getRegistrations();
-                for (let registration of registrations) {
-                    await registration.unregister();
+            console.log("Starting forced full reload...");
+            try {
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                        console.log("Service Worker unregistered");
+                    }
                 }
+                const cacheNames = await caches.keys();
+                for (let name of cacheNames) {
+                    await caches.delete(name);
+                    console.log("Cache deleted:", name);
+                }
+                localStorage.clear();
+                sessionStorage.clear();
+                console.log("Storage cleared, reloading...");
+                window.location.reload(true);
+            } catch (err) {
+                console.error("Error during force reload:", err);
+                window.location.reload(true);
             }
-            const cacheNames = await caches.keys();
-            for (let name of cacheNames) {
-                await caches.delete(name);
-            }
-            window.location.reload(true);
         }
         window.forceFullReload = forceFullReload;
 
