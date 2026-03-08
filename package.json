@@ -1,0 +1,24 @@
+{
+  "name": "pagina-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "auth.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lfalzatel/SchoolPage.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lfalzatel/SchoolPage/issues"
+  },
+  "homepage": "https://github.com/lfalzatel/SchoolPage#readme",
+  "dependencies": {
+    "firebase-admin": "^13.7.0"
+  }
+}
