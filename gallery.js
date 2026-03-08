@@ -1985,8 +1985,7 @@ async function initGallery() {
     // Initial Video Filter
     filterVideosByYear('all');
 
-    // Initialize Notifications
-    setTimeout(updateNotifications, 1500);
+
 
     setTimeout(updateAdminUI, 1000);
 }
@@ -2063,90 +2062,9 @@ function closeProfileDropdown() {
     if (profileDropdown) profileDropdown.classList.remove('active');
 }
 
-export function toggleNotifications() {
-    const dropdown = document.getElementById('notificationsDropdown');
-    if (dropdown) dropdown.classList.toggle('active');
 
-    // Cerrar el de perfil si está abierto
-    const profileDropdown = document.getElementById('profileDropdown');
-    if (profileDropdown) profileDropdown.classList.remove('active');
-}
 
-export async function updateNotifications() {
-    const badge = document.getElementById('notificationBadge');
-    const list = document.getElementById('notificationList');
-    if (!badge || !list) return;
 
-    const now = new Date();
-    // Próximos 30 días
-    const nextMonth = new Date();
-    nextMonth.setDate(now.getDate() + 30);
-
-    const upcomingEvents = (window.currentCronogramaItems || []).filter(item => {
-        let d = null;
-        if (item.date && item.date.toDate) d = item.date.toDate();
-        else if (item.date) d = new Date(item.date);
-        return d && d >= now && d <= nextMonth;
-    }).sort((a, b) => {
-        let da = a.date?.toDate ? a.date.toDate() : new Date(a.date);
-        let db = b.date?.toDate ? b.date.toDate() : new Date(b.date);
-        return da - db;
-    });
-
-    // Actualizar badge
-    if (upcomingEvents.length > 0) {
-        badge.textContent = upcomingEvents.length;
-        badge.style.display = 'flex';
-    } else {
-        badge.style.display = 'none';
-    }
-
-    // Poblar lista
-    if (upcomingEvents.length === 0) {
-        list.innerHTML = '<div class="no-notifications">No hay eventos próximos en 30 días</div>';
-    } else {
-        list.innerHTML = upcomingEvents.map(event => {
-            let d = event.date?.toDate ? event.date.toDate() : new Date(event.date);
-            const day = d.getDate();
-            const month = d.toLocaleDateString('es-CO', { month: 'short' }).toUpperCase().replace('.', '');
-            const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            return `
-                <div class="notification-item" onclick="window.scrollToEventOnDay(${day})">
-                    <div class="notification-date-box">
-                        <span class="noti-day">${day}</span>
-                        <span class="noti-month">${month}</span>
-                    </div>
-                    <div class="notification-content">
-                        <span class="notification-title">${event.title}</span>
-                        <span class="notification-date">${timeStr} • IE Barro Blanco</span>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-}
-
-export function addToGoogleCalendar(eventId) {
-    const event = window.currentCronogramaItems.find(e => e.id === eventId);
-    if (!event) return;
-
-    let d = event.date?.toDate ? event.date.toDate() : new Date(event.date);
-
-    // Formatear fechas para Google Calendar (YYYYMMDDTHHMMSSZ)
-    const formatDate = (date) => date.toISOString().replace(/-|:|\.\d+/g, "");
-    const dateStart = formatDate(d);
-    const endDate = new Date(d.getTime() + (60 * 60 * 1000)); // +1 hora aprox
-    const dateEnd = formatDate(endDate);
-
-    const title = encodeURIComponent(event.title);
-    const details = encodeURIComponent(event.description || '');
-    const location = encodeURIComponent("IE Barro Blanco, Rionegro");
-
-    const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateStart}/${dateEnd}&details=${details}&location=${location}&sf=true&output=xml`;
-
-    window.open(url, '_blank');
-}
 
 // Download Cronograma as PDF
 function downloadCronogramaPDF() {
@@ -2310,9 +2228,47 @@ function selectYear(year) {
     filterCronogramaByYear(year);
 }
 
+// ─── AÑADIR AL CALENDARIO ─────────────────────────────────────────────────────
+function addToGoogleCalendar(eventId) {
+    const events = window.currentCronogramaItems || [];
+    const event = events.find(e => e.id === eventId);
+    if (!event) {
+        console.warn('addToGoogleCalendar: event not found', eventId);
+        return;
+    }
+
+    let eventDate = null;
+    if (event.date?.toDate) {
+        eventDate = event.date.toDate();
+    } else if (event.date) {
+        eventDate = new Date(event.date + 'T00:00:00');
+    } else {
+        eventDate = new Date();
+    }
+
+    // Format: YYYYMMDDTHHMMSSZ
+    function toGCalDate(d, isEnd = false) {
+        const dt = new Date(d);
+        if (isEnd) dt.setHours(dt.getHours() + 2); // default 2h duration
+        return dt.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    }
+
+    const title = encodeURIComponent(event.title || 'Evento Green Force');
+    const description = encodeURIComponent(
+        (event.description || 'Actividad del Semillero Green Force - IE Barro Blanco') +
+        '\n\nMás info: https://green-force-pwa-2025.web.app'
+    );
+    const location = encodeURIComponent('IE Barro Blanco, Rionegro, Antioquia, Colombia');
+    const start = toGCalDate(eventDate);
+    const end = toGCalDate(eventDate, true);
+
+    const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${description}&location=${location}`;
+
+    window.open(gcalUrl, '_blank');
+}
+
 // Global exposure
-window.toggleNotifications = toggleNotifications;
-window.updateNotifications = updateNotifications;
+
 window.addToGoogleCalendar = addToGoogleCalendar;
 
 // Exports

@@ -272,7 +272,7 @@
               <span>Gestionar Galería</span>
               <i class="fas fa-chevron-right arrow-link"></i>
             </a>
-            <div class="menu-item" onclick="alert('Configuración próximamente'); closeProfileDropdown();">
+            <div class="menu-item" onclick="showView('configuracion'); closeProfileDropdown();">
               <div class="menu-item-icon bg-gray"><i class="fas fa-cog"></i></div>
               <span>Configuración</span>
               <i class="fas fa-chevron-right arrow-link"></i>
@@ -530,6 +530,96 @@
       </section>
     </div>
 
+
+    <!-- SETTINGS VIEW -->
+    <div id="view-configuracion" class="view-section" style="display: none;">
+      <section id="configuracion" class="relative-section">
+        <h2><i class="fas fa-cog"></i> Configuración</h2>
+        <p style="text-align: center; color: rgba(255,255,255,0.6); margin-bottom: 2rem;">Personaliza tu experiencia en
+          la app</p>
+
+        <div class="settings-grid">
+
+          <!-- Apariencia -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <div class="settings-icon-wrap bg-blue"><i class="fas fa-palette"></i></div>
+              <div>
+                <h3 class="settings-card-title">Apariencia</h3>
+                <p class="settings-card-desc">Elige el tema de la aplicación</p>
+              </div>
+            </div>
+            <div class="settings-theme-btns">
+              <button class="settings-theme-btn" onclick="setTheme('light')" id="themeLight">
+                <i class="fas fa-sun"></i> Claro
+              </button>
+              <button class="settings-theme-btn" onclick="setTheme('dark')" id="themeDark">
+                <i class="fas fa-moon"></i> Oscuro
+              </button>
+              <button class="settings-theme-btn" onclick="setTheme('system')" id="themeSystem">
+                <i class="fas fa-desktop"></i> Sistema
+              </button>
+            </div>
+          </div>
+
+          <!-- Notificaciones -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <div class="settings-icon-wrap bg-green"><i class="fas fa-bell"></i></div>
+              <div>
+                <h3 class="settings-card-title">Notificaciones</h3>
+                <p class="settings-card-desc">Badge de próximos eventos</p>
+              </div>
+            </div>
+            <label class="settings-toggle">
+              <input type="checkbox" id="notifToggle" checked onchange="toggleNotifBadge(this.checked)">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              <span class="toggle-label">Mostrar badge de eventos</span>
+            </label>
+          </div>
+
+          <!-- Notificaciones Push -->
+          <div class="settings-card">
+            <div class="settings-card-header">
+              <div class="settings-icon-wrap bg-blue"><i class="fas fa-paper-plane"></i></div>
+              <div>
+                <h3 class="settings-card-title">Alertas Push</h3>
+                <p class="settings-card-desc">Recibe avisos de eventos</p>
+              </div>
+            </div>
+            <button id="enablePushBtn" class="settings-theme-btn" onclick="requestPushPermission()"
+              style="width: 100%;">
+              <i class="fas fa-bell-plus"></i> Activar Alertas Push
+            </button>
+            <p id="pushStatusText"
+              style="font-size: 0.75rem; color: #10b981; text-align: center; margin-top: 5px; display: none;">¡Alertas
+              activadas!</p>
+          </div>
+
+          <!-- Sobre la app -->
+          <div class="settings-card settings-card-about">
+            <div class="settings-card-header">
+              <div class="settings-icon-wrap bg-emerald"><i class="fas fa-leaf"></i></div>
+              <div>
+                <h3 class="settings-card-title">Sobre la App</h3>
+                <p class="settings-card-desc">Información del proyecto</p>
+              </div>
+            </div>
+            <div class="settings-about-info">
+              <div class="about-row"><span>Versión</span><strong>1.0.0</strong></div>
+              <div class="about-row"><span>Proyecto</span><strong>Green Force</strong></div>
+              <div class="about-row"><span>Institución</span><strong>IE Barro Blanco</strong></div>
+              <div class="about-row"><span>Municipio</span><strong>Rionegro, Antioquia</strong></div>
+              <div class="about-row"><span>Año</span><strong>2025</strong></div>
+            </div>
+            <a href="https://green-force-pwa-2025.web.app" target="_blank" class="settings-link-btn">
+              <i class="fas fa-external-link-alt"></i> Visitar sitio web
+            </a>
+          </div>
+
+        </div>
+      </section>
+    </div>
 
     <div class="view-section view-home active">
       <section id="contacto">
@@ -951,6 +1041,195 @@
       if (notifMenu) notifMenu.classList.remove('active');
     }
 
+    // ─── NOTIFICACIONES ────────────────────────────────────────
+    window.toggleNotifications = function () {
+      const dropdown = document.getElementById('notificationsDropdown');
+      const profileMenu = document.getElementById('profileDropdown');
+      if (!dropdown) return;
+
+      const isOpen = dropdown.classList.contains('active');
+
+      // Cerrar el menú de perfil si está abierto
+      if (profileMenu) profileMenu.classList.remove('active');
+
+      if (isOpen) {
+        dropdown.classList.remove('active');
+      } else {
+        dropdown.classList.add('active');
+        // Cargar eventos si aún no se han cargado
+        if (!window._notifLoaded) {
+          loadUpcomingEvents();
+        }
+      }
+    };
+
+    async function loadUpcomingEvents() {
+      const list = document.getElementById('notificationList');
+      const badge = document.getElementById('notificationBadge');
+      if (!list) return;
+
+      list.innerHTML = '<div class="notification-loader"><i class="fas fa-spinner fa-spin"></i></div>';
+
+      try {
+        // Importar Firestore dinámicamente
+        const { db } = await import('./firebase-config.js');
+        const { collection, query, where, orderBy, limit, getDocs, Timestamp } = await import(
+          'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js'
+        );
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayTs = Timestamp.fromDate(today);
+
+        // Eventos a futuro con fecha definida
+        const q = query(
+          collection(db, 'activities'),
+          where('date', '>=', todayTs),
+          orderBy('date', 'asc'),
+          limit(10)
+        );
+
+        const snapshot = await getDocs(q);
+        const events = [];
+        snapshot.forEach(doc => events.push({ id: doc.id, ...doc.data() }));
+
+        // Contar eventos en los próximos 30 días para el badge
+        const in30Days = new Date(today);
+        in30Days.setDate(in30Days.getDate() + 30);
+        const badgeCount = events.filter(e => {
+          if (!e.date?.toDate) return false;
+          return e.date.toDate() <= in30Days;
+        }).length;
+
+        // Actualizar badge
+        if (badge) {
+          if (badgeCount > 0) {
+            badge.textContent = badgeCount;
+            badge.style.display = 'flex';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+
+        if (events.length === 0) {
+          list.innerHTML = `
+            <div class="notification-empty">
+              <i class="fas fa-calendar-check"></i>
+              No hay eventos programados<br>próximamente.
+            </div>`;
+          window._notifLoaded = true;
+          return;
+        }
+
+        list.innerHTML = events.map(ev => {
+          const date = ev.date?.toDate ? ev.date.toDate() : null;
+          const nowMidnight = new Date();
+          nowMidnight.setHours(0, 0, 0, 0);
+          const diffMs = date ? date - nowMidnight : null;
+          const diffDays = diffMs !== null ? Math.floor(diffMs / (1000 * 60 * 60 * 24)) : null;
+
+          let chipClass = 'upcoming';
+          let chipText = '';
+          if (diffDays === 0) { chipClass = 'today'; chipText = 'HOY'; }
+          else if (diffDays <= 7) { chipClass = 'soon'; chipText = `en ${diffDays}d`; }
+          else if (diffDays !== null) { chipText = `en ${diffDays}d`; }
+
+          const dateStr = date
+            ? date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
+            : '';
+
+          return `
+          <div class="notification-item" onclick="window.showView('cronograma')">
+            <div class="notif-icon"><i class="fas fa-calendar-alt"></i></div>
+            <div class="notif-content">
+              <div class="notif-title">${ev.title || 'Evento'}</div>
+              <div class="notif-meta">
+                <span class="notif-date">${dateStr}</span>
+                ${chipText ? `<span class="notif-days-chip ${chipClass}">${chipText}</span>` : ''}
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+
+        window._notifLoaded = true;
+
+      } catch (err) {
+        console.error('Error cargando notificaciones:', err);
+        list.innerHTML = `
+          <div class="notification-empty">
+            <i class="fas fa-exclamation-circle"></i>
+            No se pudieron cargar los eventos.
+          </div>`;
+      }
+    }
+
+    // Cargar badge al iniciar (sin abrir dropdown)
+    window.addEventListener('load', () => {
+      setTimeout(async () => {
+        try {
+          const savedNotif = localStorage.getItem('greenforce_notif_enabled');
+          if (savedNotif === 'false') return; // Badge deshabilitado por el usuario
+
+          const { db } = await import('./firebase-config.js');
+          const { collection, query, where, orderBy, limit, getDocs, Timestamp } = await import(
+            'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js'
+          );
+          const badge = document.getElementById('notificationBadge');
+          if (!badge) return;
+
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const in30Days = new Date(today);
+          in30Days.setDate(in30Days.getDate() + 30);
+
+          const q = query(
+            collection(db, 'activities'),
+            where('date', '>=', Timestamp.fromDate(today)),
+            where('date', '<=', Timestamp.fromDate(in30Days)),
+            orderBy('date', 'asc'),
+            limit(20)
+          );
+          const snap = await getDocs(q);
+          const count = snap.size;
+          if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'flex';
+          }
+        } catch (e) {
+          // Silently fail — badge queda oculto
+        }
+      }, 2000); // Espera 2s para que Firebase esté listo
+    });
+
+    window.toggleNotifBadge = function (show) {
+      localStorage.setItem('greenforce_notif_enabled', show);
+      const badge = document.getElementById('notificationBadge');
+      if (badge) {
+        if (!show) {
+          badge.style.display = 'none';
+        } else {
+          // Mostrar si hay eventos
+          if (badge.textContent && parseInt(badge.textContent) > 0) {
+            badge.style.display = 'flex';
+          }
+        }
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('notifToggle');
+      const saved = localStorage.getItem('greenforce_notif_enabled');
+      if (toggle) {
+        if (saved !== null) {
+          toggle.checked = saved === 'true';
+        } else {
+          toggle.checked = true; // Por defecto encendido
+        }
+      }
+    });
+
+    // ─── FIN NOTIFICACIONES ────────────────────────────────────
+
     // Close Dropdowns when clicking outside
     document.addEventListener('click', function (e) {
       const profileMenu = document.getElementById('profileDropdown');
@@ -1309,7 +1588,7 @@
     // Handle Deep Links on Load
     window.addEventListener('load', () => {
       const hash = window.location.hash.substring(1);
-      if (['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
+      if (['galeria', 'video', 'documentos', 'cronograma', 'configuracion'].includes(hash)) {
         showView(hash);
       }
     });
@@ -1335,7 +1614,7 @@
           const href = this.getAttribute('href').substring(1);
 
           // Map specific sections to Views
-          if (['galeria', 'video', 'documentos', 'cronograma'].includes(href)) {
+          if (['galeria', 'video', 'documentos', 'cronograma', 'configuracion'].includes(href)) {
             showView(href);
           } else if (href === 'sobre') {
             showView('home');
@@ -1354,13 +1633,93 @@
 
       // Check for hash
       const hash = window.location.hash.substring(1);
-      if (hash && ['galeria', 'video', 'documentos', 'cronograma'].includes(hash)) {
+      if (hash && ['galeria', 'video', 'documentos', 'cronograma', 'configuracion'].includes(hash)) {
         showView(hash);
       } else {
         // Default to home if no valid hash
         showView('home');
       }
     });
+
+    // ─── PUSH NOTIFICATIONS LOGIC ──────────────────────────────
+    window.requestPushPermission = async function () {
+      const btn = document.getElementById('enablePushBtn');
+      const statusText = document.getElementById('pushStatusText');
+      if (!btn || !statusText) return;
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Solicitando...';
+
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+          // Get Firebase FCM Token
+          const { db, messaging, auth } = await import('./firebase-config.js');
+          const { getToken } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging.js');
+          const { collection, doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js');
+
+          // REPLACE THIS with the actual VAPID key
+          const vapidKey = "BJMntgtS5E_LDFPR259t-6H-G8Up2GPBwYcuInkzCI1iqcdcCgquu0tUqUD9SvfiSJw5jf7z0U1Ceh32cszxabk";
+
+          let token = null;
+          try {
+            // Wait for the main service worker to be ready to avoid "no active Service Worker" error
+            const registration = await navigator.serviceWorker.ready;
+            token = await getToken(messaging, {
+              vapidKey: vapidKey,
+              serviceWorkerRegistration: registration
+            });
+          } catch (tokenErr) {
+            console.warn('Error getting token. Ensure VAPID key is set replacing "REPLACE_WITH_VAPID_KEY".', tokenErr);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Falta VAPID Key';
+            statusText.textContent = "Falta VAPID conf. Revisar backend.";
+            statusText.style.color = "#f59e0b";
+            statusText.style.display = "block";
+            return;
+          }
+
+          if (token) {
+            console.log('FCM Token generated:', token);
+            // Save token to Firestore
+            const currentUser = auth.currentUser;
+            const docId = currentUser ? currentUser.uid : token.substring(0, 20); // Use UID or token stub
+
+            const tokenRef = doc(collection(db, 'fcm_tokens'), docId);
+            await setDoc(tokenRef, {
+              token: token,
+              uid: currentUser ? currentUser.uid : null,
+              createdAt: serverTimestamp(),
+              lastUpdated: serverTimestamp()
+            }, { merge: true });
+
+            btn.style.display = 'none';
+            statusText.style.display = 'block';
+            statusText.textContent = '¡Alertas activadas exitosamente!';
+            statusText.style.color = '#10b981';
+          } else {
+            console.log('No instance ID token available. Request permission to generate one.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-bell-slash"></i> Token fallido';
+          }
+
+        } else {
+          console.log('Unable to get permission to notify.');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-bell-slash"></i> Permiso denegado';
+          statusText.textContent = "Rechazaste el permiso en el navegador.";
+          statusText.style.color = "#ef4444";
+          statusText.style.display = "block";
+        }
+      } catch (err) {
+        console.error('An error occurred while requesting permission ', err);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+      }
+    };
+    // ─── END PUSH NOTIFICATIONS LOGIC ─────────────────────────
+
   </script>
 
   <!-- ✅ ÚNICO bottom-nav — fuera de todos los modales -->

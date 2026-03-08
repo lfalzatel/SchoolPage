@@ -1,10 +1,13 @@
-const CACHE_NAME = 'green-force-v29';
+importScripts('./firebase-messaging-sw.js');
+
+const CACHE_NAME = 'green-force-v31';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './styles.css',
   './manifest.json',
   './auth.js',
+  './firebase-config.js',
   './gallery.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
@@ -37,11 +40,15 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // EXCLUDE Firebase Auth & API requests from Service Worker
-  // Letting the browser handle these directly prevents "auth/network-request-failed" and CORS issues.
-  if (event.request.url.includes('googleapis.com') ||
-    event.request.url.includes('firebase') ||
-    event.request.url.includes('identitytoolkit')) {
+  // EXCLUDE Remote Firebase Auth & API requests from Service Worker
+  // We only allow local assets (like firebase-config.js) to be cached.
+  const isRemoteFirebase = (
+    event.request.url.includes('googleapis.com') ||
+    event.request.url.includes('identitytoolkit') ||
+    (event.request.url.includes('firebase') && !event.request.url.includes(self.location.origin))
+  );
+
+  if (isRemoteFirebase) {
     return;
   }
 

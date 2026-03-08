@@ -11,10 +11,16 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
+    match /fcm_tokens/{tokenId} {
+      // Users can write their own tokens, or if unauthenticated, they can write tokens but not read others.
+      allow write: if true;
+      allow read: if isAdmin();
+    }
+
     // --- ACTIVITIES (ROOT) ---
     match /activities/{activityId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
 
       // Activities comments
       match /comments/{commentId} {

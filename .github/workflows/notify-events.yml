@@ -1,0 +1,28 @@
+name: Send Event Notifications
+
+on:
+  schedule:
+    # Run every day at 12:00 UTC (around 7:00 AM / 8:00 AM in Colombia depending on daylight saving)
+    - cron: '0 12 * * *'
+  workflow_dispatch: # Allows running manually from the GitHub UI
+
+jobs:
+  send-notifications:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run notification script
+      env:
+        FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      run: node scripts/send_notifications.js
