@@ -45,7 +45,12 @@ async function sendNotifications() {
             const data = doc.data();
             if (!data.date) return;
 
-            const eventDate = new Date(data.date);
+            let eventDate;
+            if (data.date && typeof data.date.toDate === 'function') {
+                eventDate = data.date.toDate();
+            } else {
+                eventDate = new Date(data.date);
+            }
             eventDate.setHours(0, 0, 0, 0);
 
             // Check if event is exactly tomorrow or exactly next week
