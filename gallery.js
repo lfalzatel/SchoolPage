@@ -851,12 +851,12 @@ function renderVideoCards(videos) {
 
     grid.innerHTML = videos.map((v, i) => `
         <div class="video-card" onclick="openVideoModal(${i})">
-          <div class="video-thumbnail">
+          <div class="video-card-thumbnail">
             <img src="${v.thumbnail || 'assets/images/1. logo 1.jpg'}" onerror="this.src='assets/images/1. logo 1.jpg'" alt="${v.title}">
             <div class="play-icon"><i class="fas fa-play-circle"></i></div>
             ${isAdmin ? `<button class="delete-btn" onclick="event.stopPropagation(); deleteVideo('${v.id}')"><i class="fas fa-trash"></i></button>` : ''}
           </div>
-          <div class="video-info">
+          <div class="video-card-content">
             <h3>${v.title}</h3>
             <p>${v.description}</p>
           </div>
