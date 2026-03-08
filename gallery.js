@@ -331,10 +331,11 @@ const activitiesSeedData = [
 ];
 
 const videosSeedData = [
-    { title: 'Planting a Sustainable Future', description: 'Documental completo sobre nuestro proyecto Green Force y nuestra postulación al Premio Zayed 2025.', videoId: 'H_0aTsx8C-w', thumbnail: 'https://img.youtube.com/vi/H_0aTsx8C-w/hqdefault.jpg' },
-    { title: 'Fomentando la Conciencia Ambiental', description: 'Video sobre el fomento de la conciencia ambiental en nuestra institución.', videoId: 'XeIvLfG3K3A', thumbnail: 'https://img.youtube.com/vi/XeIvLfG3K3A/hqdefault.jpg' },
-    { title: 'Green Force: Nace un Movimiento Ambiental', description: 'Presentación inicial de nuestro proyecto Green Force en la IE Barro Blanco.', videoId: '9StDvt-2Nbs', thumbnail: 'https://img.youtube.com/vi/9StDvt-2Nbs/hqdefault.jpg' },
-    { title: 'Reforestación - 1000 Árboles (Short)', description: 'Jornada de reforestación como parte de nuestra postulación al Premio Zayed 2025.', videoId: 'QUC-DD5WTRI', thumbnail: 'https://img.youtube.com/vi/QUC-DD5WTRI/hqdefault.jpg', isShort: true }
+    { title: 'Planting a Sustainable Future', description: 'Documental completo sobre nuestro proyecto Green Force y nuestra postulación al Premio Zayed 2025.', videoId: 'vtDMUoF_4R0', thumbnail: 'https://img.youtube.com/vi/vtDMUoF_4R0/maxresdefault.jpg' },
+    { title: 'Cómo crear un huerto familiar', description: 'Aprende a crear tu propio huerto familiar en casa paso a paso.', videoId: 'LsuVuMZlMEk', thumbnail: 'https://img.youtube.com/vi/LsuVuMZlMEk/maxresdefault.jpg' },
+    { title: 'Fomentando la Conciencia Ambiental', description: 'Video sobre el fomento de la conciencia ambiental en nuestra institución.', videoId: 'XeIvLfG3K3A', thumbnail: 'https://img.youtube.com/vi/XeIvLfG3K3A/maxresdefault.jpg' },
+    { title: 'Green Force: Nace un Movimiento Ambiental', description: 'Presentación inicial de nuestro proyecto Green Force en la IE Barro Blanco.', videoId: '9StDvt-2Nbs', thumbnail: 'https://img.youtube.com/vi/9StDvt-2Nbs/maxresdefault.jpg' },
+    { title: 'Reforestación - 1000 Árboles (Short)', description: 'Jornada de reforestación como parte de nuestra postulación al Premio Zayed 2025.', videoId: 'QUC-DD5WTRI', thumbnail: 'https://img.youtube.com/vi/QUC-DD5WTRI/maxresdefault.jpg', isShort: true }
 ];
 
 const seedData = {
@@ -1033,7 +1034,7 @@ document.getElementById('uploadForm')?.addEventListener('submit', async (e) => {
             if (thumbnailFile) {
                 data.thumbnail = await uploadImage(thumbnailFile, `videos/${Date.now()}_thumb_${thumbnailFile.name}`);
             } else {
-                data.thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                data.thumbnail = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
             }
 
             await addDoc(collection(db, "videos"), data);
