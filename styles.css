@@ -510,12 +510,24 @@ section h2::after {
 /* Grid Layouts - Responsive */
 .activities-grid,
 .videos-grid,
-.documents-grid,
 .contact-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 2rem;
   margin-top: 2rem;
+}
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .documents-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* Cards */
@@ -697,19 +709,23 @@ section h2::after {
 /* Document Cards */
 .document-card {
   background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-  padding: 2rem;
-  border-radius: 18px;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
   border-left: 5px solid #059669;
   position: relative;
   overflow: hidden;
   transition: all 0.4s ease;
-  min-height: 200px;
-  /* Ensure height for bg image */
+  min-height: auto;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: flex-start;
   align-items: center;
-  text-align: center;
+  text-align: left;
+  gap: 15px;
+  cursor: pointer;
+  /* Override general transparent card background to be a distinct clickable row */
+  background: rgba(31, 41, 55, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .document-card.has-bg {
@@ -728,57 +744,86 @@ section h2::after {
 }
 
 .document-card .doc-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  /* Dark overlay */
-  z-index: 1;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.document-card.has-bg .doc-overlay {
-  opacity: 1;
-  /* Always show overlay if bg image exists */
+  display: none;
+  /* Hide overlay in compact view */
 }
 
 .document-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transform: translateX(5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  border-left-color: #10b981;
 }
 
-.document-card i {
-  color: #059669;
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  display: block;
-  position: relative;
-  z-index: 2;
-  transition: transform 0.3s ease;
-}
 
-.document-card:hover i {
-  transform: scale(1.1);
+
+.document-card .doc-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .document-card h4 {
-  color: #065f46;
   font-size: 1.1rem;
   font-weight: 600;
   position: relative;
   z-index: 2;
+  margin: 0 0 0.2rem 0;
+  color: white;
+  /* Make text readable on transparent dark background */
+  text-align: left;
 }
 
 .doc-year {
   display: block;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: #6b7280;
+  margin-top: 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+  /* Light gray for contrast */
   position: relative;
   z-index: 2;
+  text-align: left;
+}
+
+.doc-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(16, 185, 129, 0.2);
+  border-radius: 12px;
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+.doc-icon-container i {
+  color: #10b981;
+  font-size: 1.8rem;
+  margin-bottom: 0;
+}
+
+.document-card:hover .doc-icon-container i {
+  transform: scale(1.1);
+}
+
+.delete-btn-doc {
+  background: var(--danger);
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 20;
+}
+
+.delete-btn-doc:hover {
+  background: var(--danger-hover);
+  transform: scale(1.1);
 }
 
 /* Social Section */
@@ -1802,7 +1847,6 @@ section h2 {
 /* Adjust Grid */
 .activities-grid,
 .videos-grid,
-.documents-grid,
 .contact-grid {
   grid-template-columns: 1fr;
   /* Single column on mobile */
@@ -3885,107 +3929,7 @@ body.dark-mode .hero-tagline,
   }
 }
 
-/* Document Card Styles */
-.document-card {
-  position: relative;
-  background: #1f2937;
-  /* Fallback color */
-  border-radius: 16px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  aspect-ratio: 4/3;
-  /* Adjusted from 3/4 to be less tall */
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
 
-.document-card.has-bg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.1) 100%);
-  z-index: 1;
-}
-
-.document-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.doc-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.2);
-  transition: background 0.3s;
-}
-
-.document-card:hover .doc-overlay {
-  background: rgba(0, 0, 0, 0.4);
-}
-
-.doc-icon-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  font-size: 3rem;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.doc-info {
-  position: relative;
-  z-index: 2;
-  color: white;
-  text-align: center;
-}
-
-.doc-info h4 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  line-height: 1.4;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-.doc-year {
-  display: inline-block;
-  padding: 2px 8px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 9999px;
-  font-size: 0.8rem;
-  backdrop-filter: blur(4px);
-}
-
-.delete-btn-doc {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(220, 38, 38, 0.8);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  transition: background 0.2s;
-}
-
-.delete-btn-doc:hover {
-  background: rgba(220, 38, 38, 1);
-}
 
 /* ============================================================
    LIGHTBOX — Social Bar (per-photo likes & comments)

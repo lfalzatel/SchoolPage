@@ -471,8 +471,10 @@
           <h3 style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 1rem;">Enlaces Directos a YouTube
           </h3>
           <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
-            <a href="https://www.youtube.com/watch?v=H_0aTsx8C-w" target="_blank" class="back-btn"><i
+            <a href="https://www.youtube.com/watch?v=vtDMUoF_4R0" target="_blank" class="back-btn"><i
                 class="fab fa-youtube"></i> Planting a Sustainable Future</a>
+            <a href="https://www.youtube.com/watch?v=LsuVuMZlMEk" target="_blank" class="back-btn"><i
+                class="fab fa-youtube"></i>Cómo crear un huerto familiar</a>
             <a href="https://www.youtube.com/watch?v=XeIvLfG3K3A" target="_blank" class="back-btn"><i
                 class="fab fa-youtube"></i> Conciencia Ambiental</a>
             <a href="https://www.youtube.com/watch?v=9StDvt-2Nbs&t=36s" target="_blank" class="back-btn"><i
@@ -587,10 +589,13 @@
                 <p class="settings-card-desc">Recibe avisos de eventos</p>
               </div>
             </div>
-            <button id="enablePushBtn" class="settings-theme-btn" onclick="requestPushPermission()"
-              style="width: 100%;">
-              <i class="fas fa-bell-plus"></i> Activar Alertas Push
-            </button>
+
+            <label class="settings-toggle">
+              <input type="checkbox" id="pushToggle" onchange="handlePushToggle(this.checked)">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              <span class="toggle-label" id="pushToggleLabel">Activar Alertas Push</span>
+            </label>
+
             <p id="pushStatusText"
               style="font-size: 0.75rem; color: #10b981; text-align: center; margin-top: 5px; display: none;">¡Alertas
               activadas!</p>
@@ -1642,82 +1647,136 @@
     });
 
     // ─── PUSH NOTIFICATIONS LOGIC ──────────────────────────────
-    window.requestPushPermission = async function () {
-      const btn = document.getElementById('enablePushBtn');
-      const statusText = document.getElementById('pushStatusText');
-      if (!btn || !statusText) return;
 
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Solicitando...';
-
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          console.log('Notification permission granted.');
-          // Get Firebase FCM Token
-          const { db, messaging, auth } = await import('./firebase-config.js');
-          const { getToken } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging.js');
-          const { collection, doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js');
-
-          // REPLACE THIS with the actual VAPID key
-          const vapidKey = "BJMntgtS5E_LDFPR259t-6H-G8Up2GPBwYcuInkzCI1iqcdcCgquu0tUqUD9SvfiSJw5jf7z0U1Ceh32cszxabk";
-
-          let token = null;
-          try {
-            // Wait for the main service worker to be ready to avoid "no active Service Worker" error
-            const registration = await navigator.serviceWorker.ready;
-            token = await getToken(messaging, {
-              vapidKey: vapidKey,
-              serviceWorkerRegistration: registration
-            });
-          } catch (tokenErr) {
-            console.warn('Error getting token. Ensure VAPID key is set replacing "REPLACE_WITH_VAPID_KEY".', tokenErr);
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Falta VAPID Key';
-            statusText.textContent = "Falta VAPID conf. Revisar backend.";
-            statusText.style.color = "#f59e0b";
-            statusText.style.display = "block";
-            return;
-          }
-
-          if (token) {
-            console.log('FCM Token generated:', token);
-            // Save token to Firestore
-            const currentUser = auth.currentUser;
-            const docId = currentUser ? currentUser.uid : token.substring(0, 20); // Use UID or token stub
-
-            const tokenRef = doc(collection(db, 'fcm_tokens'), docId);
-            await setDoc(tokenRef, {
-              token: token,
-              uid: currentUser ? currentUser.uid : null,
-              createdAt: serverTimestamp(),
-              lastUpdated: serverTimestamp()
-            }, { merge: true });
-
-            btn.style.display = 'none';
-            statusText.style.display = 'block';
-            statusText.textContent = '¡Alertas activadas exitosamente!';
-            statusText.style.color = '#10b981';
-          } else {
-            console.log('No instance ID token available. Request permission to generate one.');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-bell-slash"></i> Token fallido';
-          }
-
+    // Initialize toggle state based on current permission
+    window.addEventListener('load', () => {
+      const pushToggle = document.getElementById('pushToggle');
+      if (pushToggle && ('Notification' in window)) {
+        if (Notification.permission === 'granted') {
+          pushToggle.checked = true;
+          startForegroundListener(); // Start listening if already granted
         } else {
-          console.log('Unable to get permission to notify.');
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-bell-slash"></i> Permiso denegado';
-          statusText.textContent = "Rechazaste el permiso en el navegador.";
-          statusText.style.color = "#ef4444";
-          statusText.style.display = "block";
+          pushToggle.checked = false;
         }
-      } catch (err) {
-        console.error('An error occurred while requesting permission ', err);
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+      }
+    });
+
+    window.handlePushToggle = async function (isChecked) {
+      const toggle = document.getElementById('pushToggle');
+      const label = document.getElementById('pushToggleLabel');
+      const statusText = document.getElementById('pushStatusText');
+      if (!toggle || !label || !statusText) return;
+
+      statusText.style.display = "block";
+      statusText.style.color = "#6b7280";
+      statusText.textContent = "Procesando...";
+      toggle.disabled = true;
+
+      if (isChecked) {
+        // TURN ON NOTIFICATIONS
+        try {
+          const permission = await Notification.requestPermission();
+          if (permission === 'granted') {
+            console.log('Notification permission granted.');
+            const { db, messaging, auth } = await import('./firebase-config.js');
+            const { getToken } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging.js');
+            const { collection, doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js');
+
+            const vapidKey = "BJMntgtS5E_LDFPR259t-6H-G8Up2GPBwYcuInkzCI1iqcdcCgquu0tUqUD9SvfiSJw5jf7z0U1Ceh32cszxabk";
+            let token = null;
+
+            try {
+              const registration = await navigator.serviceWorker.ready;
+              token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: registration });
+            } catch (tokenErr) {
+              console.warn('Error getting token.', tokenErr);
+              toggle.checked = false;
+              toggle.disabled = false;
+              statusText.textContent = "Error interno (VAPID).";
+              statusText.style.color = "#ef4444";
+              return;
+            }
+
+            if (token) {
+              const currentUser = auth.currentUser;
+              const docId = currentUser ? currentUser.uid : token.substring(0, 20);
+              const tokenRef = doc(collection(db, 'fcm_tokens'), docId);
+              await setDoc(tokenRef, {
+                token: token,
+                uid: currentUser ? currentUser.uid : null,
+                createdAt: serverTimestamp(),
+                lastUpdated: serverTimestamp()
+              }, { merge: true });
+
+              toggle.disabled = false;
+              statusText.textContent = '¡Alertas activadas exitosamente!';
+              statusText.style.color = '#10b981';
+              label.textContent = "Alertas Push activadas";
+              startForegroundListener();
+            }
+          } else {
+            console.log('Permiso denegado.');
+            toggle.checked = false;
+            toggle.disabled = false;
+            statusText.textContent = "Permiso denegado por el navegador.";
+            statusText.style.color = "#ef4444";
+            label.textContent = "Activar Alertas Push";
+          }
+        } catch (err) {
+          console.error("Error pidiendo permiso", err);
+          toggle.checked = false;
+          toggle.disabled = false;
+          statusText.textContent = "Ocurrió un error.";
+        }
+      } else {
+        // TURN OFF NOTIFICATIONS (Delete token from device)
+        try {
+          const { messaging } = await import('./firebase-config.js');
+          const { deleteToken } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging.js');
+
+          await deleteToken(messaging);
+          console.log("Token eliminado");
+
+          toggle.disabled = false;
+          statusText.textContent = "Notificaciones pausadas temporalmente.";
+          statusText.style.color = "#f59e0b";
+          label.textContent = "Activar Alertas Push";
+
+        } catch (err) {
+          console.error("Error al eliminar token", err);
+          toggle.checked = true; // Revert visually
+          toggle.disabled = false;
+          statusText.textContent = "No se pudo desactivar.";
+        }
       }
     };
+
+    let isListeningForeground = false;
+    async function startForegroundListener() {
+      if (isListeningForeground) return;
+      try {
+        const { messaging } = await import('./firebase-config.js');
+        const { onMessage } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging.js');
+
+        onMessage(messaging, (payload) => {
+          console.log("Mensaje recibido en foreground: ", payload);
+          // Verificar si el navegador soporta notificaciones nativas, y mostrarla aunque la app esté abierta
+          if (Notification.permission === 'granted') {
+            new Notification(payload.notification.title, {
+              body: payload.notification.body,
+              icon: '/assets/icons/icon-192.png'
+            });
+            // Vibrar si el dispositivo lo soporta
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+          } else {
+            alert(payload.notification.title + "\\n" + payload.notification.body);
+          }
+        });
+        isListeningForeground = true;
+      } catch (err) {
+        console.warn("FCM messaging not initialized for foreground yet", err);
+      }
+    }
     // ─── END PUSH NOTIFICATIONS LOGIC ─────────────────────────
 
   </script>
