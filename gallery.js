@@ -852,7 +852,7 @@ function renderVideoCards(videos) {
     grid.innerHTML = videos.map((v, i) => `
         <div class="video-card" onclick="openVideoModal(${i})">
           <div class="video-card-thumbnail">
-            <img src="${v.thumbnail || 'assets/images/1. logo 1.jpg'}" onerror="this.src='assets/images/1. logo 1.jpg'" alt="${v.title}">
+            <img src="${v.thumbnail || 'assets/images/1. logo 1.jpg'}" onerror="if(this.src.includes('maxresdefault.jpg')){this.src=this.src.replace('maxresdefault.jpg','hqdefault.jpg');}else{this.onerror=null;this.src='assets/images/1. logo 1.jpg';}" alt="${v.title}">
             <div class="play-icon"><i class="fas fa-play-circle"></i></div>
             ${isAdmin ? `<button class="delete-btn" onclick="event.stopPropagation(); deleteVideo('${v.id}')"><i class="fas fa-trash"></i></button>` : ''}
           </div>
