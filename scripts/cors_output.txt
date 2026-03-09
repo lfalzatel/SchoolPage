@@ -1,0 +1,91 @@
+Configurando reglas CORS para el bucket...
+ÔØî Error configurando CORS: The specified bucket does not exist. ApiError: The specified bucket does not exist.
+    at new ApiError (C:\Users\lfalz\OneDrive - Secretaria de Educaci├│n de Rionegro\1. IE Barro Blanco\Ambiental\2025\Pagina web\node_modules\@google-cloud\storage\build\cjs\src\nodejs-common\util.js:124:15)
+    at Util.parseHttpRespBody (C:\Users\lfalz\OneDrive - Secretaria de Educaci├│n de Rionegro\1. IE Barro Blanco\Ambiental\2025\Pagina web\node_modules\@google-cloud\storage\build\cjs\src\nodejs-common\util.js:263:38)
+    at Util.handleResp (C:\Users\lfalz\OneDrive - Secretaria de Educaci├│n de Rionegro\1. IE Barro Blanco\Ambiental\2025\Pagina web\node_modules\@google-cloud\storage\build\cjs\src\nodejs-common\util.js:203:30)
+    at C:\Users\lfalz\OneDrive - Secretaria de Educaci├│n de Rionegro\1. IE Barro Blanco\Ambiental\2025\Pagina web\node_modules\@google-cloud\storage\build\cjs\src\nodejs-common\util.js:593:22
+    at onResponse (C:\Users\lfalz\OneDrive - Secretaria de Educaci├│n de Rionegro\1. IE Barro Blanco\Ambiental\2025\Pagina web\node_modules\retry-request\index.js:259:7)
+    at C:\Users\lfalz\OneDrive - Secretaria de Educaci├│n de Rionegro\1. IE Barro Blanco\Ambiental\2025\Pagina web\node_modules\teeny-request\build\src\index.js:226:13
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+  code: 404,
+  errors: [
+    {
+      message: 'The specified bucket does not exist.',
+      domain: 'global',
+      reason: 'notFound'
+    }
+  ],
+  response: PassThrough {
+    _events: {
+      close: undefined,
+      error: [Array],
+      prefinish: [Function: prefinish],
+      finish: undefined,
+      drain: undefined,
+      data: [Function (anonymous)],
+      end: [Function (anonymous)],
+      readable: undefined,
+      unpipe: undefined
+    },
+    _readableState: ReadableState {
+      highWaterMark: 16384,
+      buffer: [],
+      bufferIndex: 0,
+      length: 0,
+      pipes: [],
+      awaitDrainWriters: null,
+      Symbol(kState): 194512764
+    },
+    _writableState: WritableState {
+      highWaterMark: 16384,
+      length: 0,
+      corked: 0,
+      onwrite: [Function: bound onwrite],
+      writelen: 0,
+      bufferedIndex: 0,
+      pendingcb: 0,
+      Symbol(kState): 1091466620,
+      Symbol(kBufferedValue): null,
+      Symbol(kWriteCbValue): null
+    },
+    allowHalfOpen: true,
+    _maxListeners: undefined,
+    _eventsCount: 4,
+    statusCode: 404,
+    statusMessage: 'Not Found',
+    request: {
+      agent: [Agent],
+      headers: [Object],
+      href: 'https://storage.googleapis.com/storage/v1/b/green-force-pwa-2025.firebasestorage.app?'
+    },
+    body: '{\n' +
+      '  "error": {\n' +
+      '    "code": 404,\n' +
+      '    "message": "The specified bucket does not exist.",\n' +
+      '    "errors": [\n' +
+      '      {\n' +
+      '        "message": "The specified bucket does not exist.",\n' +
+      '        "domain": "global",\n' +
+      '        "reason": "notFound"\n' +
+      '      }\n' +
+      '    ]\n' +
+      '  }\n' +
+      '}\n',
+    headers: {
+      'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+      'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
+      'content-length': '247',
+      'content-type': 'application/json; charset=UTF-8',
+      date: 'Mon, 09 Mar 2026 00:09:40 GMT',
+      expires: 'Mon, 01 Jan 1990 00:00:00 GMT',
+      pragma: 'no-cache',
+      server: 'UploadServer',
+      vary: 'Origin, X-Origin',
+      'x-guploader-uploadid': 'AGQBYWx-Pfod8BLxAGji-Cz9FloCS2Ve6PxpddOO1QYpFyCztQ22aMhYCSwIPILf5QynnwOiqJkNkqQ'
+    },
+    toJSON: [Function: toJSON],
+    Symbol(shapeMode): true,
+    Symbol(kCapture): false,
+    Symbol(kCallback): null
+  }
+}
