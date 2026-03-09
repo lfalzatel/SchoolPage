@@ -332,11 +332,11 @@ const activitiesSeedData = [
 ];
 
 const videosSeedData = [
-    { title: 'Planting a Sustainable Future', description: 'Documental completo sobre nuestro proyecto Green Force y nuestra postulación al Premio Zayed 2025.', videoId: 'vtDMUoF_4R0', thumbnail: 'https://img.youtube.com/vi/vtDMUoF_4R0/maxresdefault.jpg' },
-    { title: 'Cómo crear un huerto familiar', description: 'Aprende a crear tu propio huerto familiar en casa paso a paso.', videoId: 'LsuVuMZlMEk', thumbnail: 'https://img.youtube.com/vi/LsuVuMZlMEk/maxresdefault.jpg' },
-    { title: 'Fomentando la Conciencia Ambiental', description: 'Video sobre el fomento de la conciencia ambiental en nuestra institución.', videoId: 'XeIvLfG3K3A', thumbnail: 'https://img.youtube.com/vi/XeIvLfG3K3A/maxresdefault.jpg' },
-    { title: 'Green Force: Nace un Movimiento Ambiental', description: 'Presentación inicial de nuestro proyecto Green Force en la IE Barro Blanco.', videoId: '9StDvt-2Nbs', thumbnail: 'https://img.youtube.com/vi/9StDvt-2Nbs/maxresdefault.jpg' },
-    { title: 'Reforestación - 1000 Árboles (Short)', description: 'Jornada de reforestación como parte de nuestra postulación al Premio Zayed 2025.', videoId: 'QUC-DD5WTRI', thumbnail: 'https://img.youtube.com/vi/QUC-DD5WTRI/maxresdefault.jpg', isShort: true }
+    { title: 'Planting a Sustainable Future', description: 'Documental completo sobre nuestro proyecto Green Force y nuestra postulación al Premio Zayed 2025.', videoId: 'vtDMUoF_4R0', thumbnail: 'https://img.youtube.com/vi/vtDMUoF_4R0/hqdefault.jpg', year: '2025' },
+    { title: 'Cómo crear un huerto familiar', description: 'Aprende a crear tu propio huerto familiar en casa paso a paso.', videoId: 'LsuVuMZlMEk', thumbnail: 'https://img.youtube.com/vi/LsuVuMZlMEk/hqdefault.jpg', year: '2026' },
+    { title: 'Fomentando la Conciencia Ambiental', description: 'Video sobre el fomento de la conciencia ambiental en nuestra institución.', videoId: 'XeIvLfG3K3A', thumbnail: 'https://img.youtube.com/vi/XeIvLfG3K3A/hqdefault.jpg', year: '2024' },
+    { title: 'Green Force: Nace un Movimiento Ambiental', description: 'Presentación inicial de nuestro proyecto Green Force en la IE Barro Blanco.', videoId: '9StDvt-2Nbs', thumbnail: 'https://img.youtube.com/vi/9StDvt-2Nbs/hqdefault.jpg', year: '2023' },
+    { title: 'Reforestación - 1000 Árboles (Short)', description: 'Jornada de reforestación como parte de nuestra postulación al Premio Zayed 2025.', videoId: 'QUC-DD5WTRI', thumbnail: 'https://img.youtube.com/vi/QUC-DD5WTRI/hqdefault.jpg', isShort: true, year: '2025' }
 ];
 
 const seedData = {
@@ -738,7 +738,19 @@ export async function loadVideos() {
         seedData.videos.forEach(v => videosMap.set(v.videoId, v));
         firestoreVideos.forEach(v => videosMap.set(v.videoId, v));
 
-        const videosToRender = Array.from(videosMap.values());
+        const videosToRender = Array.from(videosMap.values()).map(v => {
+            // Extraer el año del título si el video no tiene el campo 'year'
+            if (!v.year && v.title) {
+                const yearMatch = v.title.match(/20\d{2}/);
+                v.year = yearMatch ? yearMatch[0] : "2024";
+            }
+            // Asegurar que usamos hqdefault de youtube para evitar 404s en videos que no son HD
+            if (v.thumbnail && v.thumbnail.includes('maxresdefault.jpg')) {
+                v.thumbnail = v.thumbnail.replace('maxresdefault.jpg', 'hqdefault.jpg');
+            }
+            return v;
+        });
+
         window.currentGalleryVideos = videosToRender;
         renderVideoCards(videosToRender);
 
@@ -867,7 +879,7 @@ function renderVideoCards(videos) {
 
 // --- DELETE FUNCTIONS (Admin Only) ---
 window.deleteActivity = async (id) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar esta actividad? Esta acción no se puede deshacer.')) return;
+    if (!confirm("¿Seguro que deseas eliminar este evento/álbum fotográfico completo con todos sus comentarios, archivos e interacciones? ¡Esta acción no se puede deshacer!")) return;
 
     try {
         await deleteDoc(doc(db, "activities", id));
@@ -1834,6 +1846,10 @@ function renderCronogramaItems(events, isFiltered = false) {
             <button class="agenda-action-btn edit-activity-btn" title="Editar Evento" 
                     onclick="event.stopPropagation(); window.openEditActivityModal('${event.id}')">
                 <i class="fas fa-edit"></i>
+            </button>
+            <button class="agenda-action-btn delete-activity-btn" title="Eliminar Evento" 
+                    onclick="event.stopPropagation(); window.deleteActivity('${event.id}')" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+                <i class="fas fa-trash"></i>
             </button>
         ` : '';
 
