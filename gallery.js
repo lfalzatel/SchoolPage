@@ -1774,9 +1774,8 @@ export async function loadCronograma() {
         // Render both components
         renderCalendar();
 
-        // Default filter for the timeline view (2026 by default)
-        const currentYear = '2026';
-        filterCronogramaByYear(currentYear);
+        // Default filter for the timeline view (2026 by default and upcoming by default)
+        applyCronogramaFilters();
 
     } catch (e) {
         console.error("Error loading timeline:", e);
@@ -1784,26 +1783,71 @@ export async function loadCronograma() {
     }
 }
 
-export function filterCronogramaByYear(year) {
-    // Update UI
-    document.querySelectorAll('#cronogramaYearTrack .year-pill').forEach(btn => {
-        if (btn.dataset.year === year) btn.classList.add('active');
-        else btn.classList.remove('active');
-    });
+export function filterCronogramaByYear() {
+    applyCronogramaFilters();
+}
 
+window.filterCronogramaByStatus = function (status) {
+    applyCronogramaFilters();
+};
+
+export function applyCronogramaFilters() {
     if (!window.currentCronogramaItems) return;
 
+    // Get selected values from dropdowns
+    const yearSelect = document.getElementById('cronogramaYearSelect');
+    const statusSelect = document.getElementById('cronogramaStatusSelect');
+
+    const year = yearSelect ? yearSelect.value : 'all';
+    const status = statusSelect ? statusSelect.value : 'all';
+
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0); // Reset today's time strictly to midnight
+
     const filtered = window.currentCronogramaItems.filter(event => {
-        if (year === 'all') return true;
+        let matchesYear = false;
+        let objectDate = null;
 
-        // Check event.year string
-        if (event.year && event.year.toString() === year) return true;
-
-        // Check date logic if year string is missing
-        if (event.date && event.date.toDate) {
-            return event.date.toDate().getFullYear().toString() === year;
+        // Year logic
+        if (year === 'all') {
+            matchesYear = true;
+        } else if (event.year && event.year.toString() === year) {
+            matchesYear = true;
+        } else if (event.date && event.date.toDate) {
+            objectDate = event.date.toDate();
+            if (objectDate.getFullYear().toString() === year) {
+                matchesYear = true;
+            }
         }
-        return false;
+
+        if (!matchesYear) return false;
+
+        // Status logic
+        let matchesStatus = false;
+        if (status === 'all') {
+            matchesStatus = true;
+        } else {
+            if (!objectDate && event.date && event.date.toDate) {
+                objectDate = event.date.toDate();
+            }
+
+            if (objectDate) {
+                // Ensure the event date is also midnight-aligned for direct day comparison if preferred,
+                // but usually just comparing time values is enough:
+                const eventDateZero = new Date(objectDate.getTime());
+                eventDateZero.setHours(0, 0, 0, 0);
+
+                if (status === 'upcoming') {
+                    matchesStatus = eventDateZero.getTime() >= todayDate.getTime();
+                } else if (status === 'past') {
+                    matchesStatus = eventDateZero.getTime() < todayDate.getTime();
+                }
+            } else {
+                // If it lacks a valid date object, we might just include it or exclude it. We'll include it for 'all', otherwise exclude.
+            }
+        }
+
+        return matchesStatus;
     });
 
     renderCronogramaItems(filtered);
@@ -2241,9 +2285,8 @@ function toggleYearDropdown() {
 }
 
 // Select Year from Dropdown
-function selectYear(year) {
-    // Filter cronograma by year
-    filterCronogramaByYear(year);
+window.selectYear = function (year) {
+    applyCronogramaFilters();
 }
 
 // ─── AÑADIR AL CALENDARIO ─────────────────────────────────────────────────────

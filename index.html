@@ -382,6 +382,13 @@
             <option value="2023">2023</option>
           </select>
 
+          <select class="year-dropdown-select" id="cronogramaStatusSelect"
+            onchange="filterCronogramaByStatus(this.value)" style="margin-left: 10px;">
+            <option value="all">Todos los Eventos</option>
+            <option value="upcoming" selected>Próximos</option>
+            <option value="past">Realizados</option>
+          </select>
+
           <button class="premium-action-btn pdf-variant" onclick="downloadCronogramaPDF()" title="Descargar PDF">
             <i class="fas fa-file-pdf"></i> PDF
           </button>
