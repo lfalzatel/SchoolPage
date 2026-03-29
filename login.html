@@ -243,6 +243,11 @@
             transition: background 0.2s;
         }
 
+        .login-google-primary {
+            margin-top: 0.25rem;
+            margin-bottom: 0;
+        }
+
         .google-btn:hover {
             background: #f5f5f5;
         }
@@ -318,6 +323,15 @@
         <h2 class="login-title">Bienvenido a Green Force</h2>
         <p class="login-subtitle">Accede para gestionar actividades y ver contenido exclusivo</p>
 
+        <button id="googleLoginBtn" type="button" class="google-btn login-google-primary">
+            <i class="fab fa-google" style="color: #DB4437;"></i>
+            <span id="googleBtnText">Iniciar con Google</span>
+        </button>
+
+        <div class="divider">
+            <span>O con correo y contraseña</span>
+        </div>
+
         <form id="loginForm">
             <div class="form-group">
                 <label for="email">Correo Electrónico</label>
@@ -341,14 +355,6 @@
                 <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
             </button>
         </form>
-
-        <div class="divider">
-            <span>O continúa con</span>
-        </div>
-
-        <button id="googleLoginBtn" class="google-btn">
-            <i class="fab fa-google" style="color: #DB4437;"></i> <span id="googleBtnText">Google</span>
-        </button>
 
         <button id="installAppBtn" class="google-btn"
             style="display: none; margin-top: 1rem; background: #2E7D32; color: white; border: none;">
