@@ -2544,6 +2544,33 @@ section h2 {
   gap: 15px;
 }
 
+.group-chat-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.group-chat-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+}
+
+.group-chat-btn i {
+  font-size: 0.95rem;
+}
+
 /* Notifications Styles */
 .notifications-wrapper {
   position: relative;
@@ -4400,6 +4427,16 @@ body.dark-mode .hero-tagline,
   .notifications-dropdown {
     width: 290px;
     right: -60px;
+  }
+
+  .group-chat-btn {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .group-chat-btn span {
+    display: none;
   }
 }
 
