@@ -2544,31 +2544,35 @@ section h2 {
   gap: 15px;
 }
 
-.group-chat-btn {
-  display: inline-flex;
+.header-actions {
+  display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+/* Estilo para que el botón de Chat coincida con la campanita */
+.header-chat-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  height: 40px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #10b981, #059669);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #ffffff;
-  font-size: 0.82rem;
-  font-weight: 700;
+  background-color: var(--primary-color, var(--primary));
+  color: white;
+  border-radius: 50px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 600;
   text-decoration: none;
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
-  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  transition: background 0.3s ease, transform 0.2s ease;
+  border: none;
+  height: 40px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.group-chat-btn:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
-}
-
-.group-chat-btn i {
-  font-size: 0.95rem;
+.header-chat-button:hover {
+  background-color: #1e7e34;
+  transform: translateY(-2px);
+  color: #ffffff;
 }
 
 /* Notifications Styles */
@@ -4429,13 +4433,14 @@ body.dark-mode .hero-tagline,
     right: -60px;
   }
 
-  .group-chat-btn {
+  .header-chat-button {
     width: 40px;
     padding: 0;
     justify-content: center;
+    border-radius: 50%;
   }
 
-  .group-chat-btn span {
+  .header-chat-button span {
     display: none;
   }
 }
@@ -4453,7 +4458,7 @@ body.dark-mode .hero-tagline,
 }
 
 .settings-card {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 1.5rem;
