@@ -1,5 +1,5 @@
 {
-  "projects": {},
-  "targets": {},
-  "etags": {}
+  "projects": {
+    "default": "green-force-pwa-2025"
+  }
 }
