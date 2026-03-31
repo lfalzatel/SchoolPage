@@ -586,10 +586,10 @@ section {
   margin: 3rem auto;
   padding: 3rem 2rem;
   /* background: white; */
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 255, 255, 0.15);
   backdrop-filter: blur(0.5px);
   -webkit-backdrop-filter: blur(0.5px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.11);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
   padding: 24px;
@@ -2899,14 +2899,14 @@ section h2 {
 @media (max-width: 480px) {
   .notifications-dropdown {
     position: fixed !important;
-    top: 50% !important;
+    top: 90px !important;
     left: 50% !important;
     right: auto !important;
     bottom: auto !important;
-    transform: translate(-50%, -50%) !important;
+    transform: translateX(-50%) !important;
     width: 90% !important;
     max-width: 320px !important;
-    max-height: 70vh !important;
+    max-height: calc(100vh - 150px) !important;
   }
 }
 
@@ -4544,18 +4544,18 @@ body.dark-mode .hero-tagline,
 @media (max-width: 480px) {
   .notifications-dropdown {
     position: fixed !important;
-    top: 50% !important;
+    top: 90px !important;
     left: 50% !important;
     right: auto !important;
     bottom: auto !important;
     width: 90% !important;
     max-width: 320px !important;
-    max-height: 70vh !important;
-    transform: translate(-50%, -50%) scale(0.97) !important;
+    max-height: calc(100vh - 150px) !important;
+    transform: translateX(-50%) scale(0.97) !important;
   }
   
   .notifications-dropdown.active {
-    transform: translate(-50%, -50%) scale(1) !important;
+    transform: translateX(-50%) scale(1) !important;
   }
 }
 
@@ -4712,14 +4712,14 @@ body.dark-mode .hero-tagline,
 @media (max-width: 480px) {
   .notifications-dropdown {
     position: fixed !important;
-    top: 50% !important;
+    top: 90px !important;
     left: 50% !important;
     right: auto !important;
     bottom: auto !important;
-    transform: translate(-50%, -50%) !important;
+    transform: translateX(-50%) !important;
     width: 90% !important;
     max-width: 320px !important;
-    max-height: 70vh !important;
+    max-height: calc(100vh - 150px) !important;
   }
 
   .header-chat-button {
@@ -4747,7 +4747,7 @@ body.dark-mode .hero-tagline,
 }
 
 .settings-card {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 1.5rem;
