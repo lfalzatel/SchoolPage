@@ -313,6 +313,11 @@
               <div class="menu-item-icon bg-green"><i class="fas fa-download"></i></div>
               <span>Instalar Aplicación</span>
             </div>
+            <div class="menu-item" onclick="shareApp(); closeProfileDropdown();">
+              <div class="menu-item-icon bg-green"><i class="fas fa-share-alt"></i></div>
+              <span>Compartir App</span>
+              <i class="fas fa-chevron-right arrow-link"></i>
+            </div>
             <div class="dropdown-theme-section">
               <span class="theme-label">TEMA</span>
               <div class="theme-selector-group">
@@ -1625,9 +1630,38 @@
       }
     }
 
+    // ─── SHARE APP ───────────────────────────────────────────────
+    async function shareApp() {
+      const shareData = {
+        title: 'Green Force — IE Barro Blanco',
+        text: '🌱 Conoce el proyecto ambiental Green Force. Sembrando futuro desde Rionegro, Antioquia.',
+        url: 'https://green-force-pwa-2025.web.app'
+      };
+
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        try {
+          await navigator.share(shareData);
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            showToast('No se pudo compartir.', 'error');
+          }
+        }
+      } else {
+        // Fallback: copiar enlace al portapapeles
+        try {
+          await navigator.clipboard.writeText(shareData.url);
+          showToast('¡Enlace copiado al portapapeles!', 'success');
+        } catch (err) {
+          showToast('Copia el enlace: ' + shareData.url, 'info', 5000);
+        }
+      }
+    }
+    // ─── END SHARE APP ───────────────────────────────────────────
+
     // Expose to window
     window.showView = showView;
     window.scrollToSection = scrollToSection;
+    window.shareApp = shareApp;
 
     // Navigation logic moved to DOMContentLoaded
 
