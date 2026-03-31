@@ -26,28 +26,26 @@
   <script type="module" src="auth.js"></script>
   <script type="module" src="gallery.js"></script>
 
-  <!-- PDF Library -->>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- Auth Guard -->
+  <!-- Auth Guard (Consolidated) -->
   <script type="module">
     import { auth } from './firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
     onAuthStateChanged(auth, (user) => {
-      console.log("Index Auth Guard: State Changed. User:", user ? user.uid : "null");
       const loader = document.getElementById('auth-loader');
       if (!user) {
-        console.warn("Index Auth Guard: No user, redirecting to login.html...");
         window.location.href = 'login.html';
       } else {
-        console.log("Index Auth Guard: User authenticated. Showing content.");
         if (loader) loader.style.display = 'none';
-        // document.body.style.display = 'block'; // No longer needed as body isn't hidden
       }
     });
   </script>
+
+  <!-- PDF Library -->>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
   <style>
     body {
       margin: 0;
@@ -206,7 +204,6 @@
 
   <!-- Firebase Scripts (Loaded as modules) -->
   <!-- Scripts are imported as modules at the bottom -->
-  <script type="module" src="auth.js"></script>
   <script type="module">
     import { loadActivities, loadVideos } from './gallery.js';
 
@@ -342,7 +339,7 @@
     </div>
 
 
-    <div class="view-section view-home active">
+    <div class="view-section view-home">
       <section id="sobre">
         <h2><i class="fas fa-seedling"></i> Sobre el Proyecto</h2>
         <p style="text-align: justify; line-height: 1.8; margin-bottom: 1rem; font-size: 1.05rem;">
