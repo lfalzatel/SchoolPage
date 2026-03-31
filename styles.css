@@ -2898,27 +2898,15 @@ section h2 {
 
 @media (max-width: 480px) {
   .notifications-dropdown {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 320px;
-    max-height: 70vh;
-  }
-}
-
-@media (max-width: 480px) {
-  .notifications-dropdown {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 320px;
-    max-height: 70vh;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90% !important;
+    max-width: 320px !important;
+    max-height: 70vh !important;
   }
 }
 
@@ -4553,6 +4541,24 @@ body.dark-mode .hero-tagline,
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
+@media (max-width: 480px) {
+  .notifications-dropdown {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 90% !important;
+    max-width: 320px !important;
+    max-height: 70vh !important;
+    transform: translate(-50%, -50%) scale(0.97) !important;
+  }
+  
+  .notifications-dropdown.active {
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+}
+
 .notifications-dropdown.active {
   opacity: 1;
   transform: translateY(0) scale(1);
@@ -4705,14 +4711,15 @@ body.dark-mode .hero-tagline,
 /* Responsive: en móvil el dropdown centrado */
 @media (max-width: 480px) {
   .notifications-dropdown {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 320px;
-    max-height: 70vh;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90% !important;
+    max-width: 320px !important;
+    max-height: 70vh !important;
   }
 
   .header-chat-button {
