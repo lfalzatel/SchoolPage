@@ -1579,7 +1579,7 @@
             el.classList.add('active', 'fade-in');
           });
         } else {
-          target = document.getElementById(`view-${viewName}`);
+          const target = document.getElementById(`view-${viewName}`);
           if (target) {
             target.style.display = 'block';
             target.classList.add('active', 'fade-in');
@@ -1611,9 +1611,10 @@
           } else {
             console.warn("View not found:", viewName);
             showView('home');
-          return;
+            return;
+          }
         }
-      }
+      }, 300); // Match animation duration
 
       // Update Bottom Nav State
       const navLinks = document.querySelectorAll('.bottom-nav .nav-item');
