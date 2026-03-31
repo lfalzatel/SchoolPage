@@ -1777,6 +1777,9 @@ section h2::after {
   /* 16:9 Aspect Ratio */
   height: 0;
   width: 100%;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .video-modal-body iframe {
@@ -1785,6 +1788,16 @@ section h2::after {
   left: 0;
   width: 100%;
   height: 100%;
+  border: none;
+}
+
+.video-modal-body video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
 }
 
 .modal-content {

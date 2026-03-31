@@ -718,6 +718,19 @@ export async function updateActivity(id, data, newPhotos) {
     }
 }
 
+/**
+ * Carga videos desde Firestore y datos locales.
+ * 
+ * Estructura de video (YouTube):
+ * { id, videoId: "YouTubeID", title, description, thumbnail, year, createdAt }
+ * 
+ * Estructura de video (Local):
+ * { id, videoUrl: "assets/videos/mi-video.mp4", title, description, thumbnail, year, createdAt }
+ * 
+ * El reproductor detecta automáticamente el tipo y muestra:
+ * - Video HTML5 nativo si tiene videoUrl
+ * - YouTube embed si tiene videoId
+ */
 export async function loadVideos() {
     const grid = document.getElementById('videosGrid');
     if (!grid) return;
@@ -1140,23 +1153,37 @@ window.openVideoModal = (index) => {
     const modal = document.getElementById('videoModal');
     const title = document.getElementById('videoModalTitle');
     const iframe = document.getElementById('videoModalIframe');
+    const videoPlayer = document.getElementById('videoModalPlayer');
+    const videoSource = document.getElementById('videoModalSource');
 
     if (title) title.innerHTML = `<i class="fab fa-youtube"></i> ${video.title}`;
 
-    if (iframe) {
+    // Detectar si es un video local o YouTube
+    const isLocalVideo = video.videoUrl && (video.videoUrl.includes('assets/') || video.videoUrl.startsWith('http') && !video.videoUrl.includes('youtube'));
+    const hasVideoId = video.videoId && (typeof video.videoId === 'string' && video.videoId.length > 0);
+
+    if (isLocalVideo && videoPlayer && videoSource) {
+        // Mostrar reproductor local de video
+        videoPlayer.style.display = 'block';
+        videoPlayer.poster = video.thumbnail || '';
+        videoSource.src = video.videoUrl;
+        videoSource.type = 'video/mp4';
+        videoPlayer.load();
+
+        // Ocultar iframe
+        if (iframe) iframe.style.display = 'none';
+    } else if (hasVideoId && iframe) {
+        // Mostrar YouTube embed
+        iframe.style.display = 'block';
         iframe.src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1`;
+
+        // Ocultar reproductor local
+        if (videoPlayer) videoPlayer.style.display = 'none';
     }
 
     if (modal) {
-        modal.classList.add('active'); // Using class 'active' based on CSS usually
-        // But let's check index.html usages. It seems index used classList.add('active')
-        // While gallery.js used style.display = 'block' for galleryModal.
-        // Let's standardize on classList.add('active') if CSS supports it, or style.display.
-        // Checking previous gallery.js: it used style.display = 'block' for galleryModal.
-        // checking index.html: it used classList.add('active') for videoModal.
-        // I will support both styles for safety or check CSS.
-        // Let's stick to what was in index.html for videoModal: classList.add('active')
-        modal.style.display = 'flex'; // often flex for centering
+        modal.classList.add('active');
+        modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
 };
@@ -1164,12 +1191,26 @@ window.openVideoModal = (index) => {
 window.closeVideoModal = () => {
     const modal = document.getElementById('videoModal');
     const iframe = document.getElementById('videoModalIframe');
+    const videoPlayer = document.getElementById('videoModalPlayer');
 
     if (modal) {
         modal.classList.remove('active');
         modal.style.display = 'none';
     }
-    if (iframe) iframe.src = '';
+    
+    // Limpiar iframe de YouTube
+    if (iframe) {
+        iframe.src = '';
+        iframe.style.display = 'none';
+    }
+    
+    // Detener y limpiar reproductor local
+    if (videoPlayer) {
+        videoPlayer.pause();
+        videoPlayer.currentTime = 0;
+        videoPlayer.style.display = 'none';
+    }
+    
     document.body.style.overflow = 'auto';
 };
 

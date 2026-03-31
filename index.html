@@ -864,7 +864,18 @@
         </button>
       </div>
       <div class="video-modal-body">
-        <iframe id="videoModalIframe" src="" allowfullscreen></iframe>
+        <!-- HTML5 Video Player for local videos -->
+        <video 
+          id="videoModalPlayer" 
+          style="display: none; width: 100%; max-height: 600px; background: #000; border-radius: 8px;" 
+          controls
+          controlsList="nodownload"
+          poster="">
+          <source id="videoModalSource" src="" type="video/mp4">
+          Tu navegador no soporta el elemento video.
+        </video>
+        <!-- YouTube Embed for external videos -->
+        <iframe id="videoModalIframe" style="display: none;" src="" allowfullscreen></iframe>
       </div>
     </div>
   </div>
@@ -1639,7 +1650,7 @@
       const shareData = {
         title: 'Green Force — IE Barro Blanco',
         text: '🌱 Conoce el proyecto ambiental Green Force. Sembrando futuro desde Rionegro, Antioquia.',
-        url: 'https://green-force-pwa-2025.web.app'
+        url: 'https://lfalzatel.github.io/SchoolPage/'
       };
 
       if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
