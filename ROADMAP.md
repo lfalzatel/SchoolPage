@@ -67,8 +67,8 @@ Visualizar datos concretos del proyecto con counters animados:
 
 ```
 ┌─────────────────────────────────────────┐
-│  🌳 938 Estudiantes Participando       │
-│  🌱 50 Árboles Plantados               │
+│  🌳 32 Estudiantes Participando       │
+│  🌱 1000 Árboles Plantados               │
 │  ♻️  2,340 kg de Residuos Reciclados   │
 │  📅 47 Actividades Realizadas          │
 │  💧 12,500 L de Agua Ahorrada          │
@@ -85,8 +85,8 @@ Visualizar datos concretos del proyecto con counters animados:
 **Estructura Firestore:**
 ```
 /impacto
-  ├── estudiantes: 938
-  ├── arbolesPlantados: 50
+  ├── estudiantes: 32
+  ├── arbolesPlantados: 1000
   ├── residuosReciclados: 2340
   ├── actividadesRealizadas: 47
   ├── aguaAhorrada: 12500
