@@ -36,7 +36,10 @@
       if (!user) {
         window.location.href = 'login.html';
       } else {
-        if (loader) loader.style.display = 'none';
+        if (loader) {
+          loader.classList.add('hide');
+          setTimeout(() => { loader.style.display = 'none'; }, 500);
+        }
       }
     });
   </script>
@@ -54,17 +57,50 @@
     }
 
     #auth-loader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      position: fixed; inset: 0; background: #050f0a;
+      display: flex; justify-content: center; align-items: center;
       z-index: 9999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
     }
+    #auth-loader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+    .splash-content { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .splash-logo-wrap { position: relative; width: 96px; height: 96px; margin-bottom: 0.5rem; }
+    .splash-logo {
+      width: 96px; height: 96px; border-radius: 50%; object-fit: cover;
+      animation: splashPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .splash-ring {
+      position: absolute; inset: -8px; border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: #10b981; border-right-color: #10b981;
+      animation: splashSpin 1.2s linear infinite;
+    }
+    .splash-title {
+      font-family: 'Poppins', sans-serif; font-size: 1.4rem; font-weight: 700;
+      color: #fff; margin: 0;
+      animation: splashFade 0.6s ease 0.3s both;
+    }
+    .splash-sub {
+      font-family: 'Poppins', sans-serif; font-size: 0.78rem;
+      color: rgba(16,185,129,0.8); letter-spacing: 0.15em;
+      text-transform: uppercase; margin: 0;
+      animation: splashFade 0.6s ease 0.5s both;
+    }
+    .splash-bar-wrap {
+      width: 120px; height: 3px; background: rgba(255,255,255,0.08);
+      border-radius: 99px; margin-top: 1.2rem; overflow: hidden;
+      animation: splashFade 0.6s ease 0.6s both;
+    }
+    .splash-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      border-radius: 99px;
+      animation: splashLoad 2s ease 0.6s forwards;
+    }
+    @keyframes splashSpin { to { transform: rotate(360deg); } }
+    @keyframes splashPop  { from { opacity:0; transform:scale(0.7); } to { opacity:1; transform:scale(1); } }
+    @keyframes splashFade { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes splashLoad { 0%{width:0%} 60%{width:75%} 100%{width:100%} }
 
     /* Estilos específicos del modal de eventos están en styles.css */
 
@@ -242,7 +278,17 @@
 </head>
 
 <body>
-  <div id="auth-loader"><i class="fas fa-spinner fa-spin fa-2x"></i></div>
+  <div id="auth-loader">
+    <div class="splash-content">
+      <div class="splash-logo-wrap">
+        <img src="assets/images/1. logo 3.jpg" alt="Green Force" class="splash-logo">
+        <div class="splash-ring"></div>
+      </div>
+      <p class="splash-title">Green Force</p>
+      <p class="splash-sub">Sembrando Futuro</p>
+      <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+    </div>
+  </div>
   <!-- Randomized App Background -->
   <div id="app-background"></div>
 
@@ -362,6 +408,21 @@
                 Guardianes del planeta desde la escuela</strong>
 
             </p>
+          </div>
+
+          <!-- Countdown Widget -->
+          <div id="countdown-widget" class="countdown-widget" style="display:none;">
+            <p class="countdown-label">
+              <i class="fas fa-calendar-star"></i>
+              <span id="countdown-event-name">Próxima actividad</span>
+            </p>
+            <div class="countdown-units">
+              <div class="countdown-unit"><span id="cd-days">--</span><label>días</label></div>
+              <div class="countdown-sep">:</div>
+              <div class="countdown-unit"><span id="cd-hours">--</span><label>horas</label></div>
+              <div class="countdown-sep">:</div>
+              <div class="countdown-unit"><span id="cd-mins">--</span><label>min</label></div>
+            </div>
           </div>
 
         </div>
@@ -1633,27 +1694,32 @@
       // Animate out current views
       document.querySelectorAll('.view-section.active').forEach(el => {
         el.classList.add('fade-out');
+        setTimeout(() => {
+          el.classList.remove('active', 'fade-out', 'fade-in', 'view-enter');
+          el.style.display = 'none';
+        }, 80);
       });
 
-      // Hide all views after animation
+      // Show target view after brief delay
       setTimeout(() => {
-        document.querySelectorAll('.view-section').forEach(el => {
-          el.classList.remove('active', 'fade-out', 'fade-in');
-          el.style.display = 'none'; // Ensure hidden
-        });
-
         // Show target view with animation
         if (viewName === 'home') {
           // Show all sections that are part of home
           document.querySelectorAll('.view-home').forEach(el => {
             el.style.display = 'block';
-            el.classList.add('active', 'fade-in');
+            el.classList.remove('view-enter');
+            void el.offsetWidth; // reflow
+            el.classList.add('active', 'fade-in', 'view-enter');
+            setTimeout(() => el.classList.remove('view-enter'), 300);
           });
         } else {
           const target = document.getElementById(`view-${viewName}`);
           if (target) {
             target.style.display = 'block';
-            target.classList.add('active', 'fade-in');
+            target.classList.remove('view-enter');
+            void target.offsetWidth; // reflow para reiniciar animación
+            target.classList.add('active', 'fade-in', 'view-enter');
+            setTimeout(() => target.classList.remove('view-enter'), 300);
             window.scrollTo(0, 0);
 
             // Carga perezosa: solo al navegar a la sección, y solo una vez
@@ -1685,7 +1751,7 @@
             return;
           }
         }
-      }, 300); // Match animation duration
+      }, 100); // Pequeño delay para dejar salir la vista anterior
 
       // Update Bottom Nav State
       const navLinks = document.querySelectorAll('.bottom-nav .nav-item');
@@ -1815,10 +1881,52 @@
         // Solo carga el timeline al hacer login.
         // Actividades y videos se cargan solo cuando el usuario navega a esa sección.
         if (typeof loadCronograma === 'function') await loadCronograma();
+        initCountdown();
       } catch (error) {
         console.error("Error loading secure content:", error);
       }
     };
+
+    // ─── COUNTDOWN ───────────────────────────────────────────────
+    async function initCountdown() {
+      try {
+        const { db } = await import('./firebase-config.js');
+        const { collection, query, where, orderBy, limit, getDocs, Timestamp }
+          = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js');
+
+        const now = Timestamp.now();
+        const q = query(
+          collection(db, 'activities'),
+          where('date', '>=', now),
+          where('estado', '==', 'upcoming'),
+          orderBy('date', 'asc'),
+          limit(1)
+        );
+
+        const snap = await getDocs(q);
+        if (snap.empty) return;
+
+        const data = snap.docs[0].data();
+        const targetDate = data.date.toDate();
+        const widget = document.getElementById('countdown-widget');
+        const nameEl = document.getElementById('countdown-event-name');
+        if (!widget || !nameEl) return;
+
+        nameEl.textContent = data.title || 'Próxima actividad';
+        widget.style.display = 'inline-block';
+
+        function tick() {
+          const diff = targetDate - new Date();
+          if (diff <= 0) { widget.style.display = 'none'; return; }
+          document.getElementById('cd-days').textContent  = String(Math.floor(diff / 86400000)).padStart(2,'0');
+          document.getElementById('cd-hours').textContent = String(Math.floor((diff % 86400000) / 3600000)).padStart(2,'0');
+          document.getElementById('cd-mins').textContent  = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
+        }
+        tick();
+        setInterval(tick, 60000);
+      } catch(e) { /* Widget no aparece si hay error */ }
+    }
+    // ─── END COUNTDOWN ────────────────────────────────────────────
 
     document.addEventListener('DOMContentLoaded', () => {
       // Enhanced Navigation Handler (Mobile + Desktop)

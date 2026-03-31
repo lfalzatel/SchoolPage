@@ -5160,3 +5160,36 @@ body.dark-mode .hero-tagline,
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== VIEW TRANSITIONS (Feature 8) ===== */
+.view-section.view-enter {
+  animation: viewEnter 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes viewEnter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== COUNTDOWN WIDGET (Feature 1) ===== */
+.countdown-widget {
+  margin-top: 1.5rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  display: inline-block;
+}
+.countdown-label {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.6);
+  margin: 0 0 0.6rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.countdown-label i { color: #10b981; margin-right: 6px; }
+.countdown-units { display: flex; align-items: center; gap: 4px; }
+.countdown-unit { display: flex; flex-direction: column; align-items: center; min-width: 52px; }
+.countdown-unit span { font-size: 2rem; font-weight: 700; color: #10b981; line-height: 1; }
+.countdown-unit label { font-size: 0.65rem; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-top: 2px; }
+.countdown-sep { font-size: 1.5rem; color: rgba(16,185,129,0.5); margin-bottom: 12px; }
