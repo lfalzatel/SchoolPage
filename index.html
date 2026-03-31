@@ -399,6 +399,66 @@
       </section>
     </div>
 
+    <!-- SECTION: Dashboard de Impacto Ambiental -->
+    <div class="view-section view-home">
+      <section id="impacto" class="impact-section">
+        <h2><i class="fas fa-chart-line"></i> Nuestro Impacto Ambiental</h2>
+        <p style="text-align: center; color: #6b7280; margin-bottom: 30px; font-size: 1rem;">
+          Datos concretos del compromiso de Green Force con la sostenibilidad
+        </p>
+
+        <div class="impact-grid">
+          <!-- Estudiantes Participando -->
+          <div class="impact-card">
+            <div class="impact-icon">👥</div>
+            <div class="impact-counter" data-target="938" data-label="Estudiantes">0</div>
+            <p class="impact-label">Estudiantes Participando</p>
+            <small>Líderes ambientales en formación</small>
+          </div>
+
+          <!-- Árboles Plantados -->
+          <div class="impact-card">
+            <div class="impact-icon">🌳</div>
+            <div class="impact-counter" data-target="50" data-label="Árboles">0</div>
+            <p class="impact-label">Árboles Plantados</p>
+            <small>Especies nativas restauradas</small>
+          </div>
+
+          <!-- Residuos Reciclados -->
+          <div class="impact-card">
+            <div class="impact-icon">♻️</div>
+            <div class="impact-counter" data-target="2340" data-label="kg">0</div>
+            <p class="impact-label">kg de Residuos Reciclados</p>
+            <small>Economía circular en acción</small>
+          </div>
+
+          <!-- Actividades Realizadas -->
+          <div class="impact-card">
+            <div class="impact-icon">📅</div>
+            <div class="impact-counter" data-target="47" data-label="Actividades">0</div>
+            <p class="impact-label">Actividades Realizadas</p>
+            <small>Talleres, jornadas y campañas</small>
+          </div>
+
+          <!-- Agua Ahorrada -->
+          <div class="impact-card">
+            <div class="impact-icon">💧</div>
+            <div class="impact-counter" data-target="12500" data-label="Litros">0</div>
+            <p class="impact-label">Litros de Agua Ahorrada</p>
+            <small>Sistema de recolección de lluvia</small>
+          </div>
+
+          <!-- Comunidad Impactada -->
+          <div class="impact-card">
+            <div class="impact-icon">🌍</div>
+            <div class="impact-counter" data-target="1000" data-label="Personas">0</div>
+            <p class="impact-label">Residentes Comunitarios</p>
+            <small>Alcance local de sostenibilidad</small>
+          </div>
+        </div>
+      </section>
+    </div>
+
     <!-- SECTION: Cronograma -->
     <div id="view-cronograma" class="view-section">
       <section id="cronograma" class="relative-section">
@@ -1672,6 +1732,66 @@
       }
     }
     // ─── END SHARE APP ───────────────────────────────────────────
+
+    // ─── IMPACT COUNTERS ANIMATION ───────────────────────────────
+    let countersAnimated = false;
+
+    function animateCounters() {
+      if (countersAnimated) return;
+
+      const counters = document.querySelectorAll('.impact-counter');
+      const duration = 2000; // 2 segundos de animación
+
+      counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const label = counter.getAttribute('data-label');
+        let current = 0;
+        const increment = target / (duration / 50);
+        const startTime = Date.now();
+
+        counter.classList.add('animating');
+
+        const updateCounter = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          current = Math.round(target * progress);
+
+          // Formatear números grandes con separadores
+          const formatted = current.toLocaleString('es-ES');
+          counter.textContent = formatted;
+
+          if (progress < 1) {
+            requestAnimationFrame(updateCounter);
+          } else {
+            counter.textContent = target.toLocaleString('es-ES');
+            counter.classList.remove('animating');
+          }
+        };
+
+        updateCounter();
+      });
+
+      countersAnimated = true;
+    }
+
+    // Usar Intersection Observer para animar cuando la sección sea visible
+    const impactSection = document.getElementById('impacto');
+    if (impactSection && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !countersAnimated) {
+            animateCounters();
+            observer.unobserve(impactSection);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      observer.observe(impactSection);
+    } else if (impactSection) {
+      // Fallback para navegadores sin IntersectionObserver
+      setTimeout(animateCounters, 500);
+    }
+    // ─── END IMPACT COUNTERS ─────────────────────────────────────
 
     // Expose to window
     window.showView = showView;
