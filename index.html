@@ -1559,55 +1559,58 @@
       if (window.closeUploadModal) window.closeUploadModal();
       if (window.closeEventModal) window.closeEventModal();
 
-      // Hide all views
-      document.querySelectorAll('.view-section').forEach(el => {
-        el.classList.remove('active');
-        el.style.display = 'none'; // Ensure hidden
+      // Animate out current views
+      document.querySelectorAll('.view-section.active').forEach(el => {
+        el.classList.add('fade-out');
       });
 
-      // Show target view
-      const targetId = viewName === 'home' ? 'view-home' : `view-${viewName}`;
-      let target;
-
-      if (viewName === 'home') {
-        // Show all sections that are part of home
-        document.querySelectorAll('.view-home').forEach(el => {
-          el.classList.add('active');
-          el.style.display = 'block';
+      // Hide all views after animation
+      setTimeout(() => {
+        document.querySelectorAll('.view-section').forEach(el => {
+          el.classList.remove('active', 'fade-out', 'fade-in');
+          el.style.display = 'none'; // Ensure hidden
         });
-      } else {
-        target = document.getElementById(`view-${viewName}`);
-        if (target) {
-          target.classList.add('active');
-          target.style.display = 'block';
-          window.scrollTo(0, 0);
 
-          // Carga perezosa: solo al navegar a la sección, y solo una vez
-          if (viewName === 'galeria' && !_activitiesLoaded) {
-            if (window.initYearSelector) window.initYearSelector();
-            if (window.loadActivities) {
-              window.loadActivities('activitiesGrid');
-              _activitiesLoaded = true;
-            }
-          }
-
-          if (viewName === 'video' && !_videosLoaded) {
-            if (window.loadVideos) {
-              window.loadVideos('videosGrid');
-              _videosLoaded = true;
-            }
-          }
-
-          if (viewName === 'documentos' && !_documentsLoaded) {
-            if (window.loadDocuments) {
-              window.loadDocuments();
-              _documentsLoaded = true;
-            }
-          }
-
+        // Show target view with animation
+        if (viewName === 'home') {
+          // Show all sections that are part of home
+          document.querySelectorAll('.view-home').forEach(el => {
+            el.style.display = 'block';
+            el.classList.add('active', 'fade-in');
+          });
         } else {
-          console.warn("View not found:", viewName);
-          showView('home');
+          target = document.getElementById(`view-${viewName}`);
+          if (target) {
+            target.style.display = 'block';
+            target.classList.add('active', 'fade-in');
+            window.scrollTo(0, 0);
+
+            // Carga perezosa: solo al navegar a la sección, y solo una vez
+            if (viewName === 'galeria' && !_activitiesLoaded) {
+              if (window.initYearSelector) window.initYearSelector();
+              if (window.loadActivities) {
+                window.loadActivities('activitiesGrid');
+                _activitiesLoaded = true;
+              }
+            }
+
+            if (viewName === 'video' && !_videosLoaded) {
+              if (window.loadVideos) {
+                window.loadVideos('videosGrid');
+                _videosLoaded = true;
+              }
+            }
+
+            if (viewName === 'documentos' && !_documentsLoaded) {
+              if (window.loadDocuments) {
+                window.loadDocuments();
+                _documentsLoaded = true;
+              }
+            }
+
+          } else {
+            console.warn("View not found:", viewName);
+            showView('home');
           return;
         }
       }

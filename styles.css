@@ -4224,6 +4224,37 @@ body.dark-mode .hero-tagline,
   }
 }
 
+/* ===== VIEW TRANSITIONS ===== */
+@keyframes viewFadeOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+
+@keyframes viewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-out {
+  animation: viewFadeOut 0.3s ease-out forwards !important;
+}
+
+.fade-in {
+  animation: viewFadeIn 0.3s ease-in forwards !important;
+}
+/* ===== END VIEW TRANSITIONS =====
 
 
 /* ============================================================
