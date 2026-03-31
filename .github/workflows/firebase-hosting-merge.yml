@@ -10,7 +10,7 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # Note: No build step needed as this is a static site (Vanilla HTML/JS)
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
