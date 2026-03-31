@@ -1444,6 +1444,37 @@ window.deleteComment = async (activityId, commentId) => {
     catch (e) { console.error('Delete error:', e); }
 };
 
+// Web Share API for Activities
+window.shareActivity = async () => {
+    if (!navigator.share) {
+        showToast('Compartir no soportado en este navegador', 'info');
+        return;
+    }
+    
+    const title = document.getElementById('galleryModalTitle')?.textContent || 'Green Force';
+    const description = document.getElementById('galleryModalDescription')?.textContent || 'Mira esta actividad del proyecto Green Force';
+    
+    try {
+        await navigator.share({
+            title: 'Green Force',
+            text: title + ' - ' + description,
+            url: window.location.href
+        });
+    } catch (err) {
+        if (err.name !== 'AbortError') {
+            console.error('Share error:', err);
+        }
+    }
+};
+
+// Show share button if Web Share API is available
+document.addEventListener('DOMContentLoaded', () => {
+    if (navigator.share) {
+        const shareBtn = document.getElementById('btnShare');
+        if (shareBtn) shareBtn.style.display = 'inline-flex';
+    }
+});
+
 // ============================================================
 // PER-PHOTO SOCIAL (likes + comments sobre una foto individual)
 // ============================================================

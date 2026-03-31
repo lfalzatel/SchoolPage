@@ -1,9 +1,11 @@
 importScripts('./firebase-messaging-sw.js');
 
-const CACHE_NAME = 'green-force-v31';
+const CACHE_NAME = 'green-force-v32';
+const OFFLINE_URL = './offline.html';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './offline.html',
   './styles.css',
   './manifest.json',
   './auth.js',
@@ -68,7 +70,16 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => caches.match(event.request))
+        .catch(() => {
+          // Try cached version first
+          return caches.match(event.request).then(cachedResponse => {
+            // If it's an HTML request and no cache, serve offline page
+            if (!cachedResponse && event.request.destination === 'document') {
+              return caches.match(OFFLINE_URL);
+            }
+            return cachedResponse;
+          });
+        })
     );
     return;
   }
@@ -94,6 +105,12 @@ self.addEventListener('fetch', (event) => {
             });
 
           return fetchResponse;
+        }).catch(() => {
+          // Offline fallback for HTML documents
+          if (event.request.destination === 'document') {
+            return caches.match(OFFLINE_URL);
+          }
+          return response;
         });
       })
   );

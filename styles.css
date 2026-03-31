@@ -1239,6 +1239,37 @@ section h2::after {
   font-weight: 500;
 }
 
+/* Share Button */
+.btn-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #6ee7b7;
+  padding: 8px 18px;
+  border-radius: 50px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-share:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  transform: scale(1.05);
+}
+
+.btn-share i {
+  font-size: 1rem;
+}
+
+.share-label {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
 /* Comments */
 .comments-section h4 {
   font-size: 0.85rem;

@@ -188,7 +188,7 @@
             padding: 12px;
             border-radius: 12px;
             border: none;
-            background: linear-gradient(135deg, #007bff, #6f42c1);
+            background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             font-size: 15px;
             font-weight: 600;
@@ -520,11 +520,17 @@
             if (slides.length < 2) return;
             let current = 0;
 
-            setInterval(() => {
+            // Store interval ID to prevent memory leak
+            const slideshowInterval = setInterval(() => {
                 slides[current].classList.remove('active');
                 current = (current + 1) % slides.length;
                 slides[current].classList.add('active');
             }, 5000);
+
+            // Clean up on page navigation
+            window.addEventListener('beforeunload', () => {
+                clearInterval(slideshowInterval);
+            });
         }
 
         // Check for Redirect Result on load to catch errors or finish sign-in

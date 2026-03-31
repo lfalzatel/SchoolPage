@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sin Conexión - Green Force</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #059669, #047857);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .offline-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .offline-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        h1 {
+            color: #059669;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #6b7280;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .offline-actions {
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #047857;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #059669;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .offline-tips {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        .offline-tips h3 {
+            color: #1f2937;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .offline-tips ul {
+            list-style: none;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .offline-tips li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .offline-tips li:before {
+            content: "✓";
+            color: #059669;
+            font-weight: bold;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .offline-container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .offline-icon {
+                font-size: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">📡</div>
+        <h1>Sin Conexión</h1>
+        <p>No podemos conectar con el servidor en este momento. Verifica tu conexión a internet e intenta de nuevo.</p>
+
+        <div class="offline-actions">
+            <button class="btn btn-primary" onclick="location.reload()">
+                Reintentar
+            </button>
+            <a href="./" class="btn btn-secondary">
+                Volver al Inicio
+            </a>
+        </div>
+
+        <div class="offline-tips">
+            <h3>💡 Consejos útiles:</h3>
+            <ul>
+                <li>Verifica que tu WiFi esté conectado</li>
+                <li>Intenta desactivar el modo avión</li>
+                <li>Recarga la página en unos momentos</li>
+                <li>Si el problema persiste, contacta al administrador</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
