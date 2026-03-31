@@ -437,6 +437,42 @@
         });
     </script>
 
+    <!-- Toast System -->
+    <script>
+        window.showToast = (message, type = 'info', duration = 4000) => {
+            const container = document.getElementById('toast-container') || createToastContainer();
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            };
+
+            toast.innerHTML = `
+                <i class="${icons[type]}"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('removing');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        };
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.style.cssText = 'position:fixed;top:80px;right:20px;z-index:9998;display:flex;flex-direction:column;gap:10px;pointer-events:none;';
+            document.body.appendChild(container);
+            return container;
+        }
+    </script>
+
     <script type="module">
         console.log('Login.html MODULE script starting...');
         import { auth } from './firebase-config.js';
@@ -503,7 +539,7 @@
 
             try {
                 if (typeof window.loginWithGoogle !== 'function') {
-                    alert("Error: loginWithGoogle no está cargado todavía.");
+                    showToast('Error: loginWithGoogle no está cargado todavía.', 'error');
                     return;
                 }
 
@@ -514,7 +550,7 @@
 
             } catch (err) {
                 console.error("DEBUG: Google Click Error:", err);
-                alert("Error de Google: " + err.message);
+                showToast('Error de Google: ' + err.message, 'error');
 
                 gBtn.disabled = false;
                 gBtnText.innerText = "Iniciar con Google";
@@ -528,15 +564,13 @@
         // Auth Guard: If already logged in, redirect to index
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log("User already logged in (uid: " + user.uid + "), waiting for persistence...");
                 document.getElementById('authStatus').innerText = "Sesión detectada. Redirigiendo...";
                 // Small delay to ensure IndexedDB persistence is complete before jumping
                 setTimeout(() => {
-                    console.log("Redirecting to index.html now.");
                     window.location.href = 'index.html';
                 }, 1000);
             } else {
-                console.log("No user session found in onAuthStateChanged.");
+                // No user session found
             }
         });
 
@@ -549,13 +583,10 @@
         // Email Login
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            console.log("Login form submitted");
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const btn = e.target.querySelector('button');
-
-            console.log("Attempting login for:", email);
 
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
@@ -563,14 +594,13 @@
 
             try {
                 const user = await loginWithEmail(email, password);
-                console.log("Login successful, user:", user);
-                // Redirect handled by onAuthStateChanged, but let's force check
+                // Login successful, redirect handled by onAuthStateChanged
                 if (user) {
                     window.location.href = 'index.html';
                 }
             } catch (error) {
                 console.error("Login Error Catch:", error);
-                alert("Error: " + error.message);
+                showToast('Error: ' + error.message, 'error');
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
@@ -583,21 +613,18 @@
         // Quick Test User Creation (For Demo)
         document.getElementById('createTestUserBtn').addEventListener('click', async (e) => {
             e.preventDefault();
-            console.log("Create Test User clicked");
             const email = "test" + Date.now() + "@greenforce.com";
             const password = "password123";
             const name = "Usuario de Prueba";
 
             if (confirm(`¿Crear usuario de prueba?\nEmail: ${email}\nPass: ${password}`)) {
                 try {
-                    console.log("Registering test user...");
                     const user = await registerWithEmail(email, password, name);
-                    console.log("Test user created:", user);
-                    // Alert removed to prevent blocking execution. 
+                    // Test user created successfully
                     // onAuthStateChanged will handle the redirect.
                 } catch (err) {
                     console.error("Registration Error:", err);
-                    alert("Error: " + err.message);
+                    showToast('Error: ' + err.message, 'error');
                 }
             }
         });

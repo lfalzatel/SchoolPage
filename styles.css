@@ -24,6 +24,118 @@
   --text-secondary: #6b7280;
 }
 
+/* ===== TOAST SYSTEM ===== */
+#toast-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid var(--primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1f2937;
+  pointer-events: auto;
+  animation: toastSlideIn 0.3s ease-out;
+  max-width: 400px;
+}
+
+.toast.success {
+  border-left-color: #10b981;
+}
+
+.toast.error {
+  border-left-color: #ef4444;
+  background: rgba(254, 242, 242, 0.95);
+  color: #7f1d1d;
+}
+
+.toast.warning {
+  border-left-color: #f59e0b;
+  background: rgba(254, 252, 232, 0.95);
+  color: #78350f;
+}
+
+.toast.info {
+  border-left-color: #3b82f6;
+  background: rgba(239, 246, 255, 0.95);
+  color: #1e3a8a;
+}
+
+.toast i {
+  font-size: 1.2rem;
+  min-width: 20px;
+}
+
+.toast.success i {
+  color: #10b981;
+}
+
+.toast.error i {
+  color: #ef4444;
+}
+
+.toast.warning i {
+  color: #f59e0b;
+}
+
+.toast.info i {
+  color: #3b82f6;
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(450px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(450px);
+    opacity: 0;
+  }
+}
+
+.toast.removing {
+  animation: toastSlideOut 0.3s ease-out;
+}
+
+@media (max-width: 480px) {
+  #toast-container {
+    right: 10px;
+    left: 10px;
+    top: 90px;
+  }
+
+  .toast {
+    max-width: 100%;
+  }
+}
+
+/* ===== END TOAST SYSTEM ===== */
+
 .dark-mode {
   --background: #111827;
   --card-bg: #1f2937;
@@ -2414,6 +2526,65 @@ section h2 {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
+}
+
+/* Responsive: Mobile Header Adjustments */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 0 0.75rem;
+    gap: 8px;
+  }
+
+  .header-title {
+    font-size: 0.95rem !important;
+    letter-spacing: -0.3px;
+    line-height: 1;
+  }
+
+  .header-subtitle {
+    font-size: 0.6rem;
+    line-height: 1;
+  }
+
+  .header-brand {
+    gap: 0px;
+  }
+
+  .header-logo {
+    height: 30px;
+    width: 30px;
+  }
+
+  .header-left {
+    gap: 6px;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .notification-bell-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+
+  .profile-menu-container {
+    min-width: 0;
+  }
+
+  .header-avatar-container {
+    min-width: auto;
+  }
+
+  .user-info-pill {
+    display: none;
+  }
+
+  .header-avatar {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 /* Responsive: Reduce gap on mobile to prevent overflow */

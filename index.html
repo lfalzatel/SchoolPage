@@ -211,6 +211,34 @@
     window.loadActivities = loadActivities;
     window.loadVideos = loadVideos;
   </script>
+
+  <!-- Toast System -->
+  <script>
+    window.showToast = (message, type = 'info', duration = 4000) => {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+
+      const icons = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+      };
+
+      toast.innerHTML = `
+        <i class="${icons[type]}"></i>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('removing');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    };
+  </script>
 </head>
 
 <body>
@@ -1329,10 +1357,10 @@
 
         if (isEditing) {
           await updateActivity(eventId, data, photos);
-          alert("¡Evento actualizado con éxito!");
+          showToast('¡Evento actualizado con éxito!', 'success');
         } else {
           await createActivity(data, photos);
-          alert("¡Evento publicado con éxito!");
+          showToast('¡Evento publicado con éxito!', 'success');
         }
 
         closeEventModal();
@@ -1342,7 +1370,7 @@
 
       } catch (error) {
         console.error("Error al procesar evento:", error);
-        alert("Hubo un error: " + error.message);
+        showToast('Hubo un error: ' + error.message, 'error');
       } finally {
         btn.innerHTML = originalContent;
         btn.disabled = false;
@@ -1778,7 +1806,7 @@
             // Vibrar si el dispositivo lo soporta
             if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
           } else {
-            alert(payload.notification.title + "\\n" + payload.notification.body);
+            showToast(payload.notification.title + ': ' + payload.notification.body, 'info');
           }
         });
         isListeningForeground = true;
@@ -1817,6 +1845,9 @@
       <span>Chat</span>
     </a>
   </nav>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
 
 </body>
 

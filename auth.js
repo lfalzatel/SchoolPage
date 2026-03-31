@@ -51,11 +51,9 @@ async function saveUserToFirestore(user) {
 //  LOGIN CON GOOGLE (POPUP)
 // -----------------------------------------------------------
 export const loginWithGoogle = async () => {
-    console.log("Starting loginWithGoogle process with POPUP...");
     try {
         await setPersistence(auth, browserLocalPersistence);
         const result = await signInWithPopup(auth, provider);
-        console.log("Popup Login Success:", result.user.displayName);
 
         await saveUserToFirestore(result.user);
 
@@ -71,7 +69,7 @@ export const loginWithGoogle = async () => {
         if (error.code === 'auth/popup-closed-by-user') {
             console.warn("Popup closed by user");
         } else {
-            alert("Error al iniciar sesión: " + error.message);
+            if (window.showToast) window.showToast("Error al iniciar sesión: " + error.message, "error");
         }
         throw error;
     }
@@ -317,4 +315,3 @@ const lgOutBtn = getEl(uiIds.logoutBtn);
 if (lgOutBtn) lgOutBtn.addEventListener('click', logout);
 
 export { auth };
-console.log("Auth module loaded");
