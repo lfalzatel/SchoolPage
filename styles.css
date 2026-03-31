@@ -309,7 +309,7 @@ body {
 }
 
 .hero-message {
-  background: rgba(0, 0, 0, 0.4) !important;
+  background: rgba(30, 20, 80, 0.3);
   /* Darker semi-transparent background */
   backdrop-filter: blur(0.2px);
   -webkit-backdrop-filter: blur(10px);
@@ -586,7 +586,7 @@ section {
   margin: 3rem auto;
   padding: 3rem 2rem;
   /* background: white; */
-  background: rgba(0, 255, 255, 0.15);
+  background: rgba(0, 60, 60, 0.35);
   backdrop-filter: blur(0.5px);
   -webkit-backdrop-filter: blur(0.5px);
   border: 1px solid rgba(255, 255, 255, 0.11);
@@ -648,7 +648,7 @@ section h2::after {
 .document-card,
 .contact-card {
   /* background: white; */
-  background: rgba(0, 0, 0, 0.4) !important;
+  background: rgba(0, 20, 0, 0.2);
   backdrop-filter: blur(0.2px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 15px;
@@ -2886,7 +2886,7 @@ section h2 {
   top: 55px;
   right: 0;
   width: 320px;
-  background: rgba(26, 26, 26, 0.95);
+  background: rgba(0, 30, 26, 0.8);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
