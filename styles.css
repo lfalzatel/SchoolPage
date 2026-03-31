@@ -2898,15 +2898,27 @@ section h2 {
 
 @media (max-width: 480px) {
   .notifications-dropdown {
-    right: -80px;
-    width: 280px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 320px;
+    max-height: 70vh;
   }
 }
 
 @media (max-width: 480px) {
   .notifications-dropdown {
-    right: -80px;
-    width: 280px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 320px;
+    max-height: 70vh;
   }
 }
 
@@ -4690,11 +4702,17 @@ body.dark-mode .hero-tagline,
   border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
-/* Responsive: en móvil el dropdown ocupa más ancho */
+/* Responsive: en móvil el dropdown centrado */
 @media (max-width: 480px) {
   .notifications-dropdown {
-    width: 290px;
-    right: -60px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 320px;
+    max-height: 70vh;
   }
 
   .header-chat-button {
