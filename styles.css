@@ -1152,7 +1152,7 @@ section h2::after {
   }
 }
 
-/* ===== END IMPACT DASHBOARD =====
+/* ===== END IMPACT DASHBOARD ===== */
 .contact-card {
   /* background: linear-gradient(135deg, #f0fdf4, #dcfce7); */
   background: rgba(0, 0, 0, 0.4);
@@ -2049,7 +2049,7 @@ footer {
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   border-radius: 50px;
 
-  z-index: 2147483647 !important;
+  z-index: 10000 !important;
   visibility: visible !important;
   opacity: 1 !important;
 
@@ -4053,6 +4053,37 @@ body {
 
 .btn-save-premium:hover {
   background: #059669;
+}
+
+
+/* Base Profile Dropdown Styles */
+.profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 280px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  display: none;
+  flex-direction: column;
+  z-index: 10001; /* Above bottom-nav (10000) */
+  margin-top: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  max-height: 78vh;
+  overflow-y: auto;
+  padding-bottom: 20px;
+}
+
+.profile-dropdown.active {
+  display: flex;
+  animation: slideInDown 0.3s ease;
+}
+
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .profile-dropdown .dropdown-item:hover {
