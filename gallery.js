@@ -565,6 +565,23 @@ export async function loadActivities(targetId = 'galleryGridFull') {
         const finalActivities = finalActivitiesRaw.filter(act => act.images && act.images.length > 0);
 
         window.currentGalleryActivities = finalActivities;
+        
+        // ─── CACHE PARA OFFLINE ───────────────────────────────────────
+        // Guardar últimas actividades en localStorage para mostrar en offline.html
+        try {
+            const lastActivitiesData = finalActivities.slice(0, 5).map(act => ({
+                id: act.id,
+                title: act.title,
+                description: act.description,
+                year: act.year,
+                images: act.images ? act.images.slice(0, 1) : [] // Solo primera imagen
+            }));
+            localStorage.setItem('lastActivities', JSON.stringify(lastActivitiesData));
+        } catch (e) {
+            console.warn('No se pudo guardar actividades en cache local:', e);
+        }
+        // ─── FIN CACHE PARA OFFLINE ───────────────────────────────────
+        
         renderActivityCards(finalActivities, targetId);
 
     } catch (e) {
