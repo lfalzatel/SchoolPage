@@ -2487,6 +2487,7 @@ section h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
   padding: 0 1.5rem;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -2498,6 +2499,7 @@ section h2 {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
 }
 
 .header-title {
@@ -2518,6 +2520,8 @@ section h2 {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .header-logo {
@@ -2548,6 +2552,9 @@ section h2 {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
 /* Estilo para que el botón de Chat coincida con la campanita */
@@ -2816,6 +2823,8 @@ section h2 {
 /* Profile Dropdown */
 .profile-menu-container {
   position: relative;
+  flex-shrink: 0;
+  z-index: 1;
 }
 
 /* Profile Pill Button */
