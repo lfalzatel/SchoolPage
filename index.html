@@ -150,7 +150,7 @@
 
     .form-group-premium label {
       font-size: 0.82rem;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(255, 255, 255, 0.9);
     }
 
     .form-group-premium input,
@@ -204,7 +204,7 @@
     .btn-cancel {
       background: rgba(255, 255, 255, 0.07);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(255, 255, 255, 0.9);
       padding: 10px 20px;
       border-radius: 10px;
       cursor: pointer;
@@ -2068,7 +2068,14 @@
         closeImpactModal();
       } catch (err) {
         console.error("Save impact error:", err);
-        showToast('Error al guardar datos', 'error');
+        const { auth } = await import('./firebase-config.js');
+        const user = auth?.currentUser;
+        if (err.code === 'permission-denied') {
+          console.warn(`🔒 Permisos denegados para UID: ${user?.uid}. Verifica las FireStore Rules.`);
+          showToast('Error de permisos en Firebase (Colección impacto)', 'error');
+        } else {
+          showToast('Error al guardar datos', 'error');
+        }
       } finally {
         btn.innerHTML = original;
         btn.disabled = false;
