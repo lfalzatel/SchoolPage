@@ -44,7 +44,7 @@
     });
   </script>
 
-  <!-- PDF Library -->>
+  <!-- PDF Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -389,7 +389,7 @@
       </div>
     </div>
   </header>
-
+  
   <div id="content-to-pdf" class="main-content-wrapper">
     </div>
 
@@ -544,7 +544,7 @@
             <i class="fas fa-user-graduate"></i>
             <h3>Líder Green Force</h3>
             <p><strong>Nicolas Gañan Bedoya</strong></p>
-            <p><a href="mailto:nico050529@gmail.com">nico050529@gmail.com</a></p>
+            <p><a href="mailto:nicolasgananbedoya@gmail.com">nicolasgananbedoya@gmail.com</a></p>
             <p><i class="fas fa-phone"></i> +57 301 2625799</p>
           </div>
 
@@ -1999,21 +1999,36 @@
     }
 
     window.openImpactModal = async function() {
-      const { db } = await import('./firebase-config.js');
-      const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js');
-      const impactDocRef = doc(db, 'impacto', 'stats');
-      const snap = await getDoc(impactDocRef);
-      
-      if (snap.exists()) {
-        const d = snap.data();
-        document.getElementById('impEstudiantes').value = d.estudiantes;
-        document.getElementById('impArboles').value = d.arboles;
-        document.getElementById('impResiduos').value = d.residuos;
-        document.getElementById('impActividades').value = d.actividades;
-        document.getElementById('impAgua').value = d.agua;
-        document.getElementById('impComunidad').value = d.comunidad;
+      try {
+        const { db, auth } = await import('./firebase-config.js');
+        const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js');
+        
+        const user = auth.currentUser;
+        if (!user) { showToast('Inicia sesión como administrador', 'warning'); return; }
+        
+        const uDoc = await getDoc(doc(db, 'users', user.uid));
+        if (!uDoc.exists() || uDoc.data().role !== 'admin') {
+          showToast('No tienes permisos de administrador', 'error');
+          return;
+        }
+
+        const impactDocRef = doc(db, 'impacto', 'stats');
+        const snap = await getDoc(impactDocRef);
+        
+        if (snap.exists()) {
+          const d = snap.data();
+          document.getElementById('impEstudiantes').value = d.estudiantes;
+          document.getElementById('impArboles').value = d.arboles;
+          document.getElementById('impResiduos').value = d.residuos;
+          document.getElementById('impActividades').value = d.actividades;
+          document.getElementById('impAgua').value = d.agua;
+          document.getElementById('impComunidad').value = d.comunidad;
+        }
+        document.getElementById('impactModal').classList.add('active');
+      } catch (err) {
+        console.error("Open impact modal error:", err);
+        showToast('Error al verificar permisos', 'error');
       }
-      document.getElementById('impactModal').classList.add('active');
     };
 
     window.closeImpactModal = function() {
@@ -2028,10 +2043,17 @@
       btn.disabled = true;
 
       try {
-        const { db } = await import('./firebase-config.js');
-        const { doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js');
-        const impactDocRef = doc(db, 'impacto', 'stats');
+        const { db, auth } = await import('./firebase-config.js');
+        const { doc, getDoc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js');
+        
+        const user = auth.currentUser;
+        const uDoc = await getDoc(doc(db, 'users', user.uid));
+        if (!uDoc.exists() || uDoc.data().role !== 'admin') {
+          showToast('Permisos insuficientes', 'error');
+          return;
+        }
 
+        const impactDocRef = doc(db, 'impacto', 'stats');
         await setDoc(impactDocRef, {
           estudiantes: parseInt(document.getElementById('impEstudiantes').value),
           arboles: parseInt(document.getElementById('impArboles').value),
@@ -2258,36 +2280,41 @@
   <div id="impactModal" class="modal-premium">
     <div class="modal-content-premium">
       <div class="modal-header-premium">
-        <h2><i class="fas fa-chart-bar"></i> Gestionar Impacto</h2>
-        <button onclick="closeImpactModal()" class="close-modal-btn">&times;</button>
+        <h3><i class="fas fa-chart-line"></i> Gestionar Impacto Ambiental</h3>
+        <button onclick="closeImpactModal()" class="close-modal">&times;</button>
       </div>
-      <form id="impactForm" onsubmit="handleImpactSubmit(event)" class="modal-form-premium">
-        <label>
-          <span><i class="fas fa-users"></i> Estudiantes Green Force</span>
-          <input type="number" id="impEstudiantes" required min="0">
-        </label>
-        <label>
-          <span><i class="fas fa-tree"></i> Árboles Plantados</span>
-          <input type="number" id="impArboles" required min="0">
-        </label>
-        <label>
-          <span><i class="fas fa-recycle"></i> kg de Residuos Reciclados</span>
-          <input type="number" id="impResiduos" required min="0">
-        </label>
-        <label>
-          <span><i class="fas fa-calendar-check"></i> Actividades Realizadas</span>
-          <input type="number" id="impActividades" required min="0">
-        </label>
-        <label>
-          <span><i class="fas fa-tint"></i> Litros de Agua Ahorrada</span>
-          <input type="number" id="impAgua" required min="0">
-        </label>
-        <label>
-          <span><i class="fas fa-globe"></i> Residentes Impactados</span>
-          <input type="number" id="impComunidad" required min="0">
-        </label>
-        <div class="modal-footer-premium">
-          <button type="submit" class="btn-save-premium">Guardar Cambios</button>
+      <form id="impactForm" onsubmit="handleImpactSubmit(event)">
+        <div class="form-grid-premium">
+          <div class="form-group-premium">
+            <label for="impEstudiantes">Estudiantes Participantes</label>
+            <input type="number" id="impEstudiantes" required min="0" placeholder="Ej: 32">
+          </div>
+          <div class="form-group-premium">
+            <label for="impArboles">Árboles Plantados</label>
+            <input type="number" id="impArboles" required min="0" placeholder="Ej: 1000">
+          </div>
+          <div class="form-group-premium">
+            <label for="impResiduos">KG Residuos Reciclados</label>
+            <input type="number" id="impResiduos" required min="0" placeholder="Ej: 2340">
+          </div>
+          <div class="form-group-premium">
+            <label for="impActividades">Actividades Realizadas</label>
+            <input type="number" id="impActividades" required min="0" placeholder="Ej: 47">
+          </div>
+          <div class="form-group-premium">
+            <label for="impAgua">Litros Agua Ahorrada</label>
+            <input type="number" id="impAgua" required min="0" placeholder="Ej: 12500">
+          </div>
+          <div class="form-group-premium">
+            <label for="impComunidad">Residentes Impactados</label>
+            <input type="number" id="impComunidad" required min="0" placeholder="Ej: 1000">
+          </div>
+        </div>
+        <div class="modal-actions-premium">
+          <button type="button" class="btn-cancel" onclick="closeImpactModal()">Cancelar</button>
+          <button type="submit" class="btn-save-premium">
+            <i class="fas fa-save"></i> Guardar Cifras
+          </button>
         </div>
       </form>
     </div>
