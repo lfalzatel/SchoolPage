@@ -4,6 +4,18 @@ Documento de features e impacto potencial basado en análisis del código actual
 
 ---
 
+> [!IMPORTANT]
+> **ESTADO DE AVANCE (31 de Marzo, 2026)**
+> **Sesión Actual Finalizada**: Se completó el rediseño del Dashboard de Impacto (UI Premium), la implementación del Splash Screen animado y el refuerzo de seguridad para administradores.
+> **Último Cambio**: Despliegue exitoso de reglas de Firestore y sincronización en GitHub.
+> 
+> **PUNTOS PENDIENTES PRIORITARIOS**:
+> 1. **Feature 3**: Reproductor de Video Inline.
+> 2. **Feature 9**: Generador de Certificados PDF.
+> 3. **Feature 1**: Verificación final del Contador Regresivo.
+
+---
+
 ## 🎯 Funcionalidades que le darían vida a la app
 
 ### 1. Contador Regresivo de Próximo Evento

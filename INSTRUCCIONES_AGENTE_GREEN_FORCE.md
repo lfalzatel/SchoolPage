@@ -3,15 +3,27 @@
 
 ---
 
+> [!IMPORTANT]
+> **PUNTO DE CONTROL (31-MARZO-2026)**
+> **Estado**: El agente ha completado la **Feature 7** (Splash Screen) y ha rediseñado gran parte de la **Feature 4** (Dashboard de Impacto) con diseño Premium y seguridad reforzada.
+> **Próximo Agente**: Retomar en la **Feature 3** (Video Inline) o **Feature 9** (Certificados PDF). El Dashboard ya es funcional y seguro, pero se puede seguir puliendo la visualización de "kg" y otros micro-detalles.
+> 
+> **Cambios Clave**:
+> - Modal de "Gestionar Impacto" rediseñado con cuadrícula y validación de rol 'admin'.
+> - Reglas de Firestore (`firestore.rules`) actualizadas y desplegadas en Firebase.
+> - Sincronización total con el repositorio de GitHub.
+
+---
+
 ## MATRIZ DE PRIORIZACIÓN
 
 | # | Feature | Impacto | Complejidad | Horas est. | Sprint |
 |---|---------|---------|-------------|------------|--------|
-| 7 | Splash screen animado | Alto | Baja | 2–3h | Sprint 1 |
+| 7 | Splash screen animado | Alto | Baja | 2–3h | ✅ Sprint 1 |
 | 8 | Transiciones entre vistas | Alto | Baja | 3–4h | Sprint 1 |
 | 1 | Contador regresivo | Alto | Baja | 3–4h | Sprint 1 |
 | 6 | Pantalla offline dedicada | Medio | Baja | 2–3h | Sprint 1 |
-| 4 | Dashboard de impacto | Alto | Media | 6–8h | Sprint 2 |
+| 4 | Dashboard de impacto | Alto | Media | 6–8h | ⏳ Sprint 2 |
 | 3 | Reproductor video inline | Medio | Media | 4–6h | Sprint 2 |
 | 9 | Generador de certificados | Alto | Media | 8–10h | Sprint 2 |
 | 2 | Modo presentación | Medio | Media | 5–7h | Sprint 3 |
