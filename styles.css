@@ -1051,7 +1051,7 @@ section h2::after {
 .impact-counter {
   font-size: 2.8rem;
   font-weight: 700;
-  color: #059669;
+  color: #ecf8f4;
   margin: 15px 0 5px;
   font-variant-numeric: tabular-nums;
 }
@@ -1060,7 +1060,7 @@ section h2::after {
   content: attr(data-label);
   display: block;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: #f8f9fb;
   font-weight: 500;
   margin-top: 5px;
 }
@@ -1073,7 +1073,7 @@ section h2::after {
 }
 
 .impact-card small {
-  color: #9ca3af;
+  color: #f4f5f6;
   display: block;
   font-size: 0.9rem;
   line-height: 1.4;
@@ -3988,7 +3988,7 @@ body {
   display: block;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #374151;
+  color: #fdfeff;
   margin-bottom: 0.5rem;
 }
 
