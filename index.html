@@ -82,6 +82,28 @@
 
 
   <style>
+    .push-promo-card {
+      padding: 20px;
+      background: rgba(30, 30, 40, 0.8);
+      border-radius: 12px;
+      margin: 0 0 25px 0;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      display: none;
+      animation: promoFadeIn 0.5s ease;
+    }
+    .push-promo-card.show {
+      display: flex;
+    }
+    @keyframes promoFadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
     body {
       margin: 0;
       background-color: #000;
@@ -397,6 +419,16 @@
               <span>Compartir App</span>
               <i class="fas fa-chevron-right arrow-link"></i>
             </div>
+            <div class="dropdown-theme-section" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span class="theme-label" style="margin: 0; display:flex; align-items:center; gap:8px;"><div class="menu-item-icon bg-blue" style="width:24px;height:24px;min-width:24px;font-size:0.7rem;"><i class="fas fa-bell"></i></div> ALERTAS PUSH</span>
+                <label class="settings-toggle" style="margin: 0; pointer-events: none;">
+                  <input type="checkbox" id="menuPushToggle" onchange="handleMenuPushToggle(this.checked)" style="pointer-events: auto;">
+                  <span class="toggle-track" style="margin: 0; pointer-events: auto;"><span class="toggle-thumb"></span></span>
+                </label>
+              </div>
+            </div>
+
             <div class="dropdown-theme-section">
               <span class="theme-label">TEMA</span>
               <div class="theme-selector-group">
@@ -468,6 +500,21 @@
       </header>
 
       <section id="sobre">
+        <!-- Push Promo Banner -->
+        <div id="pushPromoCard" class="push-promo-card">
+          <div style="color: #10b981; font-size: 2rem;">
+            <i class="fas fa-bell-ring fa-shake"></i>
+          </div>
+          <div style="flex: 1;">
+            <h3 style="margin: 0 0 5px 0; color: white; font-size: 1.1rem; font-weight: 600;">¡Activa las Alertas!</h3>
+            <p style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Recibe avisos en tiempo real de nuevos eventos de Green Force.</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button onclick="triggerPushActivation()" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">Permitir</button>
+            <button onclick="dismissPushPromo()" style="background: transparent; color: #a1a1aa; border: 1px solid #a1a1aa; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.2s;" onmouseover="this.style.color='#fff'; this.style.borderColor='#fff'" onmouseout="this.style.color='#a1a1aa'; this.style.borderColor='#a1a1aa'">Más tarde</button>
+          </div>
+        </div>
+
         <h2><i class="fas fa-seedling"></i> Sobre el Proyecto</h2>
         <p style="text-align: justify; line-height: 1.8; margin-bottom: 1rem; font-size: 1.05rem;">
           El proyecto "Fomentando la Conciencia Ambiental y el Desarrollo Sostenible a través de la Creación del Grupo
@@ -2157,15 +2204,51 @@
     // Initialize toggle state based on current permission
     window.addEventListener('load', () => {
       const pushToggle = document.getElementById('pushToggle');
-      if (pushToggle && ('Notification' in window)) {
+      const menuPushToggle = document.getElementById('menuPushToggle');
+      
+      if ('Notification' in window) {
         if (Notification.permission === 'granted') {
-          pushToggle.checked = true;
+          if (pushToggle) pushToggle.checked = true;
+          if (menuPushToggle) menuPushToggle.checked = true;
           startForegroundListener(); // Start listening if already granted
         } else {
-          pushToggle.checked = false;
+          if (pushToggle) pushToggle.checked = false;
+          if (menuPushToggle) menuPushToggle.checked = false;
+          
+          // Show promo card if permission is 'default' and not dismissed
+          if (Notification.permission === 'default' && localStorage.getItem('pushPromoDismissed') !== 'true') {
+             const card = document.getElementById('pushPromoCard');
+             if (card) {
+                 card.style.display = 'flex';
+                 setTimeout(() => card.classList.add('show'), 100);
+             }
+          }
         }
       }
     });
+
+    window.dismissPushPromo = () => {
+       const card = document.getElementById('pushPromoCard');
+       if(card) {
+          card.classList.remove('show');
+          setTimeout(() => card.style.display = 'none', 500);
+          localStorage.setItem('pushPromoDismissed', 'true');
+       }
+    };
+
+    window.triggerPushActivation = () => {
+       const menuToggle = document.getElementById('menuPushToggle');
+       if (menuToggle) menuToggle.checked = true;
+       window.handlePushToggle(true);
+       dismissPushPromo();
+    };
+
+    window.handleMenuPushToggle = (checked) => {
+       const mainToggle = document.getElementById('pushToggle');
+       if (mainToggle) mainToggle.checked = checked;
+       window.handlePushToggle(checked);
+       if (checked) dismissPushPromo();
+    };
 
     window.handlePushToggle = async function (isChecked) {
       const toggle = document.getElementById('pushToggle');
@@ -2218,11 +2301,15 @@
               statusText.textContent = '¡Alertas activadas exitosamente!';
               statusText.style.color = '#10b981';
               label.textContent = "Alertas Push activadas";
+              const menuToggle = document.getElementById('menuPushToggle');
+              if (menuToggle) menuToggle.checked = true;
               startForegroundListener();
             }
           } else {
             console.log('Permiso denegado.');
             toggle.checked = false;
+            const menuToggle = document.getElementById('menuPushToggle');
+            if (menuToggle) menuToggle.checked = false;
             toggle.disabled = false;
             statusText.textContent = "Permiso denegado por el navegador.";
             statusText.style.color = "#ef4444";
@@ -2242,6 +2329,9 @@
 
           await deleteToken(messaging);
           console.log("Token eliminado");
+
+          const menuToggle = document.getElementById('menuPushToggle');
+          if (menuToggle) menuToggle.checked = false;
 
           toggle.disabled = false;
           statusText.textContent = "Notificaciones pausadas temporalmente.";
