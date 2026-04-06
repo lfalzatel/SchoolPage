@@ -31,15 +31,47 @@
     import { auth } from './firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
+    const splashStartTime = Date.now();
+    const isReload = sessionStorage.getItem('isReload');
+    sessionStorage.setItem('isReload', 'true');
+
+    // Textos de carga dinámica
+    const loaderStatus = document.getElementById('splash-status');
+    const loadingTexts = ["Validando credenciales...", "Cargando componentes...", "Preparando entorno..."];
+    let textIndex = 0;
+    const textInterval = setInterval(() => {
+      if (loaderStatus) {
+        textIndex = (textIndex + 1) % loadingTexts.length;
+        loaderStatus.innerText = loadingTexts[textIndex];
+      }
+    }, 800);
+
     onAuthStateChanged(auth, (user) => {
       const loader = document.getElementById('auth-loader');
-      if (!user) {
-        window.location.href = 'login.html';
-      } else {
-        if (loader) {
-          loader.classList.add('hide');
-          setTimeout(() => { loader.style.display = 'none'; }, 500);
+      
+      const proceed = () => {
+        clearInterval(textInterval);
+        if (!user) {
+          if (sessionStorage.getItem('isLoggingOut') !== 'true') {
+            window.location.href = 'login.html';
+          }
+        } else {
+          if (loader) {
+            if (loaderStatus) loaderStatus.innerText = "¡Bienvenido!";
+            setTimeout(() => {
+              loader.classList.add('hide');
+              setTimeout(() => { loader.style.display = 'none'; }, 500);
+            }, 300); // Pequeña pausa para mostrar "Bienvenido"
+          }
         }
+      };
+
+      if (isReload === 'true') {
+        proceed();
+      } else {
+        const elapsed = Date.now() - splashStartTime;
+        const remaining = Math.max(0, 3000 - elapsed);
+        setTimeout(proceed, remaining);
       }
     });
   </script>
@@ -59,7 +91,7 @@
     #auth-loader {
       position: fixed; inset: 0; background: #050f0a;
       display: flex; justify-content: center; align-items: center;
-      z-index: 9999;
+      z-index: 999999 !important;
       transition: opacity 0.5s ease, visibility 0.5s ease;
     }
     #auth-loader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
@@ -95,7 +127,7 @@
       height: 100%; width: 0%;
       background: linear-gradient(90deg, #10b981, #34d399);
       border-radius: 99px;
-      animation: splashLoad 2s ease 0.6s forwards;
+      animation: splashLoad 2.4s ease 0.6s forwards;
     }
     @keyframes splashSpin { to { transform: rotate(360deg); } }
     @keyframes splashPop  { from { opacity:0; transform:scale(0.7); } to { opacity:1; transform:scale(1); } }
@@ -286,6 +318,7 @@
       </div>
       <p class="splash-title">Green Force</p>
       <p class="splash-sub">Sembrando Futuro</p>
+      <p id="splash-status" class="splash-sub" style="margin-top: 5px; color: #fff; font-size: 0.70rem; opacity: 0.8; text-transform: none; letter-spacing: 0.05em;">Iniciando...</p>
       <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
     </div>
   </div>

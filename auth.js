@@ -118,10 +118,36 @@ export const registerWithEmail = async (email, password, name) => {
 // -----------------------------------------------------------
 export const logout = async () => {
     try {
-        await signOut(auth);
+        const loader = document.getElementById('auth-loader');
+        const loaderStatus = document.getElementById('splash-status');
         const menu = document.getElementById('profileDropdown');
         if (menu) menu.classList.remove('active');
-        // Clear UI or redirect if necessary
+
+        if (loader) {
+            loader.style.display = 'flex';
+            loader.style.opacity = '1';
+            loader.style.visibility = 'visible';
+            loader.classList.remove('hide');
+            if (loaderStatus) loaderStatus.innerText = 'Cerrando sesión...';
+            
+            const bar = loader.querySelector('.splash-bar');
+            if (bar) {
+                bar.style.animation = 'none';
+                setTimeout(() => { bar.style.animation = 'splashLoad 2.4s ease 0.6s forwards'; }, 10);
+            }
+
+            sessionStorage.setItem('isLoggingOut', 'true');
+            
+            await signOut(auth);
+            
+            setTimeout(() => {
+                sessionStorage.removeItem('isLoggingOut');
+                window.location.href = 'login.html';
+            }, 3000);
+        } else {
+            await signOut(auth);
+            window.location.href = 'login.html';
+        }
     } catch (error) {
         console.error("Logout failed:", error);
     }
