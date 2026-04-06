@@ -2266,14 +2266,18 @@
 
         onMessage(messaging, (payload) => {
           console.log("Mensaje recibido en foreground: ", payload);
-          // Verificar si el navegador soporta notificaciones nativas, y mostrarla aunque la app esté abierta
           if (Notification.permission === 'granted') {
-            new Notification(payload.notification.title, {
-              body: payload.notification.body,
-              icon: '/assets/icons/icon-192.png'
+            navigator.serviceWorker.ready.then(registration => {
+              registration.showNotification(payload.notification.title, {
+                body: payload.notification.body,
+                icon: '/assets/icons/icon-192.png',
+                badge: '/assets/icons/icon-192.png', // Icono blanco para Android top bar
+                vibrate: [200, 100, 200, 100, 200], // Vibración tipo App Mensajería
+                requireInteraction: false
+              });
             });
-            // Vibrar si el dispositivo lo soporta
-            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            // Mostrar Toast simultáneo dentro de la web opcional
+            showToast(payload.notification.title, 'success');
           } else {
             showToast(payload.notification.title + ': ' + payload.notification.body, 'info');
           }
