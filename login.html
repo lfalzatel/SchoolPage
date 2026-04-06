@@ -97,7 +97,9 @@
             /* User suggested width */
             max-width: 90%;
             /* Responsive fallback */
-            padding: 30px 28px;
+            max-height: 90vh; /* Limit height for small mobiles */
+            overflow-y: auto; /* Allow internal scrolling if needed */
+            padding: 24px 24px;
             border-radius: 16px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             text-align: center;
@@ -314,6 +316,11 @@
 
     <div id="app-background">
         <div class="bg-overlay"></div>
+    </div>
+
+    <div id="login-loader" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: white;">
+        <i class="fas fa-circle-notch fa-spin fa-3x" style="color: #10b981; margin-bottom: 1.5rem;"></i>
+        <h3 id="login-loader-text" style="font-family: 'Poppins', sans-serif; font-weight: 600; letter-spacing: 1px;">Verificando cuenta...</h3>
     </div>
 
     <div class="login-container">
@@ -535,7 +542,25 @@
 
         // Check for Redirect Result on load to catch errors or finish sign-in
         window.addEventListener('load', async () => {
-            await handleRedirectAuth();
+            const isRedirecting = sessionStorage.getItem('googleLoginRedirecting');
+            const loader = document.getElementById('login-loader');
+            const container = document.querySelector('.login-container');
+            
+            if (isRedirecting === 'true' && loader && container) {
+                loader.style.display = 'flex';
+                container.style.display = 'none';
+            }
+
+            try {
+                await handleRedirectAuth();
+            } finally {
+                // Return to normal if redirect didn't resolve to a login
+                sessionStorage.removeItem('googleLoginRedirecting');
+                if (loader && !auth.currentUser) {
+                    loader.style.display = 'none';
+                    if (container) container.style.display = 'block';
+                }
+            }
         });
 
         window.handleGoogleClick = async () => {
@@ -551,6 +576,7 @@
 
                 gBtn.disabled = true;
                 gBtnText.innerText = "Iniciando...";
+                sessionStorage.setItem('googleLoginRedirecting', 'true');
 
                 await window.loginWithGoogle();
 
@@ -567,9 +593,16 @@
         document.getElementById('googleLoginBtn')?.addEventListener('click', window.handleGoogleClick);
 
         // Auth Guard: If already logged in, redirect to index
-        // Auth Guard: If already logged in, redirect to index
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                const loader = document.getElementById('login-loader');
+                const container = document.querySelector('.login-container');
+                if (loader && container) {
+                    loader.style.display = 'flex';
+                    document.getElementById('login-loader-text').innerText = "Iniciando sesión...";
+                    container.style.display = 'none';
+                }
+
                 document.getElementById('authStatus').innerText = "Sesión detectada. Redirigiendo...";
                 // Small delay to ensure IndexedDB persistence is complete before jumping
                 setTimeout(() => {

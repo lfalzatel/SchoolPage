@@ -2314,6 +2314,18 @@ section h2 {
 
 /* Media Queries */
 @media (max-width: 768px) {
+  .profile-dropdown .dropdown-menu-list {
+    gap: 2px;
+  }
+  .profile-dropdown .menu-item {
+    padding: 8px 12px;
+    margin-bottom: 2px;
+  }
+  .profile-dropdown .dropdown-theme-section {
+    padding-bottom: 8px !important;
+    margin-bottom: 8px !important;
+  }
+
   .hero-content h1 {
     font-size: 2.5rem;
   }
