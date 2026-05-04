@@ -3770,15 +3770,26 @@ body {
   }
 }
 
-/* Bottom Navigation Styles Consolidated at line 1008 */
+/* Bottom Navigation Styles */
+
+/* Ítems inactivos: icono + texto en verde */
+.nav-item {
+  color: #10b981;
+}
 
 .nav-item i {
   font-size: 1.3rem;
   transition: all 0.3s ease;
+  color: #10b981;
 }
 
+.nav-item span {
+  color: #10b981;
+}
+
+/* Ítem activo: recuadro verde con icono/texto blancos */
 .nav-item.active {
-  color: var(--primary);
+  color: #ffffff;
 }
 
 .nav-item.active i {
@@ -3798,6 +3809,8 @@ body {
 .nav-item.active span {
   transform: translateY(2px);
   opacity: 1;
+  color: #ffffff;
+  font-weight: 600;
 }
 
 /* --- Phase 4: Theme Selector & Gallery Premium --- */
@@ -4196,23 +4209,18 @@ footer a:hover {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
-.dark-mode .nav-item {
-  color: #a0a0a0;
-}
-
-.dark-mode .nav-item:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.dark-mode .nav-item.active {
+.dark-mode .nav-item,
+.dark-mode .nav-item i,
+.dark-mode .nav-item span {
   color: #4ade80;
-  /* Brighter green for dark mode */
 }
 
-.dark-mode .nav-item.active::after {
-  background: #4ade80;
-  box-shadow: 0 0 8px #4ade80;
+.dark-mode .nav-item.active span {
+  color: #ffffff !important;
+}
+
+.dark-mode .nav-item.active i {
+  color: #ffffff !important;
 }
 
 /* Ensure tagline is also white - SUPER SPECIFIC TO FIX GRAY TEXT */

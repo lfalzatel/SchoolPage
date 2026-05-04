@@ -23,8 +23,8 @@
   <link rel="stylesheet" href="styles.css">
 
   <!-- Scripts -->
-  <script type="module" src="auth.js"></script>
   <script type="module" src="gallery.js"></script>
+  <!-- auth.js es manejado internamente por layout.js -->
 
   <!-- Auth Guard (Consolidated) -->
   <script type="module">
@@ -347,118 +347,8 @@
   <!-- Randomized App Background -->
   <div id="app-background"></div>
 
-  <!-- Fixed App Header -->
-  <header class="app-header">
-    <div class="header-left">
-      <img src="assets/images/1. logo 3.jpg" alt="Logo" class="header-logo">
-      <div class="header-brand">
-        <span class="header-title">Green Force</span>
-        <span class="header-subtitle">Sembrando Futuro</span>
-      </div>
-    </div>
-    <div class="header-actions">
-      <div class="notifications-wrapper">
-        <div class="notification-bell-btn" onclick="toggleNotifications()">
-          <i class="fas fa-bell"></i>
-          <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
-        </div>
-        <div id="notificationsDropdown" class="notifications-dropdown">
-          <div class="notifications-header">
-            <h3>Próximos Eventos</h3>
-          </div>
-          <div id="notificationList" class="notification-list">
-            <div class="notification-loader"><i class="fas fa-spinner fa-spin"></i></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="profile-menu-container">
-      <!-- Premium Profile Pill -->
-      <div class="header-avatar-container" onclick="toggleProfileMenu()">
-        <img src="assets/icons/icon-192.png" alt="Profile" id="headerProfileAvatar" class="header-avatar">
-        <div class="user-info-pill">
-          <span id="headerUserName" class="user-name-pill">Invitado</span>
-          <span id="headerUserRole" class="user-role-pill">Visitante</span>
-        </div>
-        <i class="fas fa-chevron-down pill-chevron"></i>
-      </div>
-
-      <div id="profileDropdown" class="profile-dropdown">
-        <div class="dropdown-card">
-          <div class="user-card-header">
-            <div class="user-card-info">
-              <span id="menuProfileName" class="user-card-name">Invitado</span>
-              <span id="menuProfileEmail" class="user-card-email">Inicia sesión para más</span>
-            </div>
-          </div>
-
-
-            <div class="dropdown-menu-list">
-            <a href="#galeria" class="menu-item" onclick="closeProfileDropdown()">
-              <div class="menu-item-icon bg-blue"><i class="fas fa-images"></i></div>
-              <span>Gestionar Galería</span>
-              <i class="fas fa-chevron-right arrow-link"></i>
-            </a>
-            <a href="formulario_asistencia_eventos.html" class="menu-item" onclick="closeProfileDropdown()">
-              <div class="menu-item-icon bg-green"><i class="fas fa-poll"></i></div>
-              <span>Encuestas</span>
-              <i class="fas fa-chevron-right arrow-link"></i>
-            </a>
-            <div class="menu-item" onclick="showView('configuracion'); closeProfileDropdown();">
-              <div class="menu-item-icon bg-gray"><i class="fas fa-cog"></i></div>
-              <span>Configuración</span>
-              <i class="fas fa-chevron-right arrow-link"></i>
-            </div>
-            <div class="menu-item" id="downloadPdfBtnMenu" onclick="closeProfileDropdown()">
-              <div class="menu-item-icon bg-red"><i class="fas fa-file-pdf"></i></div>
-              <span>Descargar Informe PDF</span>
-            </div>
-            <div class="menu-item" id="installAppBtn" style="display: none;"
-              onclick="installPWA(); closeProfileDropdown();">
-              <div class="menu-item-icon bg-green"><i class="fas fa-download"></i></div>
-              <span>Instalar Aplicación</span>
-            </div>
-            <div class="menu-item" onclick="shareApp(); closeProfileDropdown();">
-              <div class="menu-item-icon bg-green"><i class="fas fa-share-alt"></i></div>
-              <span>Compartir App</span>
-              <i class="fas fa-chevron-right arrow-link"></i>
-            </div>
-            <div class="dropdown-theme-section" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; margin-bottom: 12px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <span class="theme-label" style="margin: 0; display:flex; align-items:center; gap:8px;"><div class="menu-item-icon bg-blue" style="width:24px;height:24px;min-width:24px;font-size:0.7rem;"><i class="fas fa-bell"></i></div> ALERTAS PUSH</span>
-                <label class="settings-toggle" style="margin: 0; pointer-events: none;">
-                  <input type="checkbox" id="menuPushToggle" onchange="handleMenuPushToggle(this.checked)" style="pointer-events: auto;">
-                  <span class="toggle-track" style="margin: 0; pointer-events: auto;"><span class="toggle-thumb"></span></span>
-                </label>
-              </div>
-            </div>
-
-            <div class="dropdown-theme-section">
-              <span class="theme-label">TEMA</span>
-              <div class="theme-selector-group">
-                <button class="theme-btn active" onclick="setTheme('light')" title="Modo Claro">
-                  <i class="fas fa-sun"></i>
-                </button>
-                <button class="theme-btn" onclick="setTheme('dark')" title="Modo Oscuro">
-                  <i class="fas fa-moon"></i>
-                </button>
-                <button class="theme-btn" onclick="setTheme('system')" title="Seguir Sistema">
-                  <i class="fas fa-desktop"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="dropdown-footer">
-              <button class="logout-pill-btn" id="menuLoginBtn" onclick="handleAuthAction()">
-                <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+  <!-- ► Header inyectado por layout.js -->
+  <div id="app-header-placeholder"></div>
   
   <div id="content-to-pdf" class="main-content-wrapper">
     </div>
@@ -2386,33 +2276,14 @@
 
   </script>
 
-  <!-- ✅ ÚNICO bottom-nav — fuera de todos los modales -->
-  <nav class="bottom-nav">
-    <a href="#sobre" class="nav-item active">
-      <i class="fas fa-home"></i>
-      <span>Inicio</span>
-    </a>
-    <a href="#cronograma" class="nav-item">
-      <i class="fas fa-leaf"></i>
-      <span>Cronograma</span>
-    </a>
-    <a href="#galeria" class="nav-item">
-      <i class="fas fa-images"></i>
-      <span>Galería</span>
-    </a>
-    <a href="#video" class="nav-item">
-      <i class="fas fa-play-circle"></i>
-      <span>Videos</span>
-    </a>
-    <a href="#documentos" class="nav-item">
-      <i class="fas fa-file-alt"></i>
-      <span>Docs</span>
-    </a>
-    <a id="groupChatBtn" href="https://chat.whatsapp.com/L0hrcQ9JWmUB5DQui9ZrXv" class="nav-item" target="_blank" rel="noopener noreferrer" title="Abrir chat grupal del Grupo Ambiental">
-      <i class="fas fa-comments"></i>
-      <span>Chat</span>
-    </a>
-  </nav>
+  <!-- ► Bottom Nav inyectado por layout.js -->
+  <div id="bottom-nav-placeholder"></div>
+
+  <!-- Layout compartido: header + nav + tema + auth UI -->
+  <script type="module">
+    import { initLayout } from './layout.js';
+    initLayout({ activeNav: 'inicio' });
+  </script>
 
 
   <!-- Modal: Gestionar Impacto (Admin) -->

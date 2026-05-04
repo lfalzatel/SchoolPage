@@ -1,93 +1,163 @@
 rules_version = '2';
+
+// ══════════════════════════════════════════════════════════════════
+//  Green Force PWA — Firestore Security Rules
+//  Proyecto : green-force-pwa-2025
+//  Colecciones : users | activities | asistencia_datos | impacto | fcm_tokens
+//  Roles       : admin | lider | integrante | miembro | usuario
+//  Admins fijos: greenforceiebb@gmail.com | lfalzatel@gmail.com
+// ══════════════════════════════════════════════════════════════════
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── Helpers de rol ─────────────────────────────────────────────────────
-    function userRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    // ──────────────────────────────────────────────────────────────
+    //  FUNCIONES AUXILIARES REUTILIZABLES
+    // ──────────────────────────────────────────────────────────────
+
+    // ¿El usuario inició sesión?
+    function isAuthenticated() {
+      return request.auth != null;
     }
+
+    // ¿Es uno de los correos admin hardcodeados en la app?
+    function isAdminEmail() {
+      return request.auth.token.email in [
+        'greenforceiebb@gmail.com',
+        'lfalzatel@gmail.com'
+      ];
+    }
+
+    // ¿Tiene rol 'admin' guardado en su documento de Firestore?
+    function isAdminRole() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Es admin si cumple cualquiera de las dos condiciones anteriores
     function isAdmin() {
-      return request.auth != null &&
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             userRole() == 'admin';
-    }
-    function isPrivileged() {
-      // admin o lider tienen los mismos permisos por ahora
-      return request.auth != null &&
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             userRole() in ['admin', 'lider'];
+      return isAuthenticated() && (isAdminEmail() || isAdminRole());
     }
 
-    // ── Usuarios ────────────────────────────────────────────────────────────
-    match /users/{userId} {
-      // Cada usuario puede leer y editar su propio documento
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      // Admin puede leer TODOS los usuarios (para gestión)
-      allow read: if isAdmin();
-      // Admin puede cambiar el rol de cualquier usuario
-      allow write: if isAdmin();
+    // ¿Tiene rol 'lider' en su documento de Firestore?
+    function isLider() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'lider';
     }
 
-    match /fcm_tokens/{tokenId} {
-      // Users can write their own tokens, or if unauthenticated, they can write tokens but not read others.
-      allow write: if true;
-      allow read: if isAdmin();
+    // ¿Es admin o líder? (permiso intermedio)
+    function isAdminOrLider() {
+      return isAdmin() || isLider();
     }
 
-    // --- ACTIVITIES (ROOT) ---
+
+    // ══════════════════════════════════════════════════════════════
+    //  /users/{uid}
+    //  Perfiles creados al registrarse con Google OAuth.
+    //  Campos esperados: name, email, role, photo, lastLogin
+    // ══════════════════════════════════════════════════════════════
+    match /users/{uid} {
+
+      // Cualquier usuario autenticado puede leer perfiles
+      // (necesario para mostrar nombres y fotos en la app)
+      allow read: if isAuthenticated();
+
+      // Cada usuario puede crear su propio documento al registrarse,
+      // pero NO puede asignarse el rol 'admin' por sí solo
+      allow create: if request.auth.uid == uid &&
+        (!('role' in request.resource.data) ||
+          request.resource.data.role in ['usuario', 'miembro', 'integrante']);
+
+      // El usuario puede editar sus propios datos básicos (nombre, foto, etc.)
+      // pero no puede cambiar su propio rol — eso solo lo hace un admin
+      allow update: if
+        (request.auth.uid == uid &&
+          !('role' in request.resource.data.diff(resource.data).affectedKeys()))
+        || isAdmin();
+
+      // Solo admins pueden eliminar usuarios del sistema
+      allow delete: if isAdmin();
+    }
+
+
+    // ══════════════════════════════════════════════════════════════
+    //  /activities/{activityId}
+    //  Galería de actividades y eventos del grupo ambiental.
+    //  Campos esperados: title, description, date, images, year, type
+    // ══════════════════════════════════════════════════════════════
     match /activities/{activityId} {
+
+      // La galería es pública — cualquier visitante puede verla
       allow read: if true;
-      allow write: if isAdmin();
 
-      // Activities comments
-      match /comments/{commentId} {
-        allow read: if true;
-        allow write: if request.auth != null;
-      }
-
-      // Per-photo social (photoStats)
-      match /photoStats/{photoIndex} {
-        allow read: if true;
-        allow write: if request.auth != null;
-
-        // Photo likes
-        match /likes/{userId} {
-          allow read: if true;
-          allow write: if request.auth != null;
-        }
-
-        // Photo comments
-        match /comments/{commentId} {
-          allow read: if true;
-          allow write: if request.auth != null;
-        }
-      }
+      // Solo admins y líderes pueden agregar, editar o eliminar actividades
+      allow create, update, delete: if isAdminOrLider();
     }
 
-    match /activity_likes/{likeId} {
-      allow read: if true;
-      allow write: if request.auth != null;
+
+    // ══════════════════════════════════════════════════════════════
+    //  /asistencia_datos/{docId}
+    //  Formulario de asistencia a salidas pedagógicas.
+    //  Documentos fijos: 'eventos' y 'registros'
+    // ══════════════════════════════════════════════════════════════
+    match /asistencia_datos/{docId} {
+
+      // Solo admins y líderes pueden ver el registro completo de asistencia
+      allow read: if isAdminOrLider();
+
+      // Solo admins y líderes pueden guardar o actualizar los registros
+      allow write: if isAdminOrLider();
     }
 
-    match /videos/{document=**} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
 
-    match /documents/{documentId} {
-      allow read: if true;
+    // ══════════════════════════════════════════════════════════════
+    //  /impacto/stats
+    //  Contadores de impacto ambiental (árboles sembrados, residuos, etc.)
+    //  Documento fijo: 'stats'
+    // ══════════════════════════════════════════════════════════════
+    match /impacto/{docId} {
+
+      // Todos los usuarios autenticados pueden ver las estadísticas
+      allow read: if isAuthenticated();
+
+      // Solo admins pueden actualizar o crear los contadores de impacto
       allow write: if isAdmin();
     }
 
-    match /impacto/{documentId} {
-      allow read: if true;
-      allow write: if isAdmin();
+
+    // ══════════════════════════════════════════════════════════════
+    //  /fcm_tokens/{tokenId}
+    //  Tokens de notificaciones push (Firebase Cloud Messaging).
+    //  Campos esperados: uid, token, createdAt
+    // ══════════════════════════════════════════════════════════════
+    match /fcm_tokens/{tokenId} {
+
+      // Cada usuario solo puede leer su propio token;
+      // los admins pueden leer todos (para enviar notificaciones masivas)
+      allow read: if isAuthenticated() && (
+        resource.data.uid == request.auth.uid || isAdmin()
+      );
+
+      // Cualquier usuario autenticado puede registrar o actualizar su token,
+      // siempre que el campo 'uid' coincida con su propio uid
+      allow create, update: if isAuthenticated() &&
+        request.resource.data.uid == request.auth.uid;
+
+      // El usuario puede eliminar su propio token al cerrar sesión
+      allow delete: if isAuthenticated() &&
+        resource.data.uid == request.auth.uid;
     }
 
-    // --- ASISTENCIA DATOS (attendance records) ---
-    match /asistencia_datos/{documentId} {
-      allow read: if request.auth != null;
-      allow write: if isPrivileged();
+
+    // ══════════════════════════════════════════════════════════════
+    //  REGLA DE SEGURIDAD FINAL
+    //  Cualquier colección no listada explícitamente queda bloqueada
+    // ══════════════════════════════════════════════════════════════
+    match /{document=**} {
+      allow read, write: if false;
     }
+
   }
 }

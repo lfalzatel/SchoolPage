@@ -19,18 +19,37 @@ const ADMIN_EMAILS     = ['greenforceiebb@gmail.com', 'lfalzatel@gmail.com'];
 // ── Opciones por defecto ────────────────────────────────────────────────────
 const DEFAULTS = { activeNav: null, basePath: '' };
 
+// ── Helper: ¿Estamos en la página de inicio? ──────────────────────────────
+function isHomePage() {
+    const p = window.location.pathname.toLowerCase();
+    return p.endsWith('/') || p.endsWith('index.html');
+}
+
+// ── Detectar ítem activo por hash de URL ────────────────────────────────────
+function detectActiveNavFromHash() {
+    const hash = window.location.hash.replace('#', '');
+    const map = { 'sobre': 'inicio', 'cronograma': 'cronograma',
+                  'galeria': 'galeria', 'video': 'video', 'documentos': 'docs' };
+    return map[hash] || null;
+}
+
 // ── Bottom Nav — IDÉNTICO al de index.html ──────────────────────────────────
 function getNavItems(basePath, activeNav) {
+    // En la página inicio: usar #anchor (sin recarga). En otras: index.html#anchor
+    const home = isHomePage();
+    const homeHref = (anchor) => home ? `#${anchor}` : `${basePath}index.html#${anchor}`;
+
     const items = [
-        { id: 'nav-inicio',     href: `${basePath}index.html#sobre`,        icon: 'fa-home',        label: 'Inicio',     key: 'inicio' },
-        { id: 'nav-cronograma', href: `${basePath}index.html#cronograma`,   icon: 'fa-leaf',        label: 'Cronograma', key: 'cronograma' },
-        { id: 'nav-galeria',    href: `${basePath}index.html#galeria`,       icon: 'fa-images',      label: 'Galería',    key: 'galeria' },
-        { id: 'nav-video',      href: `${basePath}index.html#video`,         icon: 'fa-play-circle', label: 'Videos',     key: 'video' },
-        { id: 'nav-docs',       href: `${basePath}index.html#documentos`,    icon: 'fa-file-alt',    label: 'Docs',       key: 'docs' },
+        { id: 'nav-inicio',     href: homeHref('sobre'),      icon: 'fa-home',        label: 'Inicio',     key: 'inicio',     section: 'sobre' },
+        { id: 'nav-cronograma', href: homeHref('cronograma'), icon: 'fa-leaf',        label: 'Cronograma', key: 'cronograma', section: 'cronograma' },
+        { id: 'nav-galeria',    href: homeHref('galeria'),    icon: 'fa-images',      label: 'Galería',    key: 'galeria',    section: 'galeria' },
+        { id: 'nav-video',      href: homeHref('video'),      icon: 'fa-play-circle', label: 'Videos',     key: 'video',      section: 'video' },
+        { id: 'nav-docs',       href: homeHref('documentos'), icon: 'fa-file-alt',    label: 'Docs',       key: 'docs',       section: 'documentos' },
         { id: 'nav-chat',       href: 'https://chat.whatsapp.com/L0hrcQ9JWmUB5DQui9ZrXv',
           icon: 'fa-comments', label: 'Chat', key: 'chat', external: true },
     ];
-    const currentKey = activeNav || detectActiveNav();
+    // Prioridad: parámetro explícito > hash de URL > ruta
+    const currentKey = activeNav || detectActiveNavFromHash() || detectActiveNav();
     return items.map(item => ({ ...item, isActive: item.key === currentKey }));
 }
 
@@ -112,16 +131,16 @@ function buildHeaderHTML(basePath) {
             <span>Gestionar Usuarios</span>
             <i class="fas fa-chevron-right arrow-link"></i>
           </a>
-          <div class="menu-item" onclick="window.closeProfileDropdown()">
+          <div class="menu-item" onclick="window.showView && window.showView('configuracion'); window.closeProfileDropdown();">
             <div class="menu-item-icon bg-gray"><i class="fas fa-cog"></i></div>
             <span>Configuración</span>
             <i class="fas fa-chevron-right arrow-link"></i>
           </div>
-          <div class="menu-item" id="layoutPdfBtn" onclick="window.downloadPdf && window.downloadPdf(); window.closeProfileDropdown();">
+          <div class="menu-item" id="downloadPdfBtnMenu" onclick="window.closeProfileDropdown();">
             <div class="menu-item-icon bg-red"><i class="fas fa-file-pdf"></i></div>
             <span>Descargar Informe PDF</span>
           </div>
-          <div class="menu-item" id="layoutInstallBtn" style="display:none;"
+          <div class="menu-item" id="installAppBtn" style="display:none;"
                onclick="window.installPWA && window.installPWA(); window.closeProfileDropdown();">
             <div class="menu-item-icon bg-green"><i class="fas fa-download"></i></div>
             <span>Instalar Aplicación</span>
@@ -384,6 +403,58 @@ async function loadNotifications() {
     }
 }
 
+// ── Scrollspy para index.html ────────────────────────────────────────────────
+function initHomeScrollspy() {
+    if (!isHomePage()) return;
+
+    function setNavActive(key) {
+        document.querySelectorAll('#bottom-nav-root .nav-item').forEach(a => {
+            a.classList.toggle('active', a.id === `nav-${key}`);
+        });
+    }
+
+    // Actualizar active al hacer clic (inmediato)
+    document.querySelectorAll('#bottom-nav-root .nav-item').forEach(a => {
+        a.addEventListener('click', () => {
+            const key = a.id.replace('nav-', '');
+            if (key !== 'chat') setNavActive(key);
+        });
+    });
+
+    // IntersectionObserver: actualiza active al hacer scroll
+    const sections = [
+        { id: 'sobre',      key: 'inicio' },
+        { id: 'cronograma', key: 'cronograma' },
+        { id: 'galeria',    key: 'galeria' },
+        { id: 'video',      key: 'video' },
+        { id: 'documentos', key: 'docs' },
+    ];
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const sec = sections.find(s => s.id === entry.target.id);
+                if (sec) setNavActive(sec.key);
+            }
+        });
+    }, {
+        // Dispara cuando el 30% de la sección es visible
+        threshold: 0.3,
+        rootMargin: '-70px 0px -50% 0px'
+    });
+
+    sections.forEach(sec => {
+        const el = document.getElementById(sec.id);
+        if (el) observer.observe(el);
+    });
+
+    // Actualizar al cambiar el hash (navegación por teclado, etc.)
+    window.addEventListener('hashchange', () => {
+        const key = detectActiveNavFromHash();
+        if (key) setNavActive(key);
+    });
+}
+
 // ── Función principal ───────────────────────────────────────────────────────
 export function initLayout(options = {}) {
     const opts = { ...DEFAULTS, ...options };
@@ -408,6 +479,7 @@ export function initLayout(options = {}) {
     initDropdowns();
     initAuthUI(opts.basePath);
     loadNotifications();
+    initHomeScrollspy();   // ← activa solo en index.html
 }
 
 // ── Helpers exportados ──────────────────────────────────────────────────────
