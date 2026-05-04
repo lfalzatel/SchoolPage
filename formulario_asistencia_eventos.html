@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Asistencia GIGA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .switch-input:checked + .switch-label { background-color: #22c55e; }
+        .switch-input:checked + .switch-label::after { transform: translateX(100%); }
+    </style>
+</head>
+<body class="bg-gray-50 p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Encabezado -->
+        <div class="bg-blue-700 p-6 text-white text-center">
+            <h1 class="text-2xl font-bold uppercase tracking-wider">Control de Asistencia - GIGA</h1>
+            <p class="text-blue-100 mt-1">Gestión de Salidas Pedagógicas - IE Barro Blanco</p>
+        </div>
+
+        <!-- Métricas en Tiempo Real -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-blue-50 border-b">
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-500">
+                <p class="text-sm text-gray-500 font-semibold uppercase">Cubo Innovación</p>
+                <p id="count-cubo" class="text-3xl font-bold text-gray-800">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
+                <p class="text-sm text-gray-500 font-semibold uppercase">UCO Investigación</p>
+                <p id="count-uco" class="text-3xl font-bold text-gray-800">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-amber-500">
+                <p class="text-sm text-gray-500 font-semibold uppercase">Reserva CAM</p>
+                <p id="count-cam" class="text-3xl font-bold text-gray-800">0</p>
+            </div>
+        </div>
+
+        <!-- Filtros, Acciones y Registro de Eventos -->
+        <div class="p-6 flex flex-wrap gap-4 items-center justify-between border-b">
+            <div class="flex items-center gap-2">
+                <label class="font-bold text-gray-700">Filtrar Grado:</label>
+                <select id="filter-grado" class="border rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="all">Todos los grados</option>
+                    <option value="6A">6A</option><option value="6B">6B</option><option value="6C">6C</option>
+                    <option value="7A">7A</option><option value="8A">8A</option><option value="8B">8B</option>
+                    <option value="9A">9A</option><option value="9B">9B</option><option value="10A">10A</option>
+                    <option value="10B">10B</option><option value="11A">11A</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <input id="nuevo-evento" type="text" placeholder="Nuevo evento" class="border rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" />
+                <button onclick="agregarEvento()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">Agregar evento</button>
+            </div>
+            <button onclick="generarResumen()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200">
+                Ver Resumen ↗
+            </button>
+        </div>
+
+        <!-- Tabla de Estudiantes -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-700 uppercase text-xs" id="event-header-row">
+                        <th class="p-4 border-b">Estudiante</th>
+                        <th class="p-4 border-b">Grado</th>
+                        <!-- Columnas de eventos generadas por JS -->
+                    </tr>
+                </thead>
+                <tbody id="student-table-body">
+                    <!-- Filas generadas por JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // --- Datos base ---
+        let eventos = [
+            { key: 'cubo', nombre: 'Cubo Innovación' },
+            { key: 'uco', nombre: 'UCO Investigación' },
+            { key: 'cam', nombre: 'Reserva CAM' }
+        ];
+
+        const estudiantes = [
+            { id: 1, nombre: "Nicolás Gañán Bedoya (Líder)", grado: "8B" },
+            { id: 2, nombre: "Melissa Vargas Franco (Líder)", grado: "10B" },
+            { id: 3, nombre: "Julieta Gallego Builes", grado: "11A" },
+            { id: 4, nombre: "Michel Parra Rodríguez", grado: "11A" },
+            { id: 5, nombre: "Jalver Santiago Castillo Arenas", grado: "11A" },
+            { id: 6, nombre: "Samir Jeronimo Brochero Ayala", grado: "11A" },
+            { id: 7, nombre: "Estefanía Jiménez González", grado: "10A" },
+            { id: 8, nombre: "Emanuel Mejia Monares", grado: "10A" },
+            { id: 9, nombre: "Emiliano Henao Quintero", grado: "10A" },
+            { id: 10, nombre: "Jose Alejandro Ospina Echeverry", grado: "10A" },
+            { id: 11, nombre: "Dianny Dairely Saldaña García", grado: "10B" },
+            { id: 12, nombre: "Jeronimo Henao Giraldo", grado: "10B" },
+            { id: 13, nombre: "Emmanuel Osorio Melan", grado: "10B" },
+            { id: 14, nombre: "Mateo Buitrago Alzate", grado: "10B" },
+            { id: 15, nombre: "Emanuel Noreña Gallego", grado: "9A" },
+            { id: 16, nombre: "Emiliano Gómez Osorio", grado: "9A" },
+            { id: 17, nombre: "Isabel Cristina restrepo", grado: "9B" },
+            { id: 18, nombre: "Liceth Sofia Quintero Martínez", grado: "9B" },
+            { id: 19, nombre: "Emanuel Alexander Acevedo", grado: "9B" },
+            { id: 20, nombre: "Dalismar de jesus Torres Valor", grado: "9B" },
+            { id: 21, nombre: "Juana María Osorio Abad", grado: "9B" },
+            { id: 22, nombre: "Josua Martin Orbe miño", grado: "8B" },
+            { id: 23, nombre: "Dilan Andrey Montoya Arango", grado: "8A" },
+            { id: 24, nombre: "Jacob Ramírez Tamayo", grado: "8A" },
+            { id: 25, nombre: "David Preciado Usme", grado: "8A" },
+            { id: 26, nombre: "Juan Felipe Guerrero Sierra", grado: "8B" },
+            { id: 27, nombre: "David Escobar Garzon", grado: "8B" },
+            { id: 28, nombre: "Juan David Roldan Marín", grado: "8A" },
+            { id: 29, nombre: "Juan Sebastián Alzate Alzate", grado: "7A" },
+            { id: 30, nombre: "Isaac Ramírez Tamayo", grado: "6A" },
+            { id: 31, nombre: "Jeronimo García Giraldo", grado: "6B" },
+            { id: 32, nombre: "Luna Valencia Álvarez", grado: "6C" }
+        ];
+
+        let asistencia = {};
+        function inicializarAsistencia() {
+            estudiantes.forEach(e => {
+                if (!asistencia[e.id]) asistencia[e.id] = {};
+                eventos.forEach(ev => {
+                    if (typeof asistencia[e.id][ev.key] === 'undefined') {
+                        asistencia[e.id][ev.key] = false;
+                    }
+                });
+            });
+        }
+        inicializarAsistencia();
+
+        function renderTable() {
+            const filter = document.getElementById('filter-grado').value;
+            const tbody = document.getElementById('student-table-body');
+            tbody.innerHTML = '';
+
+            // Renderizar encabezado de eventos
+            const headerRow = document.getElementById('event-header-row');
+            headerRow.innerHTML = `
+                <th class="p-4 border-b">Estudiante</th>
+                <th class="p-4 border-b">Grado</th>
+                ${eventos.map(ev => `<th class="p-4 border-b text-center">${ev.nombre}</th>`).join('')}
+            `;
+
+            estudiantes.filter(e => filter === 'all' || e.grado === filter).forEach(e => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-gray-50 border-b transition-colors";
+                row.innerHTML = `
+                    <td class="p-4 font-medium text-gray-800">${e.nombre}</td>
+                    <td class="p-4 text-gray-600">${e.grado}</td>
+                    ${eventos.map(ev => `<td class="p-4 text-center">${createSwitch(e.id, ev.key)}</td>`).join('')}
+                `;
+                tbody.appendChild(row);
+            });
+            updateMetrics();
+        }
+
+        function createSwitch(id, eventKey) {
+            const checked = asistencia[id][eventKey] ? 'checked' : '';
+            return `
+                <div class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="hidden" id="${eventKey}-${id}" ${checked} onchange="toggleAsistencia(${id}, '${eventKey}')">
+                    <label for="${eventKey}-${id}" class="w-12 h-6 bg-gray-300 rounded-full relative transition duration-200 ${checked ? 'bg-green-500' : ''} shadow-inner">
+                        <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ${checked ? 'translate-x-6' : ''}"></div>
+                    </label>
+                </div>
+            `;
+        }
+
+        function toggleAsistencia(id, eventKey) {
+            asistencia[id][eventKey] = !asistencia[id][eventKey];
+            renderTable();
+        }
+
+        function updateMetrics() {
+            // Solo actualiza los 3 eventos base
+            const baseKeys = ['cubo', 'uco', 'cam'];
+            const counts = { cubo: 0, uco: 0, cam: 0 };
+            Object.values(asistencia).forEach(a => {
+                baseKeys.forEach(k => { if(a[k]) counts[k]++; });
+            });
+            document.getElementById('count-cubo').innerText = counts.cubo;
+            document.getElementById('count-uco').innerText = counts.uco;
+            document.getElementById('count-cam').innerText = counts.cam;
+        }
+
+        function generarResumen() {
+            let total = 0;
+            const resumen = Object.entries(asistencia).map(([id, data]) => {
+                const est = estudiantes.find(e => e.id == id);
+                // Si tiene asistencia en cualquier evento
+                return eventos.some(ev => data[ev.key]) ? `${est.nombre} (${est.grado})` : null;
+            }).filter(x => x);
+
+            alert("Resumen generado. Revisar consola para detalle técnico o imprimir pantalla.\nTotal estudiantes con alguna asistencia: " + resumen.length);
+        }
+
+        // --- Agregar evento dinámicamente ---
+        function agregarEvento() {
+            const input = document.getElementById('nuevo-evento');
+            let nombre = input.value.trim();
+            if (!nombre) {
+                alert('Por favor ingresa un nombre para el evento.');
+                return;
+            }
+            // Generar una key única
+            let key = nombre.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+            if (!key) key = 'evento_' + (eventos.length + 1);
+            // Evitar duplicados
+            if (eventos.some(ev => ev.key === key)) {
+                alert('Ya existe un evento con ese nombre.');
+                return;
+            }
+            eventos.push({ key, nombre });
+            // Añadir a asistencia de todos los estudiantes
+            estudiantes.forEach(e => {
+                if (typeof asistencia[e.id][key] === 'undefined') {
+                    asistencia[e.id][key] = false;
+                }
+            });
+            input.value = '';
+            renderTable();
+        }
+
+        document.getElementById('filter-grado').addEventListener('change', renderTable);
+        renderTable();
+    </script>
+</body>
+</html>
