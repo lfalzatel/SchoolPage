@@ -1119,9 +1119,9 @@
     </div>
   </div>
 
-  <div class="fab" onclick="scrollToSection('sobre')">
-    <i class="fas fa-arrow-up"></i>
-  </div>
+  <div class="scroll-top-btn" onclick="scrollToSection('sobre')">
+  <i class="fas fa-arrow-up"></i>
+</div>
   <script type="module">
     import { initBackgroundSlideshow } from './gallery.js';
     import { auth } from './auth.js';
@@ -1597,8 +1597,13 @@
     });
 
     window.addEventListener('scroll', () => {
-      const fab = document.querySelector('.fab');
-      if (fab) fab.style.opacity = window.scrollY > 100 ? '1' : '0';
+      const fab = document.querySelector('.scroll-top-btn');
+      if (fab) {
+        const visible = window.scrollY > 100;
+        fab.style.opacity = visible ? '1' : '0';
+        fab.style.visibility = visible ? 'visible' : 'hidden';
+        fab.style.pointerEvents = visible ? 'auto' : 'none';
+      }
     });
 
     document.getElementById('downloadPdfBtnMenu')?.addEventListener('click', async function () {

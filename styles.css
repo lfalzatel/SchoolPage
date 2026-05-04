@@ -2002,7 +2002,7 @@ footer {
 }
 
 /* FAB */
-.fab {
+.scroll-top-btn {
   position: fixed;
   bottom: 90px;
   /* Adjusted for bottom nav */
@@ -2264,14 +2264,12 @@ section h2 {
   background-clip: text;
 }
 
-/* Adjust FAB position */
-.fab {
+.scroll-top-btn {
   bottom: 85px;
   right: 15px;
 }
 
-
-.fab:hover {
+.scroll-top-btn:hover {
   transform: scale(1.15);
 }
 
