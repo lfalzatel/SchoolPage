@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Asistencia GIGA - Green Force</title>
-    
-    <!-- PWA Meta Tags -->
+    <title>Control de Asistencia — Green Force</title>
+    <meta name="description" content="Formulario de control de asistencia a salidas pedagógicas del Grupo Ambiental Green Force.">
+
+    <!-- PWA -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2E7D32">
+    <meta name="theme-color" content="#059669">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -15,410 +16,371 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Styles -->
+    <!-- Design System -->
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        .switch-input:checked + .switch-label { background-color: #22c55e; }
-        .switch-input:checked + .switch-label::after { transform: translateX(100%); }
-        
-        /* Ajustes para integrar Tailwind con el diseño premium */
+        /* ── Integración Tailwind + sistema premium ── */
+        body { background-color: transparent !important; }
+
         .premium-container {
             margin-top: 100px;
             margin-bottom: 100px;
             position: relative;
             z-index: 1;
         }
-        
-        body {
-            background-color: transparent !important;
-        }
 
         .main-card-premium {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
         }
 
-        .dark-mode .main-card-premium {
-            background: rgba(31, 41, 55, 0.95);
-            color: white;
-        }
-
-        .dark-mode .bg-blue-50 {
-            background-color: rgba(30, 58, 138, 0.2);
-        }
-
-        .dark-mode .text-gray-800 { color: #f3f4f6; }
-        .dark-mode .text-gray-700 { color: #e5e7eb; }
-        .dark-mode .text-gray-600 { color: #d1d5db; }
-        .dark-mode .text-gray-500 { color: #9ca3af; }
-        .dark-mode .bg-gray-100 { background-color: rgba(55, 65, 81, 0.5); }
-        .dark-mode .bg-white { background-color: rgba(31, 41, 55, 0.8); }
-        .dark-mode .border-b { border-color: rgba(255, 255, 255, 0.1); }
+        /* Dark mode Tailwind compat */
+        .dark-mode .main-card-premium      { background: rgba(31, 41, 55, 0.96); color: white; }
+        .dark-mode .bg-blue-50             { background-color: rgba(30, 58, 138, 0.2); }
+        .dark-mode .bg-gray-50             { background-color: rgba(31, 41, 55, 0.4) !important; }
+        .dark-mode .bg-gray-100            { background-color: rgba(55, 65, 81, 0.5); }
+        .dark-mode .bg-white               { background-color: rgba(31, 41, 55, 0.8); }
+        .dark-mode .text-gray-800          { color: #f3f4f6; }
+        .dark-mode .text-gray-700          { color: #e5e7eb; }
+        .dark-mode .text-gray-600          { color: #d1d5db; }
+        .dark-mode .text-gray-500          { color: #9ca3af; }
+        .dark-mode .border-b               { border-color: rgba(255, 255, 255, 0.1); }
         .dark-mode .hover\:bg-gray-50:hover { background-color: rgba(55, 65, 81, 0.3); }
+
+        /* Toggle switch */
+        .switch-input:checked + .switch-label { background-color: #22c55e !important; }
+
+        /* Barra de estado de guardado */
+        #save-status-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            font-size: 0.75rem;
+            color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        .dark-mode #save-status-bar {
+            background: rgba(31, 41, 55, 0.5);
+            border-color: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.45);
+        }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Randomized App Background -->
+<body>
+    <!-- Fondo dinámico (iniciado por layout.js) -->
     <div id="app-background"></div>
 
-    <!-- Fixed App Header -->
-    <header class="app-header">
-        <div class="header-left">
-            <img src="assets/images/1. logo 3.jpg" alt="Logo" class="header-logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
-            <div class="header-brand" onclick="window.location.href='index.html'" style="cursor: pointer;">
-                <span class="header-title">Green Force</span>
-                <span class="header-subtitle">Sembrando Futuro</span>
-            </div>
-        </div>
-        <div class="header-actions">
-            <div class="notifications-wrapper">
-                <div class="notification-bell-btn" onclick="toggleNotifications()">
-                    <i class="fas fa-bell"></i>
-                    <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
-                </div>
-                <div id="notificationsDropdown" class="notifications-dropdown">
-                    <div class="notifications-header">
-                        <h3>Próximos Eventos</h3>
-                    </div>
-                    <div id="notificationList" class="notification-list">
-                        <div class="notification-loader"><i class="fas fa-spinner fa-spin"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- ► Placeholder de Header — layout.js lo reemplaza -->
+    <div id="app-header-placeholder"></div>
 
-        <div class="profile-menu-container">
-            <div class="header-avatar-container" onclick="toggleProfileMenu()">
-                <img src="assets/icons/icon-192.png" alt="Profile" id="headerProfileAvatar" class="header-avatar">
-                <div class="user-info-pill">
-                    <span id="headerUserName" class="user-name-pill">Invitado</span>
-                    <span id="headerUserRole" class="user-role-pill">Visitante</span>
-                </div>
-                <i class="fas fa-chevron-down pill-chevron"></i>
-            </div>
-
-            <div id="profileDropdown" class="profile-dropdown">
-                <div class="dropdown-card">
-                    <div class="user-card-header">
-                        <div class="user-card-info">
-                            <span id="menuProfileName" class="user-card-name">Invitado</span>
-                            <span id="menuProfileEmail" class="user-card-email">Inicia sesión para más</span>
-                        </div>
-                    </div>
-
-                    <div class="dropdown-menu-list">
-                        <a href="index.html" class="menu-item">
-                            <div class="menu-item-icon bg-blue"><i class="fas fa-home"></i></div>
-                            <span>Inicio App</span>
-                            <i class="fas fa-chevron-right arrow-link"></i>
-                        </a>
-                        <div class="dropdown-theme-section">
-                            <span class="theme-label">TEMA</span>
-                            <div class="theme-selector-group">
-                                <button class="theme-btn active" onclick="setTheme('light')" title="Modo Claro">
-                                    <i class="fas fa-sun"></i>
-                                </button>
-                                <button class="theme-btn" onclick="setTheme('dark')" title="Modo Oscuro">
-                                    <i class="fas fa-moon"></i>
-                                </button>
-                                <button class="theme-btn" onclick="setTheme('system')" title="Seguir Sistema">
-                                    <i class="fas fa-desktop"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="dropdown-footer">
-                            <button class="logout-pill-btn" id="menuLoginBtn" onclick="handleAuthAction()">
-                                <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
+    <!-- ── Contenido principal ────────────────────────────────────────────── -->
     <div class="premium-container px-4 sm:px-6">
         <div class="max-w-6xl mx-auto main-card-premium rounded-2xl shadow-2xl overflow-hidden mb-20">
-            <!-- Encabezado del Formulario -->
+
+            <!-- Encabezado de la sección -->
             <div class="bg-gradient-to-r from-emerald-600 to-teal-700 p-6 sm:p-8 text-white text-center">
                 <h1 class="text-3xl font-extrabold uppercase tracking-widest">Control de Asistencia</h1>
-                <p class="text-emerald-50 mt-2 font-medium">Gestión de Salidas Pedagógicas - Grupo Ambiental Green Force</p>
+                <p class="text-emerald-50 mt-2 font-medium">Gestión de Salidas Pedagógicas — Grupo Ambiental Green Force</p>
             </div>
 
-        <!-- Métricas en Tiempo Real -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4 p-4 sm:p-6 bg-blue-50 border-b">
-            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-500">
-                <p class="text-sm text-gray-500 font-semibold uppercase">Cubo Innovación</p>
-                <p id="count-cubo" class="text-3xl font-bold text-gray-800">0</p>
+            <!-- Métricas en Tiempo Real -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4 p-4 sm:p-6 bg-blue-50 border-b">
+                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-500">
+                    <p class="text-sm text-gray-500 font-semibold uppercase">Cubo Innovación</p>
+                    <p id="count-cubo" class="text-3xl font-bold text-gray-800">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
+                    <p class="text-sm text-gray-500 font-semibold uppercase">UCO Investigación</p>
+                    <p id="count-uco" class="text-3xl font-bold text-gray-800">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-amber-500">
+                    <p class="text-sm text-gray-500 font-semibold uppercase">Reserva CAM</p>
+                    <p id="count-cam" class="text-3xl font-bold text-gray-800">0</p>
+                </div>
             </div>
-            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
-                <p class="text-sm text-gray-500 font-semibold uppercase">UCO Investigación</p>
-                <p id="count-uco" class="text-3xl font-bold text-gray-800">0</p>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-amber-500">
-                <p class="text-sm text-gray-500 font-semibold uppercase">Reserva CAM</p>
-                <p id="count-cam" class="text-3xl font-bold text-gray-800">0</p>
-            </div>
-        </div>
 
-        <!-- Filtros, Acciones y Registro de Eventos -->
-        <div class="p-4 sm:p-6 flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 items-stretch sm:items-center justify-between border-b">
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-                <label class="font-bold text-gray-700">Filtrar Grado:</label>
-                <select id="filter-grado" class="border rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none w-full sm:w-auto">
-                    <option value="all">Todos los grados</option>
-                    <option value="6A">6A</option><option value="6B">6B</option><option value="6C">6C</option>
-                    <option value="7A">7A</option><option value="8A">8A</option><option value="8B">8B</option>
-                    <option value="9A">9A</option><option value="9B">9B</option><option value="10A">10A</option>
-                    <option value="10B">10B</option><option value="11A">11A</option>
-                </select>
+            <!-- Filtros y Acciones -->
+            <div class="p-4 sm:p-6 flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 items-stretch sm:items-center justify-between border-b">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                    <label class="font-bold text-gray-700">Filtrar Grado:</label>
+                    <select id="filter-grado" class="border rounded-md px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none w-full sm:w-auto">
+                        <option value="all">Todos los grados</option>
+                        <option value="6A">6A</option><option value="6B">6B</option><option value="6C">6C</option>
+                        <option value="7A">7A</option><option value="8A">8A</option><option value="8B">8B</option>
+                        <option value="9A">9A</option><option value="9B">9B</option><option value="10A">10A</option>
+                        <option value="10B">10B</option><option value="11A">11A</option>
+                    </select>
+                </div>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                    <input id="nuevo-evento" type="text" placeholder="Nombre del nuevo evento…"
+                           class="border rounded-md px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none w-full sm:w-auto" />
+                    <button onclick="agregarEvento()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 w-full sm:w-auto">
+                        <i class="fas fa-plus"></i> Agregar evento
+                    </button>
+                </div>
+                <button onclick="generarResumen()"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 w-full sm:w-auto">
+                    <i class="fas fa-chart-bar"></i> Ver Resumen
+                </button>
             </div>
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-                <input id="nuevo-evento" type="text" placeholder="Nuevo evento" class="border rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none w-full sm:w-auto" />
-                <button onclick="agregarEvento()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 w-full sm:w-auto">Agregar evento</button>
-            </div>
-            <button onclick="generarResumen()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 w-full sm:w-auto">
-                Ver Resumen ↗
-            </button>
-        </div>
 
-        <!-- Tabla de Estudiantes -->
-        <div class="overflow-x-auto text-sm sm:text-base">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-100 text-gray-700 uppercase text-xs" id="event-header-row">
-                        <th class="p-4 border-b">Estudiante</th>
-                        <th class="p-4 border-b">Grado</th>
-                        <!-- Columnas de eventos generadas por JS -->
-                    </tr>
-                </thead>
-                <tbody id="student-table-body">
-                    <!-- Filas generadas por JS -->
-                </tbody>
-            </table>
-        </div>
+            <!-- Barra de estado Firestore -->
+            <div id="save-status-bar">
+                <span id="save-status"><i class="fas fa-cloud"></i>&nbsp;Iniciando…</span>
+            </div>
+
+            <!-- Tabla de Estudiantes -->
+            <div class="overflow-x-auto text-sm sm:text-base">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 uppercase text-xs" id="event-header-row">
+                            <th class="p-4 border-b">Estudiante</th>
+                            <th class="p-4 border-b">Grado</th>
+                            <!-- Columnas de eventos → generadas por JS -->
+                        </tr>
+                    </thead>
+                    <tbody id="student-table-body">
+                        <!-- Filas → generadas por JS -->
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <a href="index.html#sobre" class="nav-item">
-            <i class="fas fa-home"></i>
-            <span>Inicio</span>
-        </a>
-        <a href="index.html#cronograma" class="nav-item">
-            <i class="fas fa-leaf"></i>
-            <span>Cronograma</span>
-        </a>
-        <a href="index.html#galeria" class="nav-item">
-            <i class="fas fa-images"></i>
-            <span>Galería</span>
-        </a>
-        <a href="formulario_asistencia_eventos.html" class="nav-item active">
-            <i class="fas fa-poll"></i>
-            <span>Asistencia</span>
-        </a>
-        <a id="groupChatBtn" href="https://chat.whatsapp.com/L0hrcQ9JWmUB5DQui9ZrXv" class="nav-item" target="_blank" rel="noopener noreferrer">
-            <i class="fas fa-comments"></i>
-            <span>Chat</span>
-        </a>
-    </nav>
+    <!-- ► Placeholder de Bottom Nav — layout.js lo reemplaza -->
+    <div id="bottom-nav-placeholder"></div>
 
-    <!-- Scripts -->
-    <script type="module" src="auth.js"></script>
+    <!-- Toast Container (compartido) -->
+    <div id="toast-container"></div>
+
+    <!-- ─── Scripts ─────────────────────────────────────────────────────── -->
+
+    <!-- 1. Layout compartido (header + nav + tema + auth UI) -->
     <script type="module">
-        import { auth } from './firebase-config.js';
-        
-        // Background randomization logic (simplified from index.html)
-        const bgContainer = document.getElementById('app-background');
-        const images = [
-            'assets/images/WhatsApp Image 2024-05-23 at 8.01.21 AM (1).jpeg',
-            'assets/images/WhatsApp Image 2024-05-23 at 8.01.21 AM.jpeg',
-            'assets/images/WhatsApp Image 2024-05-23 at 8.01.22 AM.jpeg'
-        ];
-        
-        function setRandomBg() {
-            const img = images[Math.floor(Math.random() * images.length)];
-            bgContainer.style.backgroundImage = `url('${img}')`;
-            bgContainer.style.backgroundSize = 'cover';
-            bgContainer.style.backgroundPosition = 'center';
-            bgContainer.style.opacity = '0.4';
-        }
-        setRandomBg();
-
-        // UI Helpers
-        window.toggleProfileMenu = () => {
-            document.getElementById('profileDropdown').classList.toggle('active');
-        };
-
-        window.toggleNotifications = () => {
-            document.getElementById('notificationsDropdown').classList.toggle('active');
-        };
-
-        // Close dropdowns on click outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.profile-menu-container')) {
-                document.getElementById('profileDropdown').classList.remove('active');
-            }
-            if (!e.target.closest('.notifications-wrapper')) {
-                document.getElementById('notificationsDropdown').classList.remove('active');
-            }
-        });
+        import { initLayout } from './layout.js';
+        initLayout({ activeNav: 'asistencia' });
     </script>
 
-    <script>
-        // --- Datos base ---
-        let eventos = [
+    <!-- 2. Lógica de asistencia con persistencia Firestore -->
+    <script type="module">
+        import { db } from './firebase-config.js';
+        import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+        // ── Referencias Firestore ────────────────────────────────────────────
+        const DOC_EVENTOS    = doc(db, 'asistencia_datos', 'eventos');
+        const DOC_ASISTENCIA = doc(db, 'asistencia_datos', 'registros');
+
+        // ── Datos constantes ─────────────────────────────────────────────────
+        const EVENTOS_DEFAULT = [
             { key: 'cubo', nombre: 'Cubo Innovación' },
-            { key: 'uco', nombre: 'UCO Investigación' },
-            { key: 'cam', nombre: 'Reserva CAM' }
+            { key: 'uco',  nombre: 'UCO Investigación' },
+            { key: 'cam',  nombre: 'Reserva CAM' }
         ];
 
-        const estudiantes = [
-            { id: 1, nombre: "Nicolás Gañán Bedoya (Líder)", grado: "8B" },
-            { id: 2, nombre: "Melissa Vargas Franco (Líder)", grado: "10B" },
-            { id: 3, nombre: "Julieta Gallego Builes", grado: "11A" },
-            { id: 4, nombre: "Michel Parra Rodríguez", grado: "11A" },
-            { id: 5, nombre: "Jalver Santiago Castillo Arenas", grado: "11A" },
-            { id: 6, nombre: "Samir Jeronimo Brochero Ayala", grado: "11A" },
-            { id: 7, nombre: "Estefanía Jiménez González", grado: "10A" },
-            { id: 8, nombre: "Emanuel Mejia Monares", grado: "10A" },
-            { id: 9, nombre: "Emiliano Henao Quintero", grado: "10A" },
-            { id: 10, nombre: "Jose Alejandro Ospina Echeverry", grado: "10A" },
-            { id: 11, nombre: "Dianny Dairely Saldaña García", grado: "10B" },
-            { id: 12, nombre: "Jeronimo Henao Giraldo", grado: "10B" },
-            { id: 13, nombre: "Emmanuel Osorio Melan", grado: "10B" },
-            { id: 14, nombre: "Mateo Buitrago Alzate", grado: "10B" },
-            { id: 15, nombre: "Emanuel Noreña Gallego", grado: "9A" },
-            { id: 16, nombre: "Emiliano Gómez Osorio", grado: "9A" },
-            { id: 17, nombre: "Isabel Cristina restrepo", grado: "9B" },
-            { id: 18, nombre: "Liceth Sofia Quintero Martínez", grado: "9B" },
-            { id: 19, nombre: "Emanuel Alexander Acevedo", grado: "9B" },
-            { id: 20, nombre: "Dalismar de jesus Torres Valor", grado: "9B" },
-            { id: 21, nombre: "Juana María Osorio Abad", grado: "9B" },
-            { id: 22, nombre: "Josua Martin Orbe miño", grado: "8B" },
-            { id: 23, nombre: "Dilan Andrey Montoya Arango", grado: "8A" },
-            { id: 24, nombre: "Jacob Ramírez Tamayo", grado: "8A" },
-            { id: 25, nombre: "David Preciado Usme", grado: "8A" },
-            { id: 26, nombre: "Juan Felipe Guerrero Sierra", grado: "8B" },
-            { id: 27, nombre: "David Escobar Garzon", grado: "8B" },
-            { id: 28, nombre: "Juan David Roldan Marín", grado: "8A" },
-            { id: 29, nombre: "Juan Sebastián Alzate Alzate", grado: "7A" },
-            { id: 30, nombre: "Isaac Ramírez Tamayo", grado: "6A" },
-            { id: 31, nombre: "Jeronimo García Giraldo", grado: "6B" },
-            { id: 32, nombre: "Luna Valencia Álvarez", grado: "6C" }
+        const ESTUDIANTES = [
+            { id: 1,  nombre: "Nicolás Gañán Bedoya (Líder)",        grado: "8B" },
+            { id: 2,  nombre: "Melissa Vargas Franco (Líder)",        grado: "10B" },
+            { id: 3,  nombre: "Julieta Gallego Builes",               grado: "11A" },
+            { id: 4,  nombre: "Michel Parra Rodríguez",               grado: "11A" },
+            { id: 5,  nombre: "Jalver Santiago Castillo Arenas",      grado: "11A" },
+            { id: 6,  nombre: "Samir Jeronimo Brochero Ayala",        grado: "11A" },
+            { id: 7,  nombre: "Estefanía Jiménez González",           grado: "10A" },
+            { id: 8,  nombre: "Emanuel Mejia Monares",                grado: "10A" },
+            { id: 9,  nombre: "Emiliano Henao Quintero",              grado: "10A" },
+            { id: 10, nombre: "Jose Alejandro Ospina Echeverry",      grado: "10A" },
+            { id: 11, nombre: "Dianny Dairely Saldaña García",        grado: "10B" },
+            { id: 12, nombre: "Jeronimo Henao Giraldo",               grado: "10B" },
+            { id: 13, nombre: "Emmanuel Osorio Melan",                grado: "10B" },
+            { id: 14, nombre: "Mateo Buitrago Alzate",                grado: "10B" },
+            { id: 15, nombre: "Emanuel Noreña Gallego",               grado: "9A" },
+            { id: 16, nombre: "Emiliano Gómez Osorio",                grado: "9A" },
+            { id: 17, nombre: "Isabel Cristina Restrepo",             grado: "9B" },
+            { id: 18, nombre: "Liceth Sofia Quintero Martínez",       grado: "9B" },
+            { id: 19, nombre: "Emanuel Alexander Acevedo",            grado: "9B" },
+            { id: 20, nombre: "Dalismar de Jesus Torres Valor",       grado: "9B" },
+            { id: 21, nombre: "Juana María Osorio Abad",              grado: "9B" },
+            { id: 22, nombre: "Josua Martin Orbe Miño",               grado: "8B" },
+            { id: 23, nombre: "Dilan Andrey Montoya Arango",          grado: "8A" },
+            { id: 24, nombre: "Jacob Ramírez Tamayo",                 grado: "8A" },
+            { id: 25, nombre: "David Preciado Usme",                  grado: "8A" },
+            { id: 26, nombre: "Juan Felipe Guerrero Sierra",          grado: "8B" },
+            { id: 27, nombre: "David Escobar Garzon",                 grado: "8B" },
+            { id: 28, nombre: "Juan David Roldan Marín",              grado: "8A" },
+            { id: 29, nombre: "Juan Sebastián Alzate Alzate",         grado: "7A" },
+            { id: 30, nombre: "Isaac Ramírez Tamayo",                 grado: "6A" },
+            { id: 31, nombre: "Jeronimo García Giraldo",              grado: "6B" },
+            { id: 32, nombre: "Luna Valencia Álvarez",                grado: "6C" }
         ];
 
+        // ── Estado en memoria ────────────────────────────────────────────────
+        let eventos    = [...EVENTOS_DEFAULT];
         let asistencia = {};
-        function inicializarAsistencia() {
-            estudiantes.forEach(e => {
-                if (!asistencia[e.id]) asistencia[e.id] = {};
-                eventos.forEach(ev => {
-                    if (typeof asistencia[e.id][ev.key] === 'undefined') {
-                        asistencia[e.id][ev.key] = false;
-                    }
-                });
+        let saveTimer  = null;
+
+        // ── Indicador de estado ──────────────────────────────────────────────
+        function setStatus(msg, type = 'info') {
+            const el = document.getElementById('save-status');
+            if (!el) return;
+            const icons  = { saving: 'fa-spinner fa-spin', saved: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-cloud' };
+            const colors = { saving: '#f59e0b', saved: '#10b981', error: '#ef4444', info: '#6b7280' };
+            el.innerHTML = `<i class="fas ${icons[type]}" style="color:${colors[type]}"></i>&nbsp;${msg}`;
+        }
+
+        // ── Helpers ──────────────────────────────────────────────────────────
+        function ensureStudentEntry(id) {
+            if (!asistencia[id]) asistencia[id] = {};
+            eventos.forEach(ev => {
+                if (typeof asistencia[id][ev.key] === 'undefined')
+                    asistencia[id][ev.key] = false;
             });
         }
-        inicializarAsistencia();
 
+        function initAsistencia() {
+            ESTUDIANTES.forEach(e => ensureStudentEntry(e.id));
+        }
+
+        // ── Guardar en Firestore (debounce 800 ms) ───────────────────────────
+        async function saveAll() {
+            setStatus('Guardando…', 'saving');
+            try {
+                await setDoc(DOC_EVENTOS, { lista: eventos });
+                const data = {};
+                Object.entries(asistencia).forEach(([id, val]) => { data[`st_${id}`] = val; });
+                await setDoc(DOC_ASISTENCIA, data);
+                const now = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                setStatus(`Guardado a las ${now}`, 'saved');
+            } catch (err) {
+                console.error('Error guardando:', err);
+                setStatus('Error al guardar', 'error');
+            }
+        }
+
+        function scheduleSave() {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(saveAll, 800);
+        }
+
+        // ── Cargar desde Firestore ───────────────────────────────────────────
+        async function loadData() {
+            setStatus('Cargando datos…', 'info');
+            try {
+                const evSnap = await getDoc(DOC_EVENTOS);
+                eventos = (evSnap.exists() && evSnap.data().lista?.length)
+                    ? evSnap.data().lista
+                    : [...EVENTOS_DEFAULT];
+
+                const asSnap = await getDoc(DOC_ASISTENCIA);
+                if (asSnap.exists()) {
+                    Object.entries(asSnap.data()).forEach(([key, val]) => {
+                        const id = parseInt(key.replace('st_', ''), 10);
+                        if (!isNaN(id)) asistencia[id] = val;
+                    });
+                }
+
+                initAsistencia();
+                renderTable();
+                setStatus('Datos cargados', 'saved');
+            } catch (err) {
+                console.error('Error cargando:', err);
+                setStatus('Sin conexión — datos temporales', 'error');
+                initAsistencia();
+                renderTable();
+            }
+        }
+
+        // ── Render ───────────────────────────────────────────────────────────
         function renderTable() {
             const filter = document.getElementById('filter-grado').value;
-            const tbody = document.getElementById('student-table-body');
+            const tbody  = document.getElementById('student-table-body');
             tbody.innerHTML = '';
 
-            // Renderizar encabezado de eventos
-            const headerRow = document.getElementById('event-header-row');
-            headerRow.innerHTML = `
+            document.getElementById('event-header-row').innerHTML = `
                 <th class="p-4 border-b">Estudiante</th>
                 <th class="p-4 border-b">Grado</th>
                 ${eventos.map(ev => `<th class="p-4 border-b text-center">${ev.nombre}</th>`).join('')}
             `;
 
-            estudiantes.filter(e => filter === 'all' || e.grado === filter).forEach(e => {
-                const row = document.createElement('tr');
-                row.className = "hover:bg-gray-50 border-b transition-colors";
-                row.innerHTML = `
-                    <td class="p-4 font-medium text-gray-800">${e.nombre}</td>
-                    <td class="p-4 text-gray-600">${e.grado}</td>
-                    ${eventos.map(ev => `<td class="p-4 text-center">${createSwitch(e.id, ev.key)}</td>`).join('')}
-                `;
-                tbody.appendChild(row);
-            });
+            ESTUDIANTES
+                .filter(e => filter === 'all' || e.grado === filter)
+                .forEach(e => {
+                    ensureStudentEntry(e.id);
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 border-b transition-colors';
+                    row.innerHTML = `
+                        <td class="p-4 font-medium text-gray-800">${e.nombre}</td>
+                        <td class="p-4 text-gray-600">${e.grado}</td>
+                        ${eventos.map(ev => `<td class="p-4 text-center">${createSwitch(e.id, ev.key)}</td>`).join('')}
+                    `;
+                    tbody.appendChild(row);
+                });
+
             updateMetrics();
         }
 
         function createSwitch(id, eventKey) {
-            const checked = asistencia[id][eventKey] ? 'checked' : '';
+            const on      = asistencia[id]?.[eventKey] ?? false;
+            const checked = on ? 'checked' : '';
+            const bg      = on ? 'bg-green-500' : 'bg-gray-300';
+            const knob    = on ? 'translate-x-6' : '';
             return `
                 <div class="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" class="hidden" id="${eventKey}-${id}" ${checked} onchange="toggleAsistencia(${id}, '${eventKey}')">
-                    <label for="${eventKey}-${id}" class="w-12 h-6 bg-gray-300 rounded-full relative transition duration-200 ${checked ? 'bg-green-500' : ''} shadow-inner">
-                        <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ${checked ? 'translate-x-6' : ''}"></div>
+                    <input type="checkbox" class="hidden switch-input" id="${eventKey}-${id}" ${checked}
+                           onchange="window.toggleAsistencia(${id},'${eventKey}')">
+                    <label for="${eventKey}-${id}"
+                           class="switch-label w-12 h-6 ${bg} rounded-full relative transition duration-200 shadow-inner">
+                        <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ${knob}"></div>
                     </label>
-                </div>
-            `;
-        }
-
-        function toggleAsistencia(id, eventKey) {
-            asistencia[id][eventKey] = !asistencia[id][eventKey];
-            renderTable();
+                </div>`;
         }
 
         function updateMetrics() {
-            // Solo actualiza los 3 eventos base
-            const baseKeys = ['cubo', 'uco', 'cam'];
-            const counts = { cubo: 0, uco: 0, cam: 0 };
-            Object.values(asistencia).forEach(a => {
-                baseKeys.forEach(k => { if(a[k]) counts[k]++; });
+            ['cubo','uco','cam'].forEach(k => {
+                const count = Object.values(asistencia).filter(a => a[k]).length;
+                const el = document.getElementById(`count-${k}`);
+                if (el) el.innerText = count;
             });
-            document.getElementById('count-cubo').innerText = counts.cubo;
-            document.getElementById('count-uco').innerText = counts.uco;
-            document.getElementById('count-cam').innerText = counts.cam;
         }
 
-        function generarResumen() {
-            let total = 0;
-            const resumen = Object.entries(asistencia).map(([id, data]) => {
-                const est = estudiantes.find(e => e.id == id);
-                // Si tiene asistencia en cualquier evento
-                return eventos.some(ev => data[ev.key]) ? `${est.nombre} (${est.grado})` : null;
-            }).filter(x => x);
+        // ── Acciones globales ────────────────────────────────────────────────
+        window.toggleAsistencia = (id, eventKey) => {
+            ensureStudentEntry(id);
+            asistencia[id][eventKey] = !asistencia[id][eventKey];
+            renderTable();
+            scheduleSave();
+        };
 
-            alert("Resumen generado. Revisar consola para detalle técnico o imprimir pantalla.\nTotal estudiantes con alguna asistencia: " + resumen.length);
-        }
-
-        // --- Agregar evento dinámicamente ---
-        function agregarEvento() {
-            const input = document.getElementById('nuevo-evento');
-            let nombre = input.value.trim();
-            if (!nombre) {
-                alert('Por favor ingresa un nombre para el evento.');
-                return;
-            }
-            // Generar una key única
-            let key = nombre.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
-            if (!key) key = 'evento_' + (eventos.length + 1);
-            // Evitar duplicados
-            if (eventos.some(ev => ev.key === key)) {
-                alert('Ya existe un evento con ese nombre.');
-                return;
-            }
+        window.agregarEvento = () => {
+            const input  = document.getElementById('nuevo-evento');
+            const nombre = input.value.trim();
+            if (!nombre) { alert('Ingresa un nombre para el evento.'); return; }
+            let key = nombre.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'') || `evento_${eventos.length+1}`;
+            if (eventos.some(ev => ev.key === key)) { alert('Ya existe un evento con ese nombre.'); return; }
             eventos.push({ key, nombre });
-            // Añadir a asistencia de todos los estudiantes
-            estudiantes.forEach(e => {
-                if (typeof asistencia[e.id][key] === 'undefined') {
-                    asistencia[e.id][key] = false;
-                }
-            });
+            ESTUDIANTES.forEach(e => ensureStudentEntry(e.id));
             input.value = '';
             renderTable();
-        }
+            scheduleSave();
+        };
 
+        window.generarResumen = () => {
+            const lista = Object.entries(asistencia)
+                .map(([id, data]) => {
+                    const est = ESTUDIANTES.find(e => e.id == id);
+                    return eventos.some(ev => data[ev.key]) ? `${est?.nombre} (${est?.grado})` : null;
+                }).filter(Boolean);
+            alert(`📋 Resumen de Asistencia\n\nEstudiantes con al menos una asistencia: ${lista.length}\n\n${lista.join('\n')}`);
+        };
+
+        // ── Iniciar ──────────────────────────────────────────────────────────
         document.getElementById('filter-grado').addEventListener('change', renderTable);
-        renderTable();
+        loadData();
     </script>
 </body>
 </html>
