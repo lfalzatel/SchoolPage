@@ -10,9 +10,37 @@
         .switch-input:checked + .switch-label::after { transform: translateX(100%); }
     </style>
 </head>
-<body class="bg-gray-50 p-4 md:p-8">
 
-    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+<body class="bg-gray-50 p-4 md:p-8">
+    <!-- Header Green Force -->
+    <header class="app-header" style="position:sticky;top:0;z-index:1000;">
+        <div class="header-left">
+            <img src="assets/images/1. logo 3.jpg" alt="Logo" class="header-logo">
+            <div class="header-brand">
+                <span class="header-title">Green Force</span>
+                <span class="header-subtitle">Sembrando Futuro</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="notifications-wrapper">
+                <div class="notification-bell-btn" onclick="window.location.href='index.html#notificaciones'">
+                    <i class="fas fa-bell"></i>
+                </div>
+            </div>
+        </div>
+        <div class="profile-menu-container">
+            <div class="header-avatar-container" onclick="window.location.href='index.html'">
+                <img src="assets/icons/icon-192.png" alt="Profile" class="header-avatar">
+                <div class="user-info-pill">
+                    <span class="user-name-pill">Encuestas</span>
+                    <span class="user-role-pill">Green Force</span>
+                </div>
+                <i class="fas fa-chevron-down pill-chevron"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden mt-4">
         <!-- Encabezado -->
         <div class="bg-blue-700 p-4 sm:p-6 text-white text-center">
             <h1 class="text-2xl font-bold uppercase tracking-wider">Control de Asistencia - GIGA</h1>
@@ -226,4 +254,31 @@
         renderTable();
     </script>
 </body>
+<!-- Menú Inferior -->
+<nav class="bottom-nav">
+    <a href="index.html#sobre" class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>Inicio</span>
+    </a>
+    <a href="index.html#cronograma" class="nav-item">
+        <i class="fas fa-leaf"></i>
+        <span>Cronograma</span>
+    </a>
+    <a href="index.html#galeria" class="nav-item">
+        <i class="fas fa-images"></i>
+        <span>Galería</span>
+    </a>
+    <a href="index.html#video" class="nav-item">
+        <i class="fas fa-play-circle"></i>
+        <span>Videos</span>
+    </a>
+    <a href="index.html#documentos" class="nav-item">
+        <i class="fas fa-file-alt"></i>
+        <span>Docs</span>
+    </a>
+    <a id="groupChatBtn" href="https://chat.whatsapp.com/L0hrcQ9JWmUB5DQui9ZrXv" class="nav-item" target="_blank" rel="noopener noreferrer" title="Abrir chat grupal del Grupo Ambiental">
+        <i class="fas fa-comments"></i>
+        <span>Chat</span>
+    </a>
+</nav>
 </html>
