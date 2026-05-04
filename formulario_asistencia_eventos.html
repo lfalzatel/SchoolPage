@@ -3,49 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Asistencia GIGA</title>
+    <title>Control de Asistencia GIGA - Green Force</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2E7D32">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .switch-input:checked + .switch-label { background-color: #22c55e; }
         .switch-input:checked + .switch-label::after { transform: translateX(100%); }
+        
+        /* Ajustes para integrar Tailwind con el diseño premium */
+        .premium-container {
+            margin-top: 100px;
+            margin-bottom: 100px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        body {
+            background-color: transparent !important;
+        }
+
+        .main-card-premium {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .main-card-premium {
+            background: rgba(31, 41, 55, 0.95);
+            color: white;
+        }
+
+        .dark-mode .bg-blue-50 {
+            background-color: rgba(30, 58, 138, 0.2);
+        }
+
+        .dark-mode .text-gray-800 { color: #f3f4f6; }
+        .dark-mode .text-gray-700 { color: #e5e7eb; }
+        .dark-mode .text-gray-600 { color: #d1d5db; }
+        .dark-mode .text-gray-500 { color: #9ca3af; }
+        .dark-mode .bg-gray-100 { background-color: rgba(55, 65, 81, 0.5); }
+        .dark-mode .bg-white { background-color: rgba(31, 41, 55, 0.8); }
+        .dark-mode .border-b { border-color: rgba(255, 255, 255, 0.1); }
+        .dark-mode .hover\:bg-gray-50:hover { background-color: rgba(55, 65, 81, 0.3); }
     </style>
 </head>
+<body class="bg-gray-50">
+    <!-- Randomized App Background -->
+    <div id="app-background"></div>
 
-<body class="bg-gray-50 p-4 md:p-8">
-    <!-- Header Green Force -->
-    <header class="app-header" style="position:sticky;top:0;z-index:1000;">
+    <!-- Fixed App Header -->
+    <header class="app-header">
         <div class="header-left">
-            <img src="assets/images/1. logo 3.jpg" alt="Logo" class="header-logo">
-            <div class="header-brand">
+            <img src="assets/images/1. logo 3.jpg" alt="Logo" class="header-logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <div class="header-brand" onclick="window.location.href='index.html'" style="cursor: pointer;">
                 <span class="header-title">Green Force</span>
                 <span class="header-subtitle">Sembrando Futuro</span>
             </div>
         </div>
         <div class="header-actions">
             <div class="notifications-wrapper">
-                <div class="notification-bell-btn" onclick="window.location.href='index.html#notificaciones'">
+                <div class="notification-bell-btn" onclick="toggleNotifications()">
                     <i class="fas fa-bell"></i>
+                    <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
+                </div>
+                <div id="notificationsDropdown" class="notifications-dropdown">
+                    <div class="notifications-header">
+                        <h3>Próximos Eventos</h3>
+                    </div>
+                    <div id="notificationList" class="notification-list">
+                        <div class="notification-loader"><i class="fas fa-spinner fa-spin"></i></div>
+                    </div>
                 </div>
             </div>
         </div>
+
         <div class="profile-menu-container">
-            <div class="header-avatar-container" onclick="window.location.href='index.html'">
-                <img src="assets/icons/icon-192.png" alt="Profile" class="header-avatar">
+            <div class="header-avatar-container" onclick="toggleProfileMenu()">
+                <img src="assets/icons/icon-192.png" alt="Profile" id="headerProfileAvatar" class="header-avatar">
                 <div class="user-info-pill">
-                    <span class="user-name-pill">Encuestas</span>
-                    <span class="user-role-pill">Green Force</span>
+                    <span id="headerUserName" class="user-name-pill">Invitado</span>
+                    <span id="headerUserRole" class="user-role-pill">Visitante</span>
                 </div>
                 <i class="fas fa-chevron-down pill-chevron"></i>
+            </div>
+
+            <div id="profileDropdown" class="profile-dropdown">
+                <div class="dropdown-card">
+                    <div class="user-card-header">
+                        <div class="user-card-info">
+                            <span id="menuProfileName" class="user-card-name">Invitado</span>
+                            <span id="menuProfileEmail" class="user-card-email">Inicia sesión para más</span>
+                        </div>
+                    </div>
+
+                    <div class="dropdown-menu-list">
+                        <a href="index.html" class="menu-item">
+                            <div class="menu-item-icon bg-blue"><i class="fas fa-home"></i></div>
+                            <span>Inicio App</span>
+                            <i class="fas fa-chevron-right arrow-link"></i>
+                        </a>
+                        <div class="dropdown-theme-section">
+                            <span class="theme-label">TEMA</span>
+                            <div class="theme-selector-group">
+                                <button class="theme-btn active" onclick="setTheme('light')" title="Modo Claro">
+                                    <i class="fas fa-sun"></i>
+                                </button>
+                                <button class="theme-btn" onclick="setTheme('dark')" title="Modo Oscuro">
+                                    <i class="fas fa-moon"></i>
+                                </button>
+                                <button class="theme-btn" onclick="setTheme('system')" title="Seguir Sistema">
+                                    <i class="fas fa-desktop"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="dropdown-footer">
+                            <button class="logout-pill-btn" id="menuLoginBtn" onclick="handleAuthAction()">
+                                <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
 
-    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden mt-4">
-        <!-- Encabezado -->
-        <div class="bg-blue-700 p-4 sm:p-6 text-white text-center">
-            <h1 class="text-2xl font-bold uppercase tracking-wider">Control de Asistencia - GIGA</h1>
-            <p class="text-blue-100 mt-1">Gestión de Salidas Pedagógicas - IE Barro Blanco</p>
-        </div>
+    <div class="premium-container px-4 sm:px-6">
+        <div class="max-w-6xl mx-auto main-card-premium rounded-2xl shadow-2xl overflow-hidden mb-20">
+            <!-- Encabezado del Formulario -->
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 p-6 sm:p-8 text-white text-center">
+                <h1 class="text-3xl font-extrabold uppercase tracking-widest">Control de Asistencia</h1>
+                <p class="text-emerald-50 mt-2 font-medium">Gestión de Salidas Pedagógicas - Grupo Ambiental Green Force</p>
+            </div>
 
         <!-- Métricas en Tiempo Real -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4 p-4 sm:p-6 bg-blue-50 border-b">
@@ -99,7 +199,74 @@
                 </tbody>
             </table>
         </div>
+        </div>
     </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html#sobre" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="index.html#cronograma" class="nav-item">
+            <i class="fas fa-leaf"></i>
+            <span>Cronograma</span>
+        </a>
+        <a href="index.html#galeria" class="nav-item">
+            <i class="fas fa-images"></i>
+            <span>Galería</span>
+        </a>
+        <a href="formulario_asistencia_eventos.html" class="nav-item active">
+            <i class="fas fa-poll"></i>
+            <span>Asistencia</span>
+        </a>
+        <a id="groupChatBtn" href="https://chat.whatsapp.com/L0hrcQ9JWmUB5DQui9ZrXv" class="nav-item" target="_blank" rel="noopener noreferrer">
+            <i class="fas fa-comments"></i>
+            <span>Chat</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script type="module" src="auth.js"></script>
+    <script type="module">
+        import { auth } from './firebase-config.js';
+        
+        // Background randomization logic (simplified from index.html)
+        const bgContainer = document.getElementById('app-background');
+        const images = [
+            'assets/images/WhatsApp Image 2024-05-23 at 8.01.21 AM (1).jpeg',
+            'assets/images/WhatsApp Image 2024-05-23 at 8.01.21 AM.jpeg',
+            'assets/images/WhatsApp Image 2024-05-23 at 8.01.22 AM.jpeg'
+        ];
+        
+        function setRandomBg() {
+            const img = images[Math.floor(Math.random() * images.length)];
+            bgContainer.style.backgroundImage = `url('${img}')`;
+            bgContainer.style.backgroundSize = 'cover';
+            bgContainer.style.backgroundPosition = 'center';
+            bgContainer.style.opacity = '0.4';
+        }
+        setRandomBg();
+
+        // UI Helpers
+        window.toggleProfileMenu = () => {
+            document.getElementById('profileDropdown').classList.toggle('active');
+        };
+
+        window.toggleNotifications = () => {
+            document.getElementById('notificationsDropdown').classList.toggle('active');
+        };
+
+        // Close dropdowns on click outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.profile-menu-container')) {
+                document.getElementById('profileDropdown').classList.remove('active');
+            }
+            if (!e.target.closest('.notifications-wrapper')) {
+                document.getElementById('notificationsDropdown').classList.remove('active');
+            }
+        });
+    </script>
 
     <script>
         // --- Datos base ---
@@ -254,31 +421,4 @@
         renderTable();
     </script>
 </body>
-<!-- Menú Inferior -->
-<nav class="bottom-nav">
-    <a href="index.html#sobre" class="nav-item">
-        <i class="fas fa-home"></i>
-        <span>Inicio</span>
-    </a>
-    <a href="index.html#cronograma" class="nav-item">
-        <i class="fas fa-leaf"></i>
-        <span>Cronograma</span>
-    </a>
-    <a href="index.html#galeria" class="nav-item">
-        <i class="fas fa-images"></i>
-        <span>Galería</span>
-    </a>
-    <a href="index.html#video" class="nav-item">
-        <i class="fas fa-play-circle"></i>
-        <span>Videos</span>
-    </a>
-    <a href="index.html#documentos" class="nav-item">
-        <i class="fas fa-file-alt"></i>
-        <span>Docs</span>
-    </a>
-    <a id="groupChatBtn" href="https://chat.whatsapp.com/L0hrcQ9JWmUB5DQui9ZrXv" class="nav-item" target="_blank" rel="noopener noreferrer" title="Abrir chat grupal del Grupo Ambiental">
-        <i class="fas fa-comments"></i>
-        <span>Chat</span>
-    </a>
-</nav>
 </html>
