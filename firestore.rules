@@ -1,14 +1,31 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ── Helpers de rol ─────────────────────────────────────────────────────
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
     function isAdmin() {
-      return request.auth != null && 
+      return request.auth != null &&
              exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+             userRole() == 'admin';
+    }
+    function isPrivileged() {
+      // admin o lider tienen los mismos permisos por ahora
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             userRole() in ['admin', 'lider'];
     }
 
+    // ── Usuarios ────────────────────────────────────────────────────────────
     match /users/{userId} {
+      // Cada usuario puede leer y editar su propio documento
       allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Admin puede leer TODOS los usuarios (para gestión)
+      allow read: if isAdmin();
+      // Admin puede cambiar el rol de cualquier usuario
+      allow write: if isAdmin();
     }
 
     match /fcm_tokens/{tokenId} {
@@ -70,7 +87,7 @@ service cloud.firestore {
     // --- ASISTENCIA DATOS (attendance records) ---
     match /asistencia_datos/{documentId} {
       allow read: if request.auth != null;
-      allow write: if isAdmin();
+      allow write: if isPrivileged();
     }
   }
 }

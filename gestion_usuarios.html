@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios — Green Force</title>
+    <meta name="description" content="Panel de administración de usuarios del Grupo Ambiental Green Force.">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#059669">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Design System -->
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        /* ── Layout base ── */
+        body { background-color: transparent !important; }
+
+        .page-wrapper {
+            margin-top: 100px;
+            margin-bottom: 100px;
+            padding: 0 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-card {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(14px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            overflow: hidden;
+        }
+
+        .dark-mode .page-card { background: rgba(17,24,39,0.96); color: #f3f4f6; }
+
+        /* ── Cabecera de sección ── */
+        .page-header-section {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            padding: 28px 32px;
+            color: white;
+        }
+        .page-header-section h1 { font-size: 1.6rem; font-weight: 700; margin: 0 0 4px; }
+        .page-header-section p  { margin: 0; opacity: 0.85; font-size: 0.9rem; }
+
+        /* ── Barra de búsqueda ── */
+        .toolbar {
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .dark-mode .toolbar { border-color: rgba(255,255,255,0.08); }
+
+        .search-box {
+            flex: 1; min-width: 200px;
+            display: flex; align-items: center; gap: 10px;
+            background: #f3f4f6; border-radius: 10px; padding: 8px 14px;
+        }
+        .dark-mode .search-box { background: rgba(255,255,255,0.08); }
+        .search-box input {
+            border: none; background: transparent; outline: none;
+            font-family: 'Poppins', sans-serif; font-size: 0.9rem;
+            color: inherit; width: 100%;
+        }
+        .search-box i { color: #9ca3af; }
+
+        .filter-select {
+            border: 1px solid #e5e7eb; border-radius: 10px;
+            padding: 8px 12px; font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem; background: white; color: #374151; outline: none;
+        }
+        .dark-mode .filter-select { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); color: #f3f4f6; }
+
+        .user-count-badge {
+            font-size: 0.8rem; color: #6b7280;
+            background: #f3f4f6; padding: 6px 12px; border-radius: 20px;
+        }
+        .dark-mode .user-count-badge { background: rgba(255,255,255,0.08); color: #9ca3af; }
+
+        /* ── Lista de usuarios ── */
+        #users-list { padding: 12px 16px; }
+
+        .user-card {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 12px; border-radius: 14px;
+            transition: background 0.2s; margin-bottom: 4px;
+        }
+        .user-card:hover { background: rgba(0,0,0,0.04); }
+        .dark-mode .user-card:hover { background: rgba(255,255,255,0.05); }
+
+        .user-avatar {
+            width: 48px; height: 48px; border-radius: 50%;
+            object-fit: cover; flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.4);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .user-info { flex: 1; min-width: 0; }
+        .user-name  { font-weight: 600; font-size: 0.95rem; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-email { font-size: 0.78rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dark-mode .user-name  { color: #f3f4f6; }
+        .dark-mode .user-email { color: #9ca3af; }
+
+        .user-last-login { font-size: 0.72rem; color: #9ca3af; margin-top: 2px; }
+
+        /* ── Selector de rol ── */
+        .role-selector {
+            display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+        }
+
+        .role-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+        }
+        .role-badge.admin      { background: #fef3c7; color: #92400e; }
+        .role-badge.lider      { background: #ede9fe; color: #5b21b6; }
+        .role-badge.integrante { background: #d1fae5; color: #065f46; }
+        .role-badge.usuario    { background: #f3f4f6; color: #374151; }
+        .role-badge.miembro    { background: #dbeafe; color: #1e40af; }
+
+        .dark-mode .role-badge.admin      { background: rgba(251,191,36,0.15); color: #fcd34d; }
+        .dark-mode .role-badge.lider      { background: rgba(139,92,246,0.15); color: #a78bfa; }
+        .dark-mode .role-badge.integrante { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+        .dark-mode .role-badge.usuario    { background: rgba(255,255,255,0.08); color: #d1d5db; }
+        .dark-mode .role-badge.miembro    { background: rgba(59,130,246,0.15); color: #93c5fd; }
+
+        .role-select-input {
+            border: 1px solid #e5e7eb; border-radius: 8px;
+            padding: 5px 10px; font-family: 'Poppins', sans-serif; font-size: 0.82rem;
+            background: white; color: #374151; outline: none; cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .role-select-input:focus { border-color: #7c3aed; }
+        .dark-mode .role-select-input { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.1); color: #f3f4f6; }
+
+        .save-role-btn {
+            width: 32px; height: 32px; border-radius: 8px; border: none;
+            background: #7c3aed; color: white; cursor: pointer; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, transform 0.1s; flex-shrink: 0;
+        }
+        .save-role-btn:hover  { background: #6d28d9; transform: scale(1.05); }
+        .save-role-btn:active { transform: scale(0.95); }
+        .save-role-btn.saving { background: #f59e0b; }
+        .save-role-btn.done   { background: #10b981; }
+
+        /* ── Estado vacío / cargando ── */
+        .empty-state {
+            text-align: center; padding: 48px 24px; color: #9ca3af;
+        }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 12px; display: block; opacity: 0.4; }
+
+        /* ── Acceso denegado ── */
+        #access-denied {
+            text-align: center; padding: 60px 24px; color: #ef4444;
+            display: none;
+        }
+        #access-denied i { font-size: 3rem; display: block; margin-bottom: 12px; }
+        #access-denied h2 { font-size: 1.3rem; font-weight: 700; }
+        #access-denied p  { color: #6b7280; margin-top: 8px; }
+
+        /* Divisor entre cards */
+        .user-divider { height: 1px; background: rgba(0,0,0,0.06); margin: 2px 0; }
+        .dark-mode .user-divider { background: rgba(255,255,255,0.06); }
+    </style>
+</head>
+<body>
+    <div id="app-background"></div>
+    <div id="app-header-placeholder"></div>
+
+    <div class="page-wrapper">
+        <div class="page-card">
+
+            <!-- Cabecera -->
+            <div class="page-header-section">
+                <h1><i class="fas fa-users-cog" style="margin-right:10px;"></i>Gestión de Usuarios</h1>
+                <p>Asigna roles a los miembros del Grupo Ambiental Green Force</p>
+            </div>
+
+            <!-- Acceso denegado -->
+            <div id="access-denied">
+                <i class="fas fa-lock"></i>
+                <h2>Acceso restringido</h2>
+                <p>Solo los administradores pueden gestionar usuarios.</p>
+                <a href="index.html" style="margin-top:16px;display:inline-block;color:#7c3aed;font-weight:600;">
+                    <i class="fas fa-arrow-left"></i> Volver al inicio
+                </a>
+            </div>
+
+            <!-- Contenido principal (solo para admin) -->
+            <div id="main-content" style="display:none;">
+                <!-- Barra de herramientas -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input id="search-input" type="text" placeholder="Buscar por nombre o correo…">
+                    </div>
+                    <select id="filter-role" class="filter-select">
+                        <option value="all">Todos los roles</option>
+                        <option value="admin">👑 Admin</option>
+                        <option value="lider">⭐ Líder</option>
+                        <option value="integrante">🌿 Integrante</option>
+                        <option value="usuario">👤 Usuario</option>
+                        <option value="miembro">👥 Miembro</option>
+                    </select>
+                    <span class="user-count-badge" id="user-count">Cargando…</span>
+                </div>
+
+                <!-- Lista de usuarios -->
+                <div id="users-list">
+                    <div class="empty-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Cargando usuarios…
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="bottom-nav-placeholder"></div>
+    <div id="toast-container"></div>
+
+    <!-- Layout compartido -->
+    <script type="module">
+        import { initLayout } from './layout.js';
+        initLayout({ activeNav: null });
+    </script>
+
+    <!-- Lógica de gestión de usuarios -->
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import {
+            collection, getDocs, doc, updateDoc, getDoc
+        } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+        const ADMIN_EMAILS     = ['greenforceiebb@gmail.com', 'lfalzatel@gmail.com'];
+        const ADMIN_ROLES      = ['admin'];
+        const ROLE_LABELS = {
+            admin:      '👑 Admin',
+            lider:      '⭐ Líder',
+            integrante: '🌿 Integrante',
+            usuario:    '👤 Usuario',
+            miembro:    '👥 Miembro',
+        };
+
+        let allUsers = [];
+
+        // ── Verificar acceso ─────────────────────────────────────────────────
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { showDenied(); return; }
+            let role = ADMIN_EMAILS.includes(user.email) ? 'admin' : 'miembro';
+            try {
+                const snap = await getDoc(doc(db, 'users', user.uid));
+                if (snap.exists() && snap.data().role) role = snap.data().role;
+            } catch (_) {}
+            if (!ADMIN_ROLES.includes(role)) { showDenied(); return; }
+            document.getElementById('main-content').style.display = 'block';
+            loadUsers();
+        });
+
+        function showDenied() {
+            document.getElementById('access-denied').style.display = 'block';
+        }
+
+        // ── Cargar usuarios ──────────────────────────────────────────────────
+        async function loadUsers() {
+            try {
+                // Sin orderBy para no requerir índice compuesto; ordenamos en cliente
+                const snap = await getDocs(collection(db, 'users'));
+                allUsers = snap.docs
+                    .map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es'));
+                renderUsers(allUsers);
+            } catch (err) {
+                console.error('Error cargando usuarios:', err);
+                document.getElementById('users-list').innerHTML =
+                    `<div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error al cargar usuarios.</p>
+                        <small style="color:#9ca3af;">${err.message}</small>
+                     </div>`;
+            }
+        }
+
+        // ── Renderizar lista ─────────────────────────────────────────────────
+        function renderUsers(users) {
+            const list = document.getElementById('users-list');
+            const count = document.getElementById('user-count');
+            if (count) count.textContent = `${users.length} usuario${users.length !== 1 ? 's' : ''}`;
+
+            if (!users.length) {
+                list.innerHTML = `<div class="empty-state"><i class="fas fa-users-slash"></i>No se encontraron usuarios.</div>`;
+                return;
+            }
+
+            list.innerHTML = users.map((u, i) => {
+                const role      = u.role || 'miembro';
+                const initials  = (u.name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+                const lastLogin = u.lastLogin?.toDate ? formatDate(u.lastLogin.toDate()) : '—';
+                return `
+                <div class="user-card" data-uid="${u.id}">
+                    ${u.photo
+                        ? `<img src="${u.photo}" alt="${u.name}" class="user-avatar"
+                                onerror="this.style.display='none';this.nextSibling.style.display='flex'">`
+                        : ''}
+                    <div class="user-avatar" style="display:${u.photo?'none':'flex'};background:linear-gradient(135deg,#7c3aed,#4f46e5);color:white;font-weight:700;align-items:center;justify-content:center;font-size:0.9rem;">
+                        ${initials}
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name">${u.name || 'Sin nombre'}</div>
+                        <div class="user-email">${u.email || '—'}</div>
+                        <div class="user-last-login"><i class="fas fa-clock" style="font-size:0.65rem;margin-right:3px;"></i>Último acceso: ${lastLogin}</div>
+                    </div>
+                    <div class="role-selector">
+                        <select class="role-select-input" data-uid="${u.id}" data-original="${role}">
+                            <option value="admin"      ${role==='admin'      ?'selected':''}>👑 Admin</option>
+                            <option value="lider"      ${role==='lider'      ?'selected':''}>⭐ Líder</option>
+                            <option value="integrante" ${role==='integrante' ?'selected':''}>🌿 Integrante</option>
+                            <option value="usuario"    ${role==='usuario'    ?'selected':''}>👤 Usuario</option>
+                            <option value="miembro"    ${role==='miembro'    ?'selected':''}>👥 Miembro</option>
+                        </select>
+                        <button class="save-role-btn" title="Guardar rol"
+                                onclick="saveRole('${u.id}', this)">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+                ${i < users.length - 1 ? '<div class="user-divider"></div>' : ''}`;
+            }).join('');
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' });
+        }
+
+        // ── Guardar rol ──────────────────────────────────────────────────────
+        window.saveRole = async (uid, btn) => {
+            const select   = document.querySelector(`.role-select-input[data-uid="${uid}"]`);
+            const newRole  = select?.value;
+            if (!newRole) return;
+
+            btn.classList.add('saving');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled  = true;
+
+            try {
+                await updateDoc(doc(db, 'users', uid), { role: newRole });
+                // Actualizar en memoria
+                const usr = allUsers.find(u => u.id === uid);
+                if (usr) usr.role = newRole;
+                select.dataset.original = newRole;
+
+                btn.classList.remove('saving');
+                btn.classList.add('done');
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    btn.classList.remove('done');
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    btn.disabled  = false;
+                }, 1500);
+
+                showToast(`Rol actualizado a "${ROLE_LABELS[newRole]}"`, 'success');
+            } catch (err) {
+                console.error('Error guardando rol:', err);
+                btn.classList.remove('saving');
+                btn.classList.add('done');
+                btn.style.background = '#ef4444';
+                btn.innerHTML = '<i class="fas fa-times"></i>';
+                setTimeout(() => { btn.style.background=''; btn.disabled=false; btn.innerHTML='<i class="fas fa-check"></i>'; }, 2000);
+                showToast('Error al guardar. Verifica permisos.', 'error');
+            }
+        };
+
+        // ── Toast ────────────────────────────────────────────────────────────
+        function showToast(msg, type = 'info') {
+            if (window.showToast) { window.showToast(msg, type); return; }
+            const tc = document.getElementById('toast-container');
+            if (!tc) return;
+            const t = document.createElement('div');
+            t.className = `toast toast-${type}`;
+            t.style.cssText = `position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+                background:${type==='success'?'#10b981':type==='error'?'#ef4444':'#6b7280'};
+                color:white;padding:10px 20px;border-radius:10px;font-size:0.85rem;
+                font-family:Poppins,sans-serif;z-index:9999;animation:fadeInUp 0.3s ease;`;
+            t.textContent = msg;
+            tc.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        // ── Filtros ──────────────────────────────────────────────────────────
+        document.getElementById('search-input').addEventListener('input', applyFilters);
+        document.getElementById('filter-role').addEventListener('change', applyFilters);
+
+        function applyFilters() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const role   = document.getElementById('filter-role').value;
+            const filtered = allUsers.filter(u => {
+                const matchSearch = !search ||
+                    (u.name  || '').toLowerCase().includes(search) ||
+                    (u.email || '').toLowerCase().includes(search);
+                const matchRole = role === 'all' || (u.role || 'miembro') === role;
+                return matchSearch && matchRole;
+            });
+            renderUsers(filtered);
+        }
+    </script>
+</body>
+</html>
