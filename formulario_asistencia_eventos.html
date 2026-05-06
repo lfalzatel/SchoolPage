@@ -19,6 +19,7 @@
     <!-- Design System -->
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         /* ── Integración Tailwind + sistema premium ── */
@@ -116,6 +117,7 @@
         .page-wrapper {
           margin-top: 76px;  /* 70px header + 6px respiro, en vez de 100px */
         }
+        @keyframes slideUpModal { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -171,10 +173,16 @@
                         <i class="fas fa-plus"></i> Agregar evento
                     </button>
                 </div>
-                <button onclick="generarResumen()"
-                        class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 w-full sm:w-auto">
-                    <i class="fas fa-chart-bar"></i> Ver Resumen
-                </button>
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <button onclick="generarResumen()"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 w-full sm:w-auto">
+                        <i class="fas fa-chart-bar"></i> Ver Resumen
+                    </button>
+                    <button onclick="abrirModalExportar()"
+                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 w-full sm:w-auto">
+                        <i class="fas fa-file-excel"></i> Exportar
+                    </button>
+                </div>
             </div>
 
             <!-- Barra de estado Firestore -->
@@ -203,6 +211,39 @@
 
     <!-- ► Placeholder de Bottom Nav — layout.js lo reemplaza -->
     <div id="bottom-nav-placeholder"></div>
+
+    <!-- ══════════════════════════════════════════
+         MODAL DE EXPORTACIÓN (VISTA PREVIA)
+    ══════════════════════════════════════════ -->
+    <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-[10000] hidden items-center justify-center p-4" onclick="if(event.target.id === 'exportModal') closeExportModal()">
+        <div class="bg-gray-900 border border-white/10 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden animate-[slideUpModal_0.2s_ease-out]">
+            <div class="bg-gradient-to-r from-emerald-600 to-emerald-800 p-5 relative">
+                <button onclick="closeExportModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h2 class="text-white text-xl font-bold m-0 flex items-center gap-2"><i class="fas fa-file-excel"></i> Vista Previa de Exportación</h2>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-400 text-sm mb-4">Verifica la información antes de descargarla o compartirla.</p>
+                <div class="overflow-auto max-h-80 border border-white/10 rounded-lg mb-6 bg-white/5">
+                    <table class="w-full text-left border-collapse text-xs text-gray-200">
+                        <thead id="export-preview-head" class="bg-gray-800 sticky top-0 z-10 uppercase text-gray-400">
+                        </thead>
+                        <tbody id="export-preview-body" class="divide-y divide-white/10">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button onclick="compartirExcel()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-share-alt"></i> Compartir
+                    </button>
+                    <button onclick="confirmarDescargaExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-5 rounded-lg transition flex items-center gap-2">
+                        <i class="fas fa-download"></i> Descargar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Toast Container (compartido) -->
     <div id="toast-container"></div>
@@ -459,6 +500,105 @@
                 }).filter(Boolean);
             alert(`📋 Resumen de Asistencia\n\nEstudiantes con al menos una asistencia: ${lista.length}\n\n${lista.join('\n')}`);
         };
+
+        let exportDataForExcel = null;
+
+        window.abrirModalExportar = () => {
+            const data = [];
+            // Header row
+            const header = ["Estudiante", "Grado"];
+            eventos.forEach(ev => header.push(ev.nombre));
+            data.push(header);
+
+            // Data rows
+            const filter = document.getElementById('filter-grado').value;
+            ESTUDIANTES
+                .filter(e => filter === 'all' || e.grado === filter)
+                .forEach(e => {
+                    const row = [e.nombre, e.grado];
+                    eventos.forEach(ev => {
+                        const attended = asistencia[e.id]?.[ev.key] ? "Sí" : "No";
+                        row.push(attended);
+                    });
+                    data.push(row);
+                });
+
+            exportDataForExcel = data;
+
+            // Render Preview
+            const thead = document.getElementById('export-preview-head');
+            const tbody = document.getElementById('export-preview-body');
+
+            thead.innerHTML = `<tr>${header.map(h => `<th class="p-3 font-semibold">${h}</th>`).join('')}</tr>`;
+            
+            // Skip first row which is header
+            tbody.innerHTML = data.slice(1).map(row => {
+                return `<tr class="hover:bg-white/5 transition">${row.map((cell, i) => {
+                    let colorClass = "";
+                    if (cell === "Sí") colorClass = "text-emerald-400 font-semibold";
+                    else if (cell === "No") colorClass = "text-red-400 opacity-70";
+                    return `<td class="p-3 border-t border-white/5 whitespace-nowrap ${colorClass}">${cell}</td>`;
+                }).join('')}</tr>`;
+            }).join('');
+
+            const modal = document.getElementById('exportModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeExportModal = () => {
+            const modal = document.getElementById('exportModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        window.generarWorkbook = () => {
+            if (!exportDataForExcel) return null;
+            const ws = XLSX.utils.aoa_to_sheet(exportDataForExcel);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Asistencia");
+            return wb;
+        };
+
+        window.confirmarDescargaExcel = () => {
+            const wb = window.generarWorkbook();
+            if (wb) {
+                XLSX.writeFile(wb, "Asistencia_Green_Force.xlsx");
+                closeExportModal();
+            }
+        };
+
+        window.compartirExcel = async () => {
+            const wb = window.generarWorkbook();
+            if (!wb) return;
+            
+            try {
+                // Escribir a un array de bytes
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                
+                const file = new File([blob], "Asistencia_Green_Force.xlsx", { type: blob.type });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: 'Asistencia Green Force',
+                        text: 'Adjunto el registro de asistencia de Green Force.',
+                        files: [file]
+                    });
+                    closeExportModal();
+                } else {
+                    alert('Tu dispositivo/navegador no soporta compartir archivos directamente. Se descargará el archivo en su lugar.');
+                    window.confirmarDescargaExcel();
+                }
+            } catch (err) {
+                console.error("Error al compartir:", err);
+                if (err.name !== 'AbortError') {
+                    alert("Error al compartir el archivo.");
+                }
+            }
+        };
+
+        window.descargarExcel = window.abrirModalExportar;
 
         // ── Iniciar ──────────────────────────────────────────────────────────
         document.getElementById('filter-grado').addEventListener('change', renderTable);
