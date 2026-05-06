@@ -55,6 +55,63 @@
             border-color: rgba(255,255,255,0.07);
             color: rgba(255,255,255,0.45);
         }
+
+        /* ── Override de Tailwind para compatibilidad con fondo dinámico ── */
+
+        /* Sección de métricas (bg-blue-50) → glass semitransparente */
+        .bg-blue-50 {
+          background: rgba(16, 185, 129, 0.06) !important;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+
+        /* Tarjetas de métricas (bg-white) → glass */
+        .bg-white {
+          background: rgba(255, 255, 255, 0.06) !important;
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Números grandes de métricas */
+        .text-gray-800 { color: #f3f4f6 !important; }
+
+        /* Labels de métricas */
+        .text-gray-500 { color: #9ca3af !important; }
+
+        /* Sección de filtros (bg-gray-50) → transparente */
+        .bg-gray-50 { background: rgba(0, 0, 0, 0.1) !important; }
+
+        /* Encabezado de tabla (bg-gray-100) → glass oscuro */
+        .bg-gray-100 {
+          background: rgba(5, 150, 105, 0.15) !important;
+        }
+
+        /* Texto de encabezado de tabla */
+        .text-gray-700 { color: #d1d5db !important; }
+
+        /* Labels del filtro */
+        .font-bold.text-gray-700 { color: #e5e7eb !important; }
+
+        /* Bordes */
+        .border-b { border-color: rgba(255, 255, 255, 0.08) !important; }
+
+        /* Select e inputs de filtro */
+        #filter-grado,
+        #nuevo-evento {
+          background: rgba(255, 255, 255, 0.06) !important;
+          color: #f3f4f6 !important;
+          border-color: rgba(255, 255, 255, 0.12) !important;
+        }
+        #filter-grado option,
+        #nuevo-evento option {
+          background: #1f2937;
+          color: #f3f4f6;
+        }
+
+        /* Hover en filas de tabla */
+        .hover\:bg-gray-50:hover {
+          background: rgba(16, 185, 129, 0.08) !important;
+        }
     </style>
 </head>
 <body>
