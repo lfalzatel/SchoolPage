@@ -112,6 +112,10 @@
         .hover\:bg-gray-50:hover {
           background: rgba(16, 185, 129, 0.08) !important;
         }
+
+        .page-wrapper {
+          margin-top: 76px;  /* 70px header + 6px respiro, en vez de 100px */
+        }
     </style>
 </head>
 <body>
@@ -208,7 +212,8 @@
     <!-- 1. Layout compartido (header + nav + tema + auth UI) -->
     <script type="module">
         import { initLayout } from './layout.js';
-        import './gallery.js';
+        import { initBackgroundSlideshow } from './gallery.js';
+        initBackgroundSlideshow();
         initLayout({ activeNav: 'asistencia' });
     </script>
 

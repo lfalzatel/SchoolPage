@@ -351,6 +351,10 @@
         .modal-save-btn:active { transform: scale(0.96); }
         .modal-save-btn.saving { background: #f59e0b; }
         .modal-save-btn.done   { background: #10b981; }
+
+        .page-wrapper {
+            margin-top: 76px;  /* 70px header + 6px respiro, en vez de 100px */
+        }
     </style>
 </head>
 <body>
@@ -475,7 +479,8 @@
 
     <script type="module">
         import { initLayout } from './layout.js';
-        import './gallery.js';
+        import { initBackgroundSlideshow } from './gallery.js';
+        initBackgroundSlideshow();   // ← agrega los slides ANTES de que initLayout los busque
         initLayout({ activeNav: null });
     </script>
 

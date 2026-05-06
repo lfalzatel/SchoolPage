@@ -55,7 +55,7 @@ function getNavItems(basePath, activeNav) {
 
 function detectActiveNav() {
     const path = window.location.pathname.toLowerCase();
-    if (path.includes('formulario_asistencia')) return 'asistencia';
+    if (path.includes('formulario_asistencia')) return 'inicio'; // Fallback a inicio
     if (path.includes('gallery'))               return 'galeria';
     if (path.includes('gestion_usuarios'))      return null;
     if (path.includes('index') || path.endsWith('/')) return 'inicio';
@@ -495,6 +495,18 @@ export function initLayout(options = {}) {
     initAuthUI(opts.basePath);
     loadNotifications();
     initHomeScrollspy();   // ← activa solo en index.html
+
+    // ── Interceptar nav en subpáginas para bypass del splash ───────────────
+    if (!isHomePage()) {
+        document.querySelectorAll('#bottom-nav-root .nav-item:not([target])').forEach(a => {
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Garantiza que el splash de index.html se salte al volver
+                sessionStorage.setItem('isReload', 'true');
+                window.location.href = a.getAttribute('href');
+            });
+        });
+    }
 }
 
 // ── Helpers exportados ──────────────────────────────────────────────────────
