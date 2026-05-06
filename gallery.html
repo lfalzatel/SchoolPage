@@ -233,30 +233,32 @@
     <!-- Nav removed (duplicate) -->
 
     <script type="module">
+        import { initLayout } from './layout.js';
         import { initBackgroundSlideshow } from './gallery.js';
         import { auth } from './auth.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initBackgroundSlideshow();
+        // Inicializar primero el carrusel de fondo para que initLayout() salte la carga de imágenes locales
+        initBackgroundSlideshow();
+        initLayout({ activeNav: 'galeria' });
 
-            onAuthStateChanged(auth, (user) => {
-                const adminPanel = document.getElementById('galleryAdminPanel');
-                const overlay = document.getElementById('galleryOverlay');
+        onAuthStateChanged(auth, (user) => {
+            const adminPanel = document.getElementById('galleryAdminPanel');
+            const overlay = document.getElementById('galleryOverlay');
 
-                if (user) {
-                    overlay.style.display = 'none';
-                    // Simulación de rol admin (igual que en auth.js)
-                    if (user.email === 'greenforceiebb@gmail.com') {
-                        adminPanel.style.display = 'flex';
-                    }
-                    if (window.loadActivities) window.loadActivities('galleryGridFull');
-                } else {
-                    overlay.style.display = 'flex';
-                    adminPanel.style.display = 'none';
+            if (user) {
+                if (overlay) overlay.style.display = 'none';
+                // Simulación de rol admin (igual que en auth.js)
+                if (user.email === 'greenforceiebb@gmail.com') {
+                    if (adminPanel) adminPanel.style.display = 'flex';
                 }
-            });
+                if (window.loadActivities) window.loadActivities('galleryGridFull');
+            } else {
+                if (overlay) overlay.style.display = 'flex';
+                if (adminPanel) adminPanel.style.display = 'none';
+            }
         });
+
         // ── Year Selector: Sliding Track ──
         const track = document.getElementById('yearTrack');
         const pills = track.querySelectorAll('.year-pill');
@@ -270,9 +272,6 @@
 
             track.style.setProperty('--pill-x', (pillRect.left - trackRect.left - 4) + 'px');
             track.style.setProperty('--pill-w', pillRect.width + 'px');
-
-            // Conecta tu función de filtro aquí:
-            // filterByYear(activePill.dataset.year);
         }
 
         // Inicializar en la pill activa por defecto
@@ -285,11 +284,5 @@
     </script>
     <!-- ► Placeholder Bottom Nav — layout.js lo reemplaza -->
     <div id="bottom-nav-placeholder"></div>
-
-    <!-- Layout compartido (header + nav) -->
-    <script type="module">
-        import { initLayout } from './layout.js';
-        initLayout({ activeNav: 'galeria' });
-    </script>
 </body>
 </html>
