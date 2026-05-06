@@ -1,6 +1,6 @@
 importScripts('./firebase-messaging-sw.js');
 
-const CACHE_NAME = 'green-force-v32';
+const CACHE_NAME = 'green-force-v33';
 const OFFLINE_URL = './offline.html';
 const ASSETS_TO_CACHE = [
   './',
@@ -41,6 +41,19 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Helper para sanitizar respuestas redireccionadas y evitar el bloqueo ERR_FAILED de Fetch/Service Worker en localhost
+function cleanResponse(response) {
+  if (!response || !response.redirected) {
+    return response;
+  }
+  // Si la respuesta fue redireccionada, recreamos una limpia sin el flag de redirección
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers
+  });
+}
+
 self.addEventListener('fetch', (event) => {
   // EXCLUDE Remote Firebase Auth & API requests from Service Worker
   // We only allow local assets (like firebase-config.js) to be cached.
@@ -68,7 +81,7 @@ self.addEventListener('fetch', (event) => {
             const responseClone = response.clone();
             caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseClone));
           }
-          return response;
+          return cleanResponse(response);
         })
         .catch(() => {
           // Try cached version first

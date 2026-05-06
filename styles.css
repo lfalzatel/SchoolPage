@@ -52,7 +52,7 @@
 }
 
 .page-header-section {
-  background: linear-gradient(135deg, rgba(5, 150, 105, 0.6), rgba(4, 120, 87, 0.5));
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(4, 120, 87, 0.5));
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 28px 32px;
   color: white;
@@ -2752,7 +2752,7 @@ section h2 {
 .calendar-wrapper {
   margin: 2rem auto 4rem;
   max-width: 900px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;

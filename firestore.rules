@@ -92,8 +92,40 @@ service cloud.firestore {
       // La galería es pública — cualquier visitante puede verla
       allow read: if true;
 
-      // Solo admins y líderes pueden agregar, editar o eliminar actividades
-      allow create, update, delete: if isAdminOrLider();
+      // Solo admins y líderes pueden agregar o eliminar actividades
+      allow create, delete: if isAdminOrLider();
+
+      // Admins/líderes editan todo. Usuarios autenticados solo pueden modificar 'likeCount' y 'updatedAt' (transacción de likes)
+      allow update: if isAdminOrLider() || (
+        isAuthenticated() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likeCount', 'updatedAt'])
+      );
+
+      // --- COMENTARIOS DEL ÁLBUM ---
+      match /comments/{commentId} {
+        allow read: if true;
+        // Cualquier usuario autenticado puede comentar asignándose su propio uid
+        allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+        // Solo el autor o un admin puede borrar un comentario
+        allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      }
+
+      // --- LIKES Y COMENTARIOS DE FOTOS INDIVIDUALES (Lightbox) ---
+      match /photoStats/{photoIndex} {
+        allow read: if true;
+        
+        match /likes/{userId} {
+          allow read: if true;
+          // Cada usuario solo puede dar/quitar su propio like de foto
+          allow create, delete: if isAuthenticated() && request.auth.uid == userId;
+        }
+
+        match /comments/{commentId} {
+          allow read: if true;
+          allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+          allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+        }
+      }
     }
 
 
@@ -166,6 +198,18 @@ service cloud.firestore {
       // El usuario puede eliminar su propio token al cerrar sesión
       allow delete: if isAuthenticated() &&
         resource.data.uid == request.auth.uid;
+    }
+
+
+    // ══════════════════════════════════════════════════════════════
+    //  /activity_likes/{likeId} (ID: actividadId_usuarioId)
+    //  Registro individual de likes de álbumes.
+    // ══════════════════════════════════════════════════════════════
+    match /activity_likes/{likeId} {
+      allow read: if true;
+      // El usuario autenticado solo puede crear o borrar su propio documento de like
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
 
 
