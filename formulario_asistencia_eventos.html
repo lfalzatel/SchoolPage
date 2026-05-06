@@ -24,21 +24,7 @@
         /* ── Integración Tailwind + sistema premium ── */
         body { background-color: transparent !important; }
 
-        .premium-container {
-            margin-top: 100px;
-            margin-bottom: 100px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .main-card-premium {
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-        }
-
         /* Dark mode Tailwind compat */
-        .dark-mode .main-card-premium      { background: rgba(31, 41, 55, 0.96); color: white; }
         .dark-mode .bg-blue-50             { background-color: rgba(30, 58, 138, 0.2); }
         .dark-mode .bg-gray-50             { background-color: rgba(31, 41, 55, 0.4) !important; }
         .dark-mode .bg-gray-100            { background-color: rgba(55, 65, 81, 0.5); }
@@ -79,13 +65,13 @@
     <div id="app-header-placeholder"></div>
 
     <!-- ── Contenido principal ────────────────────────────────────────────── -->
-    <div class="premium-container px-4 sm:px-6">
-        <div class="max-w-6xl mx-auto main-card-premium rounded-2xl shadow-2xl overflow-hidden mb-20">
+    <div class="page-wrapper">
+        <div class="page-card" style="max-width: 1100px;">
 
             <!-- Encabezado de la sección -->
-            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 p-6 sm:p-8 text-white text-center">
-                <h1 class="text-3xl font-extrabold uppercase tracking-widest">Control de Asistencia</h1>
-                <p class="text-emerald-50 mt-2 font-medium">Gestión de Salidas Pedagógicas — Grupo Ambiental Green Force</p>
+            <div class="page-header-section" style="text-align: center;">
+                <h1><i class="fas fa-poll" style="margin-right: 10px;"></i>Control de Asistencia</h1>
+                <p>Gestión de Salidas Pedagógicas — Grupo Ambiental Green Force</p>
             </div>
 
             <!-- Métricas en Tiempo Real -->
@@ -116,7 +102,7 @@
                         <option value="10B">10B</option><option value="11A">11A</option>
                     </select>
                 </div>
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+                <div id="admin-tools-container" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto" style="display: none;">
                     <input id="nuevo-evento" type="text" placeholder="Nombre del nuevo evento…"
                            class="border rounded-md px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none w-full sm:w-auto" />
                     <button onclick="agregarEvento()"
@@ -170,8 +156,10 @@
 
     <!-- 2. Lógica de asistencia con persistencia Firestore -->
     <script type="module">
+        import { auth } from './auth.js';
         import { db } from './firebase-config.js';
         import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
         // ── Referencias Firestore ────────────────────────────────────────────
         const DOC_EVENTOS    = doc(db, 'asistencia_datos', 'eventos');
@@ -223,6 +211,31 @@
         let eventos    = [...EVENTOS_DEFAULT];
         let asistencia = {};
         let saveTimer  = null;
+        let canEditForm = false;
+
+        // ── Auth Observer ────────────────────────────────────────────────────
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    const role = userDoc.exists() ? userDoc.data().role : null;
+                    canEditForm = role === 'admin' || role === 'lider' || 
+                                  user.email === 'greenforceiebb@gmail.com' || 
+                                  user.email === 'lfalzatel@gmail.com';
+                } catch(e) {
+                    console.error("Error verificando rol:", e);
+                    canEditForm = false;
+                }
+            } else {
+                canEditForm = false;
+            }
+            
+            const adminTools = document.getElementById('admin-tools-container');
+            if (adminTools) {
+                adminTools.style.display = canEditForm ? 'flex' : 'none';
+            }
+            renderTable(); // Re-render for switch state
+        });
 
         // ── Indicador de estado ──────────────────────────────────────────────
         function setStatus(msg, type = 'info') {
@@ -329,12 +342,16 @@
             const checked = on ? 'checked' : '';
             const bg      = on ? 'bg-green-500' : 'bg-gray-300';
             const knob    = on ? 'translate-x-6' : '';
+            const disabled = canEditForm ? '' : 'disabled';
+            const cursor = canEditForm ? 'cursor-pointer' : 'cursor-not-allowed opacity-70';
+            const labelCursor = canEditForm ? 'cursor-pointer' : '';
+
             return `
-                <div class="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" class="hidden switch-input" id="${eventKey}-${id}" ${checked}
+                <div class="inline-flex items-center ${cursor}">
+                    <input type="checkbox" class="hidden switch-input" id="${eventKey}-${id}" ${checked} ${disabled}
                            onchange="window.toggleAsistencia(${id},'${eventKey}')">
                     <label for="${eventKey}-${id}"
-                           class="switch-label w-12 h-6 ${bg} rounded-full relative transition duration-200 shadow-inner">
+                           class="switch-label w-12 h-6 ${bg} rounded-full relative transition duration-200 shadow-inner ${labelCursor}">
                         <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ${knob}"></div>
                     </label>
                 </div>`;
@@ -350,6 +367,7 @@
 
         // ── Acciones globales ────────────────────────────────────────────────
         window.toggleAsistencia = (id, eventKey) => {
+            if (!canEditForm) return;
             ensureStudentEntry(id);
             asistencia[id][eventKey] = !asistencia[id][eventKey];
             renderTable();
@@ -357,6 +375,7 @@
         };
 
         window.agregarEvento = () => {
+            if (!canEditForm) return;
             const input  = document.getElementById('nuevo-evento');
             const nombre = input.value.trim();
             if (!nombre) { alert('Ingresa un nombre para el evento.'); return; }

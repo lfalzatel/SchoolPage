@@ -106,8 +106,7 @@
     
     body {
       margin: 0;
-      background-color: #000;
-      color: #fff;
+      background-color: transparent !important;
     }
 
     #auth-loader {
@@ -351,7 +350,6 @@
   <div id="app-header-placeholder"></div>
   
   <div id="content-to-pdf" class="main-content-wrapper">
-    </div>
 
     <!-- Contenido dinámico de Home (Consolidado) -->
     <div class="view-section view-home active">
@@ -401,7 +399,7 @@
             <i class="fas fa-bell-ring fa-shake"></i>
           </div>
           <div style="flex: 1;">
-            <h3 style="margin: 0 0 5px 0; color: white; font-size: 1.1rem; font-weight: 600;">¡Activa las Alertas!</h3>
+            <h3 style="margin: 0 0 5px 0; font-size: 1.1rem; font-weight: 600;">¡Activa las Alertas!</h3>
             <p style="margin: 0; color: #a1a1aa; font-size: 0.9rem;">Recibe avisos en tiempo real de nuevos eventos de Green Force.</p>
           </div>
           <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -545,9 +543,14 @@
 
 
     <!-- SECTION: Cronograma -->
-    <div id="view-cronograma" class="view-section">
-      <section id="cronograma" class="relative-section">
-        <h2><i class="fas fa-calendar-alt"></i> Cronograma de Actividades</h2>
+    <div id="view-cronograma" class="view-section" style="display: none;">
+      <div class="page-wrapper">
+        <div class="page-card">
+          <div class="page-header-section">
+            <h2><i class="fas fa-calendar-alt" style="margin-right:10px;"></i>Cronograma de Actividades</h2>
+            <p>Sigue las actividades planeadas por el Grupo Ambiental Green Force</p>
+          </div>
+          <section id="cronograma" class="relative-section">
 
         <!-- Year Selector and Action Buttons -->
         <div class="year-selector-container">
@@ -581,16 +584,20 @@
         </div>
 
         <div id="timeline-container"></div>
-      </section>
+          </section>
+        </div>
+      </div>
     </div>
 
     <!-- PROTECTED SECTION: Galería -->
-    <div id="view-galeria" class="view-section">
-      <section id="galeria" class="relative-section">
-        <h2><i class="fas fa-camera"></i> Galería de Actividades</h2>
-        <div>
-          <p>Momentos capturados sembrando futuro.</p>
-        </div>
+    <div id="view-galeria" class="view-section" style="display: none;">
+      <div class="page-wrapper">
+        <div class="page-card">
+          <div class="page-header-section">
+            <h2><i class="fas fa-camera" style="margin-right:10px;"></i>Galería de Actividades</h2>
+            <p>Momentos capturados sembrando futuro</p>
+          </div>
+          <section id="galeria" class="relative-section">
 
         <!-- Premium Year Selector — Sliding Track -->
         <div class="year-selector-container">
@@ -617,13 +624,20 @@
         </div>
 
         <div class="activities-grid" id="activitiesGrid"></div>
-      </section>
+          </section>
+        </div>
+      </div>
     </div>
 
     <!-- PROTECTED SECTION: Videos -->
-    <div id="view-video" class="view-section">
-      <section id="video" class="relative-section">
-        <h2><i class="fas fa-video"></i> Videos del Proyecto</h2>
+    <div id="view-video" class="view-section" style="display: none;">
+      <div class="page-wrapper">
+        <div class="page-card">
+          <div class="page-header-section">
+            <h2><i class="fab fa-youtube" style="margin-right:10px;"></i>Videos y Reportajes</h2>
+            <p>Mira nuestras producciones audiovisuales y reportajes de ecología</p>
+          </div>
+          <section id="video" class="relative-section">
 
         <!-- Year Selector and Admin Controls for Videos -->
         <div class="year-selector-container">
@@ -667,15 +681,20 @@
                 class="fab fa-youtube"></i> Reforestación (Short)</a>
           </div>
         </div>
-      </section>
+          </section>
+        </div>
+      </div>
     </div>
 
     <!-- PROTECTED SECTION: Documentos -->
     <div id="view-documentos" class="view-section" style="display: none;">
-      <section id="documentos" class="relative-section">
-        <h2><i class="fas fa-folder-open"></i> Documentos del Proyecto</h2>
-        <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">Haz clic en un documento para visualizarlo
-        </p>
+      <div class="page-wrapper">
+        <div class="page-card">
+          <div class="page-header-section">
+            <h2><i class="fas fa-file-alt" style="margin-right:10px;"></i>Documentos y Archivos</h2>
+            <p>Haz clic en un documento para visualizarlo y descargarlo</p>
+          </div>
+          <section id="documentos" class="relative-section">
 
         <!-- Year Selector for Documents -->
         <div class="year-selector-container">
@@ -701,16 +720,21 @@
           <!-- Dynamic Documents will be loaded here -->
           <p style="grid-column: 1/-1; text-align: center; color: #666;">Cargando documentos...</p>
         </div>
-      </section>
+          </section>
+        </div>
+      </div>
     </div>
 
 
     <!-- SETTINGS VIEW -->
     <div id="view-configuracion" class="view-section" style="display: none;">
-      <section id="configuracion" class="relative-section">
-        <h2><i class="fas fa-cog"></i> Configuración</h2>
-        <p style="text-align: center; color: rgba(255,255,255,0.6); margin-bottom: 2rem;">Personaliza tu experiencia en
-          la app</p>
+      <div class="page-wrapper">
+        <div class="page-card">
+          <div class="page-header-section">
+            <h2><i class="fas fa-cog" style="margin-right:10px;"></i>Configuración</h2>
+            <p>Personaliza tu experiencia en la aplicación</p>
+          </div>
+          <section id="configuracion" class="relative-section">
 
         <div class="settings-grid">
 
@@ -812,17 +836,18 @@
           </div>
 
         </div>
-      </section>
+          </section>
+        </div>
+      </div>
     </div>
 
-  </div>
-
   <!-- VIEW: GALERÍA (Migrated from gallery.html) -->
-  <div id="view-galeria" class="view-section" style="display: none;">
-    <main class="gallery-manage-container">
-      <div class="gallery-header">
-        <div>
-          <h1>Explora nuestras Actividades</h1>
+  <div id="view-galeria-legacy" class="view-section" style="display: none;">
+    <main class="page-wrapper">
+      <div class="page-card gallery-manage-card">
+        <div class="gallery-header page-header-section">
+          <div>
+            <h1>Explora nuestras Actividades</h1>
           <p>Momentos capturados sembrando futuro.</p>
         </div>
 
@@ -843,8 +868,11 @@
       <div id="galleryGridFull">
         <!-- Events loaded here -->
       </div>
+      </div>
     </main>
   </div>
+
+  </div><!-- /#content-to-pdf -->
 
   <div id="documentModal" class="modal">
     <div class="modal-content">

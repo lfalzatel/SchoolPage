@@ -24,6 +24,71 @@
   --text-secondary: #6b7280;
 }
 
+/* ===== GLOBAL LAYOUT CLASSES (FLOATING CARD DESIGN) ===== */
+.page-wrapper {
+  margin-top: 100px;
+  margin-bottom: 100px;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.page-card {
+  max-width: 900px;
+  margin: 0 auto;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  color: #f3f4f6;
+}
+
+.dark-mode .page-card {
+  background: rgba(0, 0, 0, 0.55);
+  color: #f3f4f6;
+}
+
+.page-header-section {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.6), rgba(4, 120, 87, 0.5));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 28px 32px;
+  color: white;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.page-header-section h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.page-header-section h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.page-header-section p {
+  margin: 0;
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+
+/* Limpieza de secciones anidadas en tarjetas para evitar duplicaciones visuales */
+.page-card section {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 24px !important;
+}
+
 /* ===== TOAST SYSTEM ===== */
 #toast-container {
   position: fixed;
@@ -2039,14 +2104,14 @@ footer {
   padding: 0 25px;
 
   /* ✅ Glassmorphism real */
-  background: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(20, 20, 20, 0.85) !important;
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
 
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   border-radius: 50px;
 
   z-index: 10000 !important;
@@ -2065,11 +2130,6 @@ footer {
   box-shadow:
     0 15px 40px rgba(0, 0, 0, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  transform: translateX(-50%) translateY(-3px) !important;
-}
-
-.bottom-nav:hover {
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
   transform: translateX(-50%) translateY(-3px) !important;
 }
 
@@ -4201,11 +4261,7 @@ footer a:hover {
 /* Redundant .bottom-nav:hover and .nav-item styles removed */
 
 /* Dark Mode Overrides for Menu */
-.dark-mode .bottom-nav {
-  background: rgba(30, 30, 30, 0.75) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
+/* Dark Mode Overrides for Menu */
 
 .dark-mode .nav-item,
 .dark-mode .nav-item i,

@@ -211,13 +211,26 @@ function buildNavHTML(navItems) {
 // ── Fondo dinámico con slideshow ────────────────────────────────────────────
 function initBackground(basePath) {
     const container = document.getElementById('app-background');
-    if (!container) return;
+    if (!container || container.children.length > 0) return; // Ya fue inicializado (por gallery.js)
     const images = [
         'assets/images/WhatsApp Image 2024-05-23 at 8.01.21 AM (1).jpeg',
         'assets/images/WhatsApp Image 2024-05-23 at 8.01.21 AM.jpeg',
         'assets/images/WhatsApp Image 2024-05-23 at 8.01.22 AM.jpeg',
+        'assets/images/1. Arboles sembrados 1.jpg',
+        'assets/images/1. logo 3.jpg',
+        'assets/images/2. Cubo innovación 1.jpg',
+        'assets/images/3. UCO investigación 1.jpg',
+        'assets/images/4. Huerta escolar 1.jpg',
+        'assets/images/5. Vertiente Barro Blanco 1.jpg',
+        'assets/images/6. Reciclaje 1.jpg',
+        'assets/images/7. Reserva CAM 1.jpg',
+        'assets/images/8. Reforestacion 1.jpg',
+        'assets/images/11. Encuentro departamental 2025 - 1.jpg',
+        'assets/images/12. Visita agrosavia 2025 - 1.jpg',
     ];
-    images.forEach((src, i) => {
+    // Mezclar aleatoriamente
+    const shuffled = [...images].sort(() => 0.5 - Math.random());
+    shuffled.forEach((src, i) => {
         const slide = document.createElement('div');
         slide.className = 'bg-slide' + (i === 0 ? ' active' : '');
         slide.style.backgroundImage = `url('${basePath}${src}')`;
@@ -228,9 +241,11 @@ function initBackground(basePath) {
     if (slides.length > 1) {
         setInterval(() => {
             slides[current].classList.remove('active');
-            current = (current + 1) % slides.length;
+            let next;
+            do { next = Math.floor(Math.random() * slides.length); } while (next === current);
+            current = next;
             slides[current].classList.add('active');
-        }, 8000);
+        }, 6000);
     }
 }
 

@@ -14,20 +14,7 @@
     <!-- auth.js es cargado por layout.js -->
 
     <style>
-        .gallery-manage-container {
-            max-width: 1200px;
-            margin: 100px auto 40px;
-            padding: 2rem;
-            /* background: var(--card-bg);
-            border-radius: 24px;
-            box-shadow: var(--glass-shadow); */
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(0.5px);
-            -webkit-backdrop-filter: blur(0.5px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px;
-            min-height: 80vh;
-        }
+        /* Removed gallery-manage-container to use global page-wrapper/page-card */
 
         .gallery-header {
             display: flex;
@@ -174,17 +161,19 @@
 </head>
 
 <body>
+    <!-- Fondo dinámico (iniciado por layout.js) -->
     <div id="app-background"></div>
 
     <!-- ► Placeholder de Header — layout.js lo reemplaza -->
     <div id="app-header-placeholder"></div>
 
-    <main class="gallery-manage-container">
-        <div class="gallery-header">
-            <div>
-                <h1>Explora nuestras Actividades</h1>
-                <p>Momentos capturados sembrando futuro.</p>
-            </div>
+    <main class="page-wrapper">
+        <div class="page-card" style="padding: 2rem; max-width: 1200px; min-height: 80vh;">
+            <div class="gallery-header page-header-section" style="margin: -2rem -2rem 2rem -2rem;">
+                <div>
+                    <h1 style="background: none; -webkit-text-fill-color: inherit; color: white;">Explora nuestras Actividades</h1>
+                    <p style="color: rgba(255,255,255,0.85);">Momentos capturados sembrando futuro.</p>
+                </div>
 
             <!-- Premium Year Selector -->
             <!-- Premium Year Selector — Sliding Track -->
@@ -207,6 +196,7 @@
 
         <div id="galleryGridFull">
             <!-- Los eventos se cargarán aquí -->
+        </div>
         </div>
     </main>
 

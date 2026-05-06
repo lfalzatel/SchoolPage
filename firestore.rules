@@ -104,11 +104,29 @@ service cloud.firestore {
     // ══════════════════════════════════════════════════════════════
     match /asistencia_datos/{docId} {
 
-      // Solo admins y líderes pueden ver el registro completo de asistencia
-      allow read: if isAdminOrLider();
+      // Todos pueden ver el registro completo de asistencia
+      allow read: if true;
 
       // Solo admins y líderes pueden guardar o actualizar los registros
       allow write: if isAdminOrLider();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  /videos/{videoId}
+    //  Videos del proyecto Green Force
+    // ══════════════════════════════════════════════════════════════
+    match /videos/{videoId} {
+      allow read: if true;
+      allow create, update, delete: if isAdminOrLider();
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  /documents/{docId}
+    //  Documentos subidos del proyecto
+    // ══════════════════════════════════════════════════════════════
+    match /documents/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdminOrLider();
     }
 
 

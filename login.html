@@ -670,6 +670,11 @@
         // Auth Guard: If already logged in, redirect to index
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // Si estamos en medio de un flujo de login activo, dejar que auth.js maneje el redirect
+                if (sessionStorage.getItem('googleLoginRedirecting') === 'true') {
+                    return; 
+                }
+                
                 // Instantly swap to splash if navigating via other auth modes
                 document.body.classList.add('is-redirecting');
                 const splashStatus = document.getElementById('splash-status');
