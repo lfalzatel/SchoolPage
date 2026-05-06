@@ -94,7 +94,7 @@ function buildHeaderHTML(basePath) {
 
   <div class="profile-menu-container">
     <div class="header-avatar-container" id="profilePillBtn">
-      <img src="${basePath}assets/icons/icon-192.png" alt="Profile" id="headerProfileAvatar" class="header-avatar">
+      <img src="${basePath}assets/icons/icon-192.png" alt="Profile" id="headerProfileAvatar" class="header-avatar" referrerpolicy="no-referrer">
       <div class="user-info-pill">
         <span id="headerUserName" class="user-name-pill">Invitado</span>
         <span id="headerUserRole" class="user-role-pill">Visitante</span>

@@ -17,77 +17,121 @@
         body { background-color: transparent !important; }
 
         .toolbar {
-            padding: 16px 24px;
-            border-bottom: 1px solid rgba(0,0,0,0.07);
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
             display: flex;
             gap: 12px;
             align-items: center;
             flex-wrap: wrap;
+            background: rgba(0, 0, 0, 0.12);
+            border-radius: 16px 16px 0 0;
         }
-        .dark-mode .toolbar { border-color: rgba(255,255,255,0.08); }
+        .dark-mode .toolbar { border-color: rgba(255,255,255,0.06); background: rgba(0, 0, 0, 0.3); }
 
         .search-box {
             flex: 1; min-width: 200px;
             display: flex; align-items: center; gap: 10px;
-            background: #f3f4f6; border-radius: 10px; padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px; padding: 8px 14px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            color: #374151;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .dark-mode .search-box { background: rgba(255,255,255,0.08); }
+        .dark-mode .search-box { background: rgba(255,255,255,0.04); color: #f3f4f6; }
+        .search-box:focus-within {
+            border-color: rgba(16, 185, 129, 0.5);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+        }
         .search-box input {
             border: none; background: transparent; outline: none;
             font-family: 'Poppins', sans-serif; font-size: 0.9rem;
             color: inherit; width: 100%;
         }
-        .search-box i { color: #9ca3af; }
+        .search-box i { color: #10b981; }
 
         .filter-select {
-            border: 1px solid #e5e7eb; border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px;
             padding: 8px 12px; font-family: 'Poppins', sans-serif;
-            font-size: 0.85rem; background: white; color: #374151; outline: none;
+            font-size: 0.85rem; background: rgba(255, 255, 255, 0.04); color: #374151; outline: none;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: border-color 0.2s;
         }
-        .dark-mode .filter-select { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); color: #f3f4f6; }
+        .filter-select:focus { border-color: #10b981; }
+        .dark-mode .filter-select { background: rgba(255,255,255,0.04); color: #f3f4f6; }
+        /* Style select options to ensure readability */
+        .filter-select option, .role-select-input option, .modal-role-select option {
+            background: #1f2937;
+            color: #f3f4f6;
+        }
 
         .user-count-badge {
-            font-size: 0.8rem; color: #6b7280;
-            background: #f3f4f6; padding: 6px 12px; border-radius: 20px;
+            font-size: 0.8rem; color: #10b981; font-weight: 600;
+            background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.15);
+            padding: 6px 14px; border-radius: 20px;
         }
-        .dark-mode .user-count-badge { background: rgba(255,255,255,0.08); color: #9ca3af; }
+        .dark-mode .user-count-badge { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
 
-        #users-list { padding: 12px 16px; }
+        #users-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
         .user-card {
-            display: flex; align-items: center; gap: 14px;
-            padding: 14px 12px; border-radius: 14px;
-            transition: background 0.2s; margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        .user-card:hover { background: rgba(124,58,237,0.06); }
-        .dark-mode .user-card:hover { background: rgba(139,92,246,0.1); }
+        .user-card:hover {
+            background: rgba(5, 150, 105, 0.08);
+            border-color: rgba(16, 185, 129, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.2);
+        }
+        
+        .user-main-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+            min-width: 0;
+        }
 
         .user-avatar-wrap { position: relative; flex-shrink: 0; }
 
         .user-avatar {
             width: 48px; height: 48px; border-radius: 50%;
             object-fit: cover;
-            border: 2px solid rgba(255,255,255,0.4);
+            border: 2px solid rgba(16, 185, 129, 0.3);
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             display: block;
         }
         .user-avatar-fallback {
             width: 48px; height: 48px; border-radius: 50%;
-            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            background: linear-gradient(135deg, #059669, #10b981);
             color: white; font-weight: 700;
             display: flex; align-items: center; justify-content: center;
             font-size: 0.9rem; flex-shrink: 0;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(16, 185, 129, 0.3);
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         .user-info { flex: 1; min-width: 0; }
-        .user-name  { font-weight: 600; font-size: 0.95rem; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-email { font-size: 0.78rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-name  { font-weight: 600; font-size: 1rem; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-email { font-size: 0.8rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .dark-mode .user-name  { color: #f3f4f6; }
         .dark-mode .user-email { color: #9ca3af; }
-        .user-last-login { font-size: 0.72rem; color: #9ca3af; margin-top: 2px; }
+        .user-last-login { font-size: 0.72rem; color: #9ca3af; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
 
         .role-selector {
             display: flex; align-items: center; gap: 8px; flex-shrink: 0;
@@ -98,40 +142,43 @@
             padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
         }
         .role-badge.admin      { background: #fef3c7; color: #92400e; }
-        .role-badge.lider      { background: #ede9fe; color: #5b21b6; }
+        .role-badge.lider      { background: rgba(5, 150, 105, 0.15); color: #059669; }
         .role-badge.integrante { background: #d1fae5; color: #065f46; }
         .role-badge.usuario    { background: #f3f4f6; color: #374151; }
         .role-badge.miembro    { background: #dbeafe; color: #1e40af; }
         .dark-mode .role-badge.admin      { background: rgba(251,191,36,0.15);  color: #fcd34d; }
-        .dark-mode .role-badge.lider      { background: rgba(139,92,246,0.15);  color: #a78bfa; }
-        .dark-mode .role-badge.integrante { background: rgba(16,185,129,0.15);  color: #6ee7b7; }
+        .dark-mode .role-badge.lider      { background: rgba(16,185,129,0.15);  color: #6ee7b7; }
+        .dark-mode .role-badge.integrante { background: rgba(52,211,153,0.15);  color: #a7f3d0; }
         .dark-mode .role-badge.usuario    { background: rgba(255,255,255,0.08); color: #d1d5db; }
         .dark-mode .role-badge.miembro    { background: rgba(59,130,246,0.15);  color: #93c5fd; }
 
         .role-select-input {
-            border: 1px solid #e5e7eb; border-radius: 8px;
-            padding: 5px 10px; font-family: 'Poppins', sans-serif; font-size: 0.82rem;
-            background: white; color: #374151; outline: none; cursor: pointer;
-            transition: border-color 0.2s;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+            padding: 6px 12px; font-family: 'Poppins', sans-serif; font-size: 0.82rem;
+            background: rgba(255, 255, 255, 0.05); color: #374151; outline: none; cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
-        .role-select-input:focus { border-color: #7c3aed; }
-        .dark-mode .role-select-input { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.1); color: #f3f4f6; }
+        .role-select-input:focus { border-color: #10b981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15); }
+        .dark-mode .role-select-input { color: #f3f4f6; }
 
         .save-role-btn {
-            width: 32px; height: 32px; border-radius: 8px; border: none;
-            background: #7c3aed; color: white; cursor: pointer; font-size: 0.85rem;
+            width: 34px; height: 34px; border-radius: 10px; border: none;
+            background: #059669; color: white; cursor: pointer; font-size: 0.85rem;
             display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s, transform 0.1s; flex-shrink: 0;
+            transition: all 0.2s, transform 0.1s; flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(5, 150, 105, 0.2);
         }
-        .save-role-btn:hover  { background: #6d28d9; transform: scale(1.05); }
-        .save-role-btn:active { transform: scale(0.95); }
-        .save-role-btn.saving { background: #f59e0b; }
-        .save-role-btn.done   { background: #10b981; }
+        .save-role-btn:hover  { background: #047857; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(5, 150, 105, 0.35); }
+        .save-role-btn:active { transform: translateY(0); }
+        .save-role-btn.saving { background: #f59e0b; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2); }
+        .save-role-btn.done   { background: #10b981; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2); }
 
         .empty-state {
             text-align: center; padding: 48px 24px; color: #9ca3af;
         }
-        .empty-state i { font-size: 2.5rem; margin-bottom: 12px; display: block; opacity: 0.4; }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 12px; display: block; opacity: 0.4; color: #10b981; }
 
         #access-denied {
             text-align: center; padding: 60px 24px; color: #ef4444; display: none;
@@ -140,8 +187,27 @@
         #access-denied h2 { font-size: 1.3rem; font-weight: 700; }
         #access-denied p  { color: #6b7280; margin-top: 8px; }
 
-        .user-divider { height: 1px; background: rgba(0,0,0,0.06); margin: 2px 0; }
-        .dark-mode .user-divider { background: rgba(255,255,255,0.06); }
+        @media (max-width: 600px) {
+            .user-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+                padding: 16px;
+            }
+            .user-main-info {
+                width: 100%;
+            }
+            .role-selector {
+                width: 100%;
+                justify-content: flex-end;
+                border-top: 1px solid rgba(255, 255, 255, 0.06);
+                padding-top: 12px;
+                margin-top: 4px;
+            }
+            .role-select-input {
+                flex: 1;
+            }
+        }
 
         /* ══════════════════════════════════════════
            MODAL DE DETALLES DE USUARIO
@@ -360,7 +426,7 @@
                     <i class="fas fa-times"></i>
                 </button>
                 <div class="modal-avatar-wrap">
-                    <img id="modal-avatar-img" class="modal-avatar" src="" alt=""
+                    <img id="modal-avatar-img" class="modal-avatar" src="" alt="" referrerpolicy="no-referrer"
                          onerror="this.style.display='none';document.getElementById('modal-avatar-fallback').style.display='flex';">
                     <div id="modal-avatar-fallback" class="modal-avatar-fallback" style="display:none;"></div>
                 </div>
@@ -423,6 +489,7 @@
 
     <script type="module">
         import { initLayout } from './layout.js';
+        import './gallery.js';
         initLayout({ activeNav: null });
     </script>
 
@@ -507,13 +574,15 @@
 
                 return `
                 <div class="user-card" data-uid="${u.id}" onclick="openUserModal('${u.id}')">
-                    ${avatarHtml}
-                    <div class="user-info">
-                        <div class="user-name">${u.name || 'Sin nombre'}</div>
-                        <div class="user-email">${u.email || '—'}</div>
-                        <div class="user-last-login">
-                            <i class="fas fa-clock" style="font-size:0.65rem;margin-right:3px;"></i>
-                            Último acceso: ${lastLogin}
+                    <div class="user-main-info">
+                        ${avatarHtml}
+                        <div class="user-info">
+                            <div class="user-name">${u.name || 'Sin nombre'}</div>
+                            <div class="user-email">${u.email || '—'}</div>
+                            <div class="user-last-login">
+                                <i class="fas fa-clock" style="font-size:0.65rem;margin-right:3px;"></i>
+                                Último acceso: ${lastLogin}
+                            </div>
                         </div>
                     </div>
                     <div class="role-selector" onclick="event.stopPropagation()">
@@ -529,8 +598,7 @@
                             <i class="fas fa-check"></i>
                         </button>
                     </div>
-                </div>
-                ${i < users.length - 1 ? '<div class="user-divider"></div>' : ''}`;
+                </div>`;
             }).join('');
         }
 
@@ -552,7 +620,7 @@
             if (photo) {
                 return `
                 <div class="user-avatar-wrap">
-                    <img src="${photo}" alt="${name || ''}" class="${imgClass}"
+                    <img src="${photo}" alt="${name || ''}" class="${imgClass}" referrerpolicy="no-referrer"
                          onerror="this.style.display='none';this.parentElement.querySelector('.${fallbackClass}').style.display='flex';">
                     <div class="${fallbackClass}" style="display:none;">${initials}</div>
                 </div>`;

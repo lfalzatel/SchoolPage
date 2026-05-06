@@ -411,33 +411,30 @@ export async function loadDocuments() {
 
     grid.innerHTML = '<div class="loader"><i class="fas fa-spinner fa-spin"></i> Cargando documentos...</div>';
 
+    let dbDocuments = [];
     try {
         const q = query(collection(db, "documents"), orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
-
-        let documents = [];
         querySnapshot.forEach((doc) => {
-            documents.push({ id: doc.id, ...doc.data() });
+            dbDocuments.push({ id: doc.id, ...doc.data() });
         });
-
-        console.log("Documents FETCHED from DB:", documents);
-
-        // Always merge static documents with DB documents
-        // This ensures the default files (GitHub) are always shown
-        documents = [...documents, ...staticDocuments];
-
-        window.currentDocuments = documents;
-
-        // Default filter to 'all' (Todos) to show everything initially
-        const activeYearBtn = document.querySelector('#docsYearSelector .year-pill.active');
-        const defaultYear = activeYearBtn ? activeYearBtn.getAttribute('data-year') : 'all';
-
-        filterDocumentsByYear(defaultYear);
-
+        console.log("Documents FETCHED from DB:", dbDocuments);
     } catch (e) {
-        console.error("Error loading documents:", e);
-        grid.innerHTML = '<p style="text-align: center; color: red;">Error al cargar documentos.</p>';
+        console.error("Error loading documents from Firestore, falling back to static:", e);
+        if (window.showToast) {
+            window.showToast("Cargando archivos del sistema local.", "info");
+        }
     }
+
+    // Always merge database documents with static documents
+    const documents = [...dbDocuments, ...staticDocuments];
+    window.currentDocuments = documents;
+
+    // Default filter to active year
+    const activeYearBtn = document.querySelector('#docsYearSelector .year-pill.active');
+    const defaultYear = activeYearBtn ? activeYearBtn.getAttribute('data-year') : 'all';
+
+    filterDocumentsByYear(defaultYear);
 }
 
 export function filterDocumentsByYear(year) {
