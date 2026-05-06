@@ -887,6 +887,7 @@ function renderActivityCards(activities, targetId = 'activitiesGrid') {
 
 function renderVideoCards(videos) {
     const grid = document.getElementById('videosGrid');
+    if (!grid) return;
     const isAdmin = window.currentUserRole === 'admin';
 
     grid.innerHTML = videos.map((v, i) => `
