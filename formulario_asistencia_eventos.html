@@ -38,7 +38,8 @@
         .dark-mode .hover\:bg-gray-50:hover { background-color: rgba(55, 65, 81, 0.3); }
 
         /* Toggle switch */
-        .switch-input:checked + .switch-label { background-color: #22c55e !important; }
+        .switch-label { background-color: rgba(255, 255, 255, 0.15) !important; border: 1px solid rgba(255,255,255,0.1); }
+        .switch-input:checked + .switch-label { background-color: #10b981 !important; border-color: #10b981 !important; }
 
         /* Barra de estado de guardado */
         #save-status-bar {
@@ -444,7 +445,6 @@
         function createSwitch(id, eventKey) {
             const on      = asistencia[id]?.[eventKey] ?? false;
             const checked = on ? 'checked' : '';
-            const bg      = on ? 'bg-green-500' : 'bg-gray-300';
             const knob    = on ? 'translate-x-6' : '';
             const disabled = canEditForm ? '' : 'disabled';
             const cursor = canEditForm ? 'cursor-pointer' : 'cursor-not-allowed opacity-70';
@@ -455,8 +455,9 @@
                     <input type="checkbox" class="hidden switch-input" id="${eventKey}-${id}" ${checked} ${disabled}
                            onchange="window.toggleAsistencia(${id},'${eventKey}')">
                     <label for="${eventKey}-${id}"
-                           class="switch-label w-12 h-6 ${bg} rounded-full relative transition duration-200 shadow-inner ${labelCursor}">
-                        <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ${knob}"></div>
+                           class="switch-label w-12 h-6 rounded-full relative transition-colors duration-200 shadow-inner ${labelCursor}">
+                        <div class="absolute left-1 top-1 w-4 h-4 rounded-full transition-transform duration-200 ${knob}"
+                             style="background-color: #ffffff !important; box-shadow: 0 2px 4px rgba(0,0,0,0.4);"></div>
                     </label>
                 </div>`;
         }
@@ -577,12 +578,15 @@
                 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
                 const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                 
-                const file = new File([blob], "Asistencia_Green_Force.xlsx", { type: blob.type });
+                // Añadir lastModified ayuda en algunos navegadores móviles
+                const file = new File([blob], "Asistencia_Green_Force.xlsx", { 
+                    type: blob.type,
+                    lastModified: new Date().getTime()
+                });
 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    // Enviar solo el archivo a veces evita errores en Android
                     await navigator.share({
-                        title: 'Asistencia Green Force',
-                        text: 'Adjunto el registro de asistencia de Green Force.',
                         files: [file]
                     });
                     closeExportModal();
@@ -593,7 +597,9 @@
             } catch (err) {
                 console.error("Error al compartir:", err);
                 if (err.name !== 'AbortError') {
-                    alert("Error al compartir el archivo.");
+                    // Si falla, avisamos exactamente qué falló y descargamos el archivo
+                    alert("Aviso: " + err.message + "\nSe descargará el archivo localmente.");
+                    window.confirmarDescargaExcel();
                 }
             }
         };
