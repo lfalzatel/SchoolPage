@@ -20,6 +20,9 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         /* ── Integración Tailwind + sistema premium ── */
@@ -175,13 +178,9 @@
                     </button>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <button onclick="generarResumen()"
-                            class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 w-full sm:w-auto">
-                        <i class="fas fa-chart-bar"></i> Ver Resumen
-                    </button>
                     <button onclick="abrirModalExportar()"
-                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 w-full sm:w-auto">
-                        <i class="fas fa-file-excel"></i> Exportar
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 w-full sm:w-auto">
+                        <i class="fas fa-file-export"></i> Exportar
                     </button>
                 </div>
             </div>
@@ -234,13 +233,23 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="flex justify-end gap-3">
-                    <button onclick="compartirExcel()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition flex items-center gap-2">
-                        <i class="fas fa-share-alt"></i> Compartir
-                    </button>
-                    <button onclick="confirmarDescargaExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-5 rounded-lg transition flex items-center gap-2">
-                        <i class="fas fa-download"></i> Descargar
-                    </button>
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-2">
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <span class="text-sm text-gray-400 font-semibold uppercase">Formato:</span>
+                        <div class="flex bg-black/30 rounded-lg p-1 border border-white/10 w-full sm:w-auto">
+                            <button id="fmt-excel" onclick="selectExportFormat('excel')" class="flex-1 sm:flex-none px-4 py-1.5 rounded-md bg-white/20 text-white text-sm font-semibold transition">Excel</button>
+                            <button id="fmt-pdf" onclick="selectExportFormat('pdf')" class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-gray-400 hover:text-white hover:bg-white/5 text-sm font-semibold transition">PDF</button>
+                            <button id="fmt-img" onclick="selectExportFormat('img')" class="flex-1 sm:flex-none px-4 py-1.5 rounded-md text-gray-400 hover:text-white hover:bg-white/5 text-sm font-semibold transition">Imagen</button>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-3 w-full sm:w-auto">
+                        <button onclick="compartirExportacion()" class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition flex justify-center items-center gap-2">
+                            <i class="fas fa-share-alt"></i> Compartir
+                        </button>
+                        <button onclick="descargarExportacion()" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-5 rounded-lg transition flex justify-center items-center gap-2">
+                            <i class="fas fa-download"></i> Descargar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -493,14 +502,7 @@
             scheduleSave();
         };
 
-        window.generarResumen = () => {
-            const lista = Object.entries(asistencia)
-                .map(([id, data]) => {
-                    const est = ESTUDIANTES.find(e => e.id == id);
-                    return eventos.some(ev => data[ev.key]) ? `${est?.nombre} (${est?.grado})` : null;
-                }).filter(Boolean);
-            alert(`📋 Resumen de Asistencia\n\nEstudiantes con al menos una asistencia: ${lista.length}\n\n${lista.join('\n')}`);
-        };
+
 
         let exportDataForExcel = null;
 
@@ -561,50 +563,143 @@
             return wb;
         };
 
-        window.confirmarDescargaExcel = () => {
-            const wb = window.generarWorkbook();
-            if (wb) {
-                XLSX.writeFile(wb, "Asistencia_Green_Force.xlsx");
-                closeExportModal();
+        let currentExportFormat = 'excel';
+
+        window.selectExportFormat = (fmt) => {
+            currentExportFormat = fmt;
+            ['excel','pdf','img'].forEach(f => {
+                const btn = document.getElementById('fmt-' + f);
+                if(f === fmt) {
+                    btn.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-md bg-white/20 text-white text-sm font-semibold transition";
+                } else {
+                    btn.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-md text-gray-400 hover:text-white hover:bg-white/5 text-sm font-semibold transition";
+                }
+            });
+        };
+
+        window.descargarExportacion = async () => {
+            if (currentExportFormat === 'excel') {
+                const wb = window.generarWorkbook();
+                if (wb) {
+                    XLSX.writeFile(wb, "Asistencia_Green_Force.xlsx");
+                    closeExportModal();
+                }
+            } else if (currentExportFormat === 'pdf') {
+                await generarPDF(false);
+            } else if (currentExportFormat === 'img') {
+                await generarImagen(false);
             }
         };
 
-        window.compartirExcel = async () => {
-            const wb = window.generarWorkbook();
-            if (!wb) return;
-            
+        window.compartirExportacion = async () => {
             try {
-                // Escribir a un array de bytes
-                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                
-                // Añadir lastModified ayuda en algunos navegadores móviles
-                const file = new File([blob], "Asistencia_Green_Force.xlsx", { 
-                    type: blob.type,
-                    lastModified: new Date().getTime()
-                });
+                let file = null;
+                if (currentExportFormat === 'excel') {
+                    const wb = window.generarWorkbook();
+                    if (!wb) return;
+                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    file = new File([blob], "Asistencia_Green_Force.xlsx", { type: blob.type, lastModified: Date.now() });
+                } else if (currentExportFormat === 'pdf') {
+                    const blob = await generarPDF(true);
+                    if(blob) file = new File([blob], "Asistencia_Green_Force.pdf", { type: blob.type, lastModified: Date.now() });
+                } else if (currentExportFormat === 'img') {
+                    const blob = await generarImagen(true);
+                    if(blob) file = new File([blob], "Asistencia_Green_Force.jpg", { type: blob.type, lastModified: Date.now() });
+                }
 
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    // Enviar solo el archivo a veces evita errores en Android
-                    await navigator.share({
-                        files: [file]
-                    });
+                if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file] });
                     closeExportModal();
                 } else {
-                    alert('Tu dispositivo/navegador no soporta compartir archivos directamente. Se descargará el archivo en su lugar.');
-                    window.confirmarDescargaExcel();
+                    alert('Tu dispositivo/navegador no soporta compartir este formato directamente. Se descargará el archivo en su lugar.');
+                    descargarExportacion();
                 }
             } catch (err) {
                 console.error("Error al compartir:", err);
                 if (err.name !== 'AbortError') {
-                    // Si falla, avisamos exactamente qué falló y descargamos el archivo
                     alert("Aviso: " + err.message + "\nSe descargará el archivo localmente.");
-                    window.confirmarDescargaExcel();
+                    descargarExportacion();
                 }
             }
         };
 
-        window.descargarExcel = window.abrirModalExportar;
+        async function generarPDF(returnBlob = false) {
+            if(!exportDataForExcel || exportDataForExcel.length === 0) return null;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+            
+            doc.setFontSize(18);
+            doc.setTextColor(16, 185, 129); // emerald-500
+            doc.text("Asistencia Green Force", 14, 20);
+            
+            const thead = exportDataForExcel[0];
+            const tbody = exportDataForExcel.slice(1);
+            
+            doc.autoTable({
+                startY: 25,
+                head: [thead],
+                body: tbody,
+                theme: 'grid',
+                headStyles: { fillColor: [16, 185, 129] },
+                styles: { fontSize: 9 }
+            });
+            
+            if (returnBlob) {
+                return doc.output('blob');
+            } else {
+                doc.save("Asistencia_Green_Force.pdf");
+                closeExportModal();
+            }
+        }
+
+        async function generarImagen(returnBlob = false) {
+            // Clonar la tabla para tomar la foto limpia
+            const modalContent = document.querySelector('#exportModal .p-6').cloneNode(true);
+            
+            // Remover las cosas innecesarias del clon
+            const description = modalContent.querySelector('p');
+            if(description) description.remove();
+            const footerButtons = modalContent.querySelector('.flex.flex-col.sm\\:flex-row');
+            if(footerButtons) footerButtons.remove();
+            const scrollContainer = modalContent.querySelector('.overflow-auto');
+            if(scrollContainer) {
+                scrollContainer.classList.remove('max-h-80', 'overflow-auto');
+                scrollContainer.classList.add('overflow-visible');
+            }
+            
+            modalContent.className = "p-6 bg-gray-900 text-white w-[800px]";
+            
+            // Añadir Título
+            const title = document.createElement('h2');
+            title.className = "text-xl font-bold mb-4 text-emerald-500 flex items-center gap-2";
+            title.innerHTML = '<i class="fas fa-leaf"></i> Asistencia Green Force';
+            modalContent.insertBefore(title, modalContent.firstChild);
+
+            // Añadir a body fuera de la vista
+            const offscreen = document.createElement('div');
+            offscreen.style.position = 'absolute';
+            offscreen.style.left = '-9999px';
+            offscreen.appendChild(modalContent);
+            document.body.appendChild(offscreen);
+
+            const canvas = await html2canvas(modalContent, {
+                backgroundColor: '#111827',
+                scale: 2
+            });
+            
+            document.body.removeChild(offscreen);
+            
+            if (returnBlob) {
+                return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+            } else {
+                const link = document.createElement('a');
+                link.download = "Asistencia_Green_Force.jpg";
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                closeExportModal();
+            }
+        }
 
         // ── Iniciar ──────────────────────────────────────────────────────────
         document.getElementById('filter-grado').addEventListener('change', renderTable);
