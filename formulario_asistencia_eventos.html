@@ -433,7 +433,7 @@
                     row.className = 'hover:bg-gray-50 border-b transition-colors';
                     row.innerHTML = `
                         <td class="p-4 font-medium text-gray-800">${e.nombre}</td>
-                        <td class="p-4 text-gray-600">${e.grado}</td>
+                        <td class="p-4 text-white font-medium">${e.grado}</td>
                         ${eventos.map(ev => `<td class="p-4 text-center">${createSwitch(e.id, ev.key)}</td>`).join('')}
                     `;
                     tbody.appendChild(row);
@@ -535,7 +535,7 @@
             // Skip first row which is header
             tbody.innerHTML = data.slice(1).map(row => {
                 return `<tr class="hover:bg-white/5 transition">${row.map((cell, i) => {
-                    let colorClass = "";
+                    let colorClass = "text-white";
                     if (cell === "Sí") colorClass = "text-emerald-400 font-semibold";
                     else if (cell === "No") colorClass = "text-red-400 opacity-70";
                     return `<td class="p-3 border-t border-white/5 whitespace-nowrap ${colorClass}">${cell}</td>`;
