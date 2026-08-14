@@ -46,7 +46,7 @@ function getNavItems(basePath, activeNav) {
         { id: 'nav-video',      href: homeHref('video'),      icon: 'fa-play-circle', label: 'Videos',     key: 'video',      section: 'video' },
         { id: 'nav-docs',       href: homeHref('documentos'), icon: 'fa-file-alt',    label: 'Docs',       key: 'docs',       section: 'documentos' },
         { id: 'nav-chat',       href: 'https://chat.whatsapp.com/L0hrcQ9JWmUB5DQui9ZrXv',
-          icon: 'fa-comments', label: 'Chat', key: 'chat', external: true },
+          icon: 'fa-whatsapp', iconPrefix: 'fab', label: 'Chat', key: 'chat', external: true },
     ];
     // Prioridad: parámetro explícito > hash de URL > ruta
     const currentKey = activeNav || detectActiveNavFromHash() || detectActiveNav();
@@ -202,8 +202,9 @@ function buildNavHTML(navItems) {
     const itemsHTML = navItems.map(item => {
         const cls      = item.isActive ? ' active' : '';
         const external = item.external ? ' target="_blank" rel="noopener noreferrer"' : '';
+        const prefix   = item.iconPrefix || 'fas';
         return `<a id="${item.id}" href="${item.href}" class="nav-item${cls}"${external}>
-      <i class="fas ${item.icon}"></i><span>${item.label}</span></a>`;
+      <i class="${prefix} ${item.icon}"></i><span>${item.label}</span></a>`;
     }).join('');
     return `<nav class="bottom-nav" id="bottom-nav-root">${itemsHTML}</nav>`;
 }
