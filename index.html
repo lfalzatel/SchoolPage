@@ -46,23 +46,35 @@
       }
     }, 800);
 
-    onAuthStateChanged(auth, (user) => {
+    let hasProceeded = false;
+
+    const hideLoader = () => {
+      if (hasProceeded) return;
+      hasProceeded = true;
+      clearInterval(textInterval);
       const loader = document.getElementById('auth-loader');
+      if (loader) {
+        if (loaderStatus) loaderStatus.innerText = "¡Bienvenido!";
+        setTimeout(() => {
+          loader.classList.add('hide');
+          setTimeout(() => { loader.style.display = 'none'; }, 400);
+        }, 200);
+      }
+    };
+
+    // Timeout de seguridad: Máximo 2.5s de pantalla de carga para evitar bloqueos
+    setTimeout(hideLoader, 2500);
+
+    onAuthStateChanged(auth, (user) => {
+      if (hasProceeded) return;
       
       const proceed = () => {
-        clearInterval(textInterval);
         if (!user) {
           if (sessionStorage.getItem('isLoggingOut') !== 'true') {
             window.location.href = 'login.html';
           }
         } else {
-          if (loader) {
-            if (loaderStatus) loaderStatus.innerText = "¡Bienvenido!";
-            setTimeout(() => {
-              loader.classList.add('hide');
-              setTimeout(() => { loader.style.display = 'none'; }, 500);
-            }, 300); // Pequeña pausa para mostrar "Bienvenido"
-          }
+          hideLoader();
         }
       };
 
@@ -70,7 +82,7 @@
         proceed();
       } else {
         const elapsed = Date.now() - splashStartTime;
-        const remaining = Math.max(0, 3000 - elapsed);
+        const remaining = Math.max(0, 1500 - elapsed);
         setTimeout(proceed, remaining);
       }
     });
