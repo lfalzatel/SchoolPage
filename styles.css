@@ -4009,6 +4009,7 @@ body {
   z-index: 10000;
   opacity: 0;
   visibility: hidden;
+  overflow-x: hidden !important;
   transition: all 0.3s ease;
 }
 
@@ -4030,6 +4031,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   overflow-y: auto;
+  overflow-x: hidden !important;
   margin: auto;
   animation: modalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-sizing: border-box;
@@ -4071,14 +4073,26 @@ body {
 
 .form-grid-premium {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1rem;
   padding: 1.25rem;
   box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .full-width {
   grid-column: span 2;
+}
+
+@media (max-width: 480px) {
+  .form-grid-premium {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .full-width {
+    grid-column: span 1;
+  }
 }
 
 .form-group-premium {
