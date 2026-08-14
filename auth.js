@@ -288,17 +288,13 @@ const updateUI = (user) => {
         }
     }
 
-    // 3. Overlays de contenido protegido - MODIFICADO: Galería pública
-    ['videoOverlay', 'docsOverlay'].forEach(id => { // galleryOverlay removed
+    // 3. Overlays de contenido protegido - Galería, Videos y Documentos son públicos para visitantes
+    ['galleryOverlay', 'videoOverlay', 'docsOverlay'].forEach(id => {
         const el = getEl(id);
         if (el) {
-            el.style.display = user ? 'none' : 'flex';
+            el.style.display = 'none';
         }
     });
-
-    // Explicitly hide gallery overlay if it exists (cleanup)
-    const galOverlay = getEl('galleryOverlay');
-    if (galOverlay) galOverlay.style.display = 'none';
 
     // 4. Nav de escritorio (legacy)
     const lBtn = getEl(uiIds.loginBtn);

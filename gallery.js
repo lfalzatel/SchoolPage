@@ -903,15 +903,33 @@ function renderVideoCards(videos) {
 
 // --- DELETE FUNCTIONS (Admin Only) ---
 window.deleteActivity = async (id) => {
-    if (!confirm("¿Seguro que deseas eliminar este evento/álbum fotográfico completo con todos sus comentarios, archivos e interacciones? ¡Esta acción no se puede deshacer!")) return;
+    if (!confirm("¿Seguro que deseas eliminar este evento/álbum fotográfico completo? ¡Esta acción no se puede deshacer!")) return;
 
     try {
-        await deleteDoc(doc(db, "activities", id));
-        alert('Actividad eliminada correctamente.');
-        loadActivities(); // Reload list
+        if (id) {
+            await deleteDoc(doc(db, "activities", id));
+        }
+        // También remover de seedData local si existe
+        if (window.seedData && Array.isArray(window.seedData.activities)) {
+            window.seedData.activities = window.seedData.activities.filter(a => a.id !== id);
+        }
+        if (window.currentCronogramaItems) {
+            window.currentCronogramaItems = window.currentCronogramaItems.filter(a => a.id !== id);
+        }
+        
+        showToast('Actividad eliminada correctamente.', 'success');
+        
+        // Recargar Galería y Cronograma simultáneamente
+        if (typeof loadActivities === 'function') {
+            await loadActivities();
+            await loadActivities('activitiesGrid');
+        }
+        if (typeof loadCronograma === 'function') {
+            await loadCronograma();
+        }
     } catch (e) {
         console.error("Error eliminando actividad:", e);
-        alert("Error al eliminar: " + e.message);
+        showToast("Error al eliminar: " + e.message, 'error');
     }
 };
 

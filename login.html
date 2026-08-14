@@ -411,11 +411,12 @@
             <span id="googleBtnText">Iniciar con Google</span>
         </button>
 
-        <div class="divider">
-            <span>O con correo y contraseña</span>
+        <div class="divider" id="toggleEmailFormBtn" style="cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; user-select: none; margin: 1.2rem 0; color: rgba(255,255,255,0.85); font-size: 0.85rem; font-weight: 500;">
+            <span>O ingresar con correo y contraseña</span>
+            <i class="fas fa-chevron-down" id="emailChevron" style="transition: transform 0.3s ease; font-size: 0.8rem;"></i>
         </div>
 
-        <form id="loginForm">
+        <form id="loginForm" style="display: none; margin-top: 0.8rem; transition: all 0.3s ease;">
             <div class="form-group">
                 <label for="email">Correo Electrónico</label>
                 <div style="position: relative;">
@@ -438,6 +439,20 @@
                 <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
             </button>
         </form>
+
+        <script>
+            document.getElementById('toggleEmailFormBtn')?.addEventListener('click', () => {
+                const form = document.getElementById('loginForm');
+                const chevron = document.getElementById('emailChevron');
+                if (form) {
+                    const isHidden = form.style.display === 'none';
+                    form.style.display = isHidden ? 'block' : 'none';
+                    if (chevron) {
+                        chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+                    }
+                }
+            });
+        </script>
 
         <button id="installAppBtn" class="google-btn"
             style="display: none; margin-top: 1rem; background: #2E7D32; color: white; border: none;">
