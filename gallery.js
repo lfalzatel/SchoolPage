@@ -626,14 +626,20 @@ export async function createActivity(data, photos) {
 
         const imageUrls = [];
 
-        // Subir fotos a Storage (Solo si hay fotos)
+        // Subir fotos a Storage (o convertir a Base64 si Storage requiere pago)
         if (photos && photos.length > 0) {
             for (let i = 0; i < photos.length; i++) {
                 const file = photos[i];
-                const storageRef = ref(storage, `activities/${Date.now()}_${file.name}`);
-                const snapshot = await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(snapshot.ref);
-                imageUrls.push(url);
+                try {
+                    const storageRef = ref(storage, `activities/${Date.now()}_${file.name}`);
+                    const snapshot = await uploadBytes(storageRef, file);
+                    const url = await getDownloadURL(snapshot.ref);
+                    imageUrls.push(url);
+                } catch (storageErr) {
+                    console.warn("Storage upload falló, usando compresión Base64 gratuita:", storageErr);
+                    const base64Url = await fileToBase64(file);
+                    imageUrls.push(base64Url);
+                }
             }
         }
 
@@ -681,14 +687,20 @@ export async function updateActivity(id, data, newPhotos) {
 
         const imageUrls = data.existingImages || [];
 
-        // Subir fotos nuevas a Storage (Solo si hay fotos)
+        // Subir fotos nuevas a Storage (o convertir a Base64 si Storage requiere pago)
         if (newPhotos && newPhotos.length > 0) {
             for (let i = 0; i < newPhotos.length; i++) {
                 const file = newPhotos[i];
-                const storageRef = ref(storage, `activities/${Date.now()}_${file.name}`);
-                const snapshot = await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(snapshot.ref);
-                imageUrls.push(url);
+                try {
+                    const storageRef = ref(storage, `activities/${Date.now()}_${file.name}`);
+                    const snapshot = await uploadBytes(storageRef, file);
+                    const url = await getDownloadURL(snapshot.ref);
+                    imageUrls.push(url);
+                } catch (storageErr) {
+                    console.warn("Storage upload falló, usando compresión Base64 gratuita:", storageErr);
+                    const base64Url = await fileToBase64(file);
+                    imageUrls.push(base64Url);
+                }
             }
         }
 
@@ -982,11 +994,60 @@ window.closeUploadModal = () => {
     document.body.style.overflow = 'auto';
 };
 
+// --- BASE64 COMPRESSION FALLBACK (0 COST, NO BILLING REQUIRED) ---
+export async function fileToBase64(file, maxWidth = 1000, maxHeight = 1000, quality = 0.75) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                try {
+                    const webpData = canvas.toDataURL('image/webp', quality);
+                    if (webpData && webpData.startsWith('data:image/webp')) {
+                        return resolve(webpData);
+                    }
+                } catch (e) {}
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = () => resolve(event.target.result);
+        };
+        reader.onerror = (err) => reject(err);
+    });
+}
+
 // --- UPLOAD HELPERS ---
 async function uploadImage(file, path) {
-    const storageRef = ref(storage, path);
-    await uploadBytes(storageRef, file);
-    return await getDownloadURL(storageRef);
+    try {
+        const storageRef = ref(storage, path);
+        const snapshot = await uploadBytes(storageRef, file);
+        return await getDownloadURL(snapshot.ref);
+    } catch (err) {
+        console.warn("Storage upload error, using Base64 fallback:", err);
+        return await fileToBase64(file);
+    }
 }
 
 // --- HANDLE UPLOAD SUBMISSION ---

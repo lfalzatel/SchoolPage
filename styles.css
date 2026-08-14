@@ -2138,10 +2138,10 @@ footer {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #99fbad;
+  color: #10b981 !important;
   text-decoration: none;
   font-size: 0.65rem;
-  font-weight: 500;
+  font-weight: 600;
   gap: 2px;
   transition: all 0.3s ease;
   padding: 5px 0;
@@ -2153,22 +2153,48 @@ footer {
 .nav-item i {
   font-size: 1.4rem;
   margin-bottom: 2px;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: #10b981 !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.nav-item span {
+  color: #10b981 !important;
+  transition: color 0.3s ease;
 }
 
 .nav-item.active {
-  color: var(--primary);
+  color: #ffffff !important;
 }
 
 .nav-item.active i {
-  transform: scale(1.1);
-  filter: drop-shadow(0 4px 6px rgba(46, 125, 50, 0.3));
-  color: var(--primary);
+  color: #ffffff !important;
+  animation: navIconBounce 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  filter: drop-shadow(0 4px 10px rgba(16, 185, 129, 0.4));
 }
 
 .nav-item.active span {
+  color: #ffffff !important;
   opacity: 1;
   font-weight: 700;
+}
+
+/* Keyframes de rebote para el icono activo */
+@keyframes navIconBounce {
+  0% {
+    transform: scale(0.8) translateY(0);
+  }
+  40% {
+    transform: scale(1.3) translateY(-10px);
+  }
+  60% {
+    transform: scale(0.92) translateY(2px);
+  }
+  80% {
+    transform: scale(1.15) translateY(-4px);
+  }
+  100% {
+    transform: scale(1.1) translateY(0);
+  }
 }
 
 /* Specific styling for the Active indicator */
@@ -2178,9 +2204,9 @@ footer {
   bottom: 5px;
   width: 4px;
   height: 4px;
-  background: var(--primary);
+  background: #ffffff;
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--primary);
+  box-shadow: 0 0 8px #ffffff;
 }
 
 /* Styling for Chat button in bottom nav */
@@ -3830,45 +3856,45 @@ body {
 
 /* Bottom Navigation Styles */
 
-/* Ítems inactivos: icono + texto en verde */
+/* Ítems inactivos: icono + texto en verde brillante */
 .nav-item {
-  color: #10b981;
+  color: #10b981 !important;
 }
 
 .nav-item i {
   font-size: 1.3rem;
   transition: all 0.3s ease;
-  color: #10b981;
+  color: #10b981 !important;
 }
 
 .nav-item span {
-  color: #10b981;
+  color: #10b981 !important;
 }
 
-/* Ítem activo: recuadro verde con icono/texto blancos */
+/* Ítem activo: icono y texto en blanco brillante con animación de rebote */
 .nav-item.active {
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 .nav-item.active i {
-  transform: translateY(-12px);
+  animation: navIconBounce 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   background: var(--primary);
-  color: white;
+  color: #ffffff !important;
   width: 45px;
   height: 45px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 14px;
-  box-shadow: 0 8px 15px rgba(5, 150, 105, 0.3);
+  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.45);
   margin-bottom: -15px;
 }
 
 .nav-item.active span {
   transform: translateY(2px);
   opacity: 1;
-  color: #ffffff;
-  font-weight: 600;
+  color: #ffffff !important;
+  font-weight: 700;
 }
 
 /* --- Phase 4: Theme Selector & Gallery Premium --- */
