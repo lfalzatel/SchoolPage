@@ -10,7 +10,11 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "**/*.log",
+      "**/*.txt",
+      "**/scripts/**",
+      "*.md"
     ],
     "rewrites": [
       {
