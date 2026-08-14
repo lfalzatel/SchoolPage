@@ -4018,18 +4018,21 @@ body {
 }
 
 /* Modal Premium Evento */
+/* Modal Premium Evento */
 .modal-container-premium {
-  background: rgba(0, 255, 255, 0.2);
-  backdrop-filter: blur(0.5px);
-  -webkit-backdrop-filter: blur(20px);
-  width: 95%;
-  max-width: 480px;
+  background: rgba(10, 35, 30, 0.95);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  width: 92%;
+  max-width: 460px;
   max-height: 85vh;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   overflow-y: auto;
+  margin: auto;
   animation: modalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-sizing: border-box;
 }
 
 @keyframes modalScaleUp {
@@ -4045,11 +4048,11 @@ body {
 }
 
 .modal-header-premium {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.25rem 1.5rem;
   color: white;
   display: flex;
   justify-content: space-between;
@@ -4058,7 +4061,7 @@ body {
 
 .modal-header-premium h3 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -4069,79 +4072,122 @@ body {
 .form-grid-premium {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: 1rem;
+  padding: 1.25rem;
+  box-sizing: border-box;
 }
 
 .full-width {
   grid-column: span 2;
 }
 
+.form-group-premium {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
 .form-group-premium label {
   display: block;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #fdfeff;
+  color: #e2e8f0;
   margin-bottom: 0.5rem;
 }
 
 .form-group-premium input,
 .form-group-premium textarea {
   width: 100%;
-  padding: 12px 16px;
+  padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-  transition: border 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  transition: all 0.2s;
 }
 
 .form-group-premium input:focus,
 .form-group-premium textarea:focus {
-  border-color: var(--primary);
+  border-color: #10b981;
+  background: rgba(255, 255, 255, 0.15);
   outline: none;
 }
 
 .drop-zone-premium {
-  border: 2px dashed #d1d5db;
+  border: 2px dashed rgba(255, 255, 255, 0.25);
   border-radius: 16px;
-  padding: 1rem;
+  padding: 1.25rem 1rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
-  background: #f9fafb;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .drop-zone-premium:hover {
-  background: #f0fdf4;
-  border-color: var(--primary);
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10b981;
 }
 
 .drop-zone-premium i {
-  font-size: 2rem;
-  color: var(--primary);
-  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  color: #10b981;
+  margin-bottom: 0.5rem;
   display: block;
 }
 
+.drop-zone-premium span {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
 .modal-actions-premium {
-  padding: 1rem 1.5rem;
-  /* background: rgba(249, 250, 251, 0.8); */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  padding: 1rem 1.25rem 1.5rem 1.25rem;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 1rem;
 }
 
+.modal-actions-premium .btn-cancel {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.modal-actions-premium .btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .btn-save-premium {
+  flex: 1;
   background: #10b981;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 10px;
+  padding: 12px;
+  border-radius: 12px;
   font-weight: 700;
   cursor: pointer;
+  text-align: center;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .btn-save-premium:hover {

@@ -626,20 +626,12 @@ export async function createActivity(data, photos) {
 
         const imageUrls = [];
 
-        // Subir fotos a Storage (o convertir a Base64 si Storage requiere pago)
+        // Compresión directa a Base64 (0 costo, sin errores CORS)
         if (photos && photos.length > 0) {
             for (let i = 0; i < photos.length; i++) {
                 const file = photos[i];
-                try {
-                    const storageRef = ref(storage, `activities/${Date.now()}_${file.name}`);
-                    const snapshot = await uploadBytes(storageRef, file);
-                    const url = await getDownloadURL(snapshot.ref);
-                    imageUrls.push(url);
-                } catch (storageErr) {
-                    console.warn("Storage upload falló, usando compresión Base64 gratuita:", storageErr);
-                    const base64Url = await fileToBase64(file);
-                    imageUrls.push(base64Url);
-                }
+                const base64Url = await fileToBase64(file);
+                imageUrls.push(base64Url);
             }
         }
 
@@ -687,20 +679,12 @@ export async function updateActivity(id, data, newPhotos) {
 
         const imageUrls = data.existingImages || [];
 
-        // Subir fotos nuevas a Storage (o convertir a Base64 si Storage requiere pago)
+        // Compresión directa a Base64 para fotos nuevas (0 costo, sin errores CORS)
         if (newPhotos && newPhotos.length > 0) {
             for (let i = 0; i < newPhotos.length; i++) {
                 const file = newPhotos[i];
-                try {
-                    const storageRef = ref(storage, `activities/${Date.now()}_${file.name}`);
-                    const snapshot = await uploadBytes(storageRef, file);
-                    const url = await getDownloadURL(snapshot.ref);
-                    imageUrls.push(url);
-                } catch (storageErr) {
-                    console.warn("Storage upload falló, usando compresión Base64 gratuita:", storageErr);
-                    const base64Url = await fileToBase64(file);
-                    imageUrls.push(base64Url);
-                }
+                const base64Url = await fileToBase64(file);
+                imageUrls.push(base64Url);
             }
         }
 
@@ -1040,14 +1024,7 @@ export async function fileToBase64(file, maxWidth = 1000, maxHeight = 1000, qual
 
 // --- UPLOAD HELPERS ---
 async function uploadImage(file, path) {
-    try {
-        const storageRef = ref(storage, path);
-        const snapshot = await uploadBytes(storageRef, file);
-        return await getDownloadURL(snapshot.ref);
-    } catch (err) {
-        console.warn("Storage upload error, using Base64 fallback:", err);
-        return await fileToBase64(file);
-    }
+    return await fileToBase64(file);
 }
 
 // --- HANDLE UPLOAD SUBMISSION ---
