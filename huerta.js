@@ -553,15 +553,21 @@ function switchViewTab(view) {
   activeView = view;
   const gameSection = document.getElementById("farmGameSection");
   const classicSection = document.getElementById("classicBitacoraSection");
+  const headerSection = document.querySelector(".page-header-section");
+  const scopeControl = document.querySelector(".scope-segmented-control");
   const btnGame = document.getElementById("viewTabGame");
   const btnClassic = document.getElementById("viewTabClassic");
 
   if (view === "juego") {
+    if (headerSection) headerSection.style.display = "none";
+    if (scopeControl) scopeControl.style.display = "none";
     if (gameSection) gameSection.style.display = "block";
     if (classicSection) classicSection.style.display = "none";
     if (btnGame) btnGame.classList.add("active");
     if (btnClassic) btnClassic.classList.remove("active");
   } else {
+    if (headerSection) headerSection.style.display = "flex";
+    if (scopeControl) scopeControl.style.display = "flex";
     if (gameSection) gameSection.style.display = "none";
     if (classicSection) classicSection.style.display = "block";
     if (btnGame) btnGame.classList.remove("active");
