@@ -1,6 +1,6 @@
 importScripts('./firebase-messaging-sw.js');
 
-const CACHE_NAME = 'green-force-v48';
+const CACHE_NAME = 'green-force-v49';
 const OFFLINE_URL = './offline.html';
 const ASSETS_TO_CACHE = [
   './',
@@ -11,6 +11,8 @@ const ASSETS_TO_CACHE = [
   './auth.js',
   './firebase-config.js',
   './gallery.js',
+  './layout.js',
+  './settings-view.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
@@ -18,7 +20,7 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // Force new SW to take over
+  self.skipWaiting(); // Force new SW to take over immediately
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -33,6 +35,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
+            console.log('[SW] Purging old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -46,7 +49,6 @@ function cleanResponse(response) {
   if (!response || !response.redirected) {
     return response;
   }
-  // Si la respuesta fue redireccionada, recreamos una limpia sin el flag de redirección
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -56,7 +58,6 @@ function cleanResponse(response) {
 
 self.addEventListener('fetch', (event) => {
   // EXCLUDE Remote Firebase Auth & API requests from Service Worker
-  // We only allow local assets (like firebase-config.js) to be cached.
   const isRemoteFirebase = (
     event.request.url.includes('googleapis.com') ||
     event.request.url.includes('identitytoolkit') ||
@@ -67,10 +68,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first for HTML, JS, CSS to ensure fresh code
-  const isCritical = event.request.url.endsWith('.html') ||
-    event.request.url.endsWith('.js') ||
-    event.request.url.endsWith('.css');
+  // Network-first for HTML, JS, CSS and page navigation to ensure fresh code
+  const url = event.request.url;
+  const isCritical = event.request.mode === 'navigate' ||
+    url.includes('.html') ||
+    url.includes('.js') ||
+    url.includes('.css') ||
+    url.endsWith('/') ||
+    event.request.destination === 'document';
 
   if (isCritical) {
     event.respondWith(
@@ -84,9 +89,8 @@ self.addEventListener('fetch', (event) => {
           return cleanResponse(response);
         })
         .catch(() => {
-          // Try cached version first
+          // Try cached version if network fails
           return caches.match(event.request).then(cachedResponse => {
-            // If it's an HTML request and no cache, serve offline page
             if (!cachedResponse && event.request.destination === 'document') {
               return caches.match(OFFLINE_URL);
             }

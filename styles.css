@@ -25,9 +25,9 @@
 }
 
 /* ===== GLOBAL LAYOUT CLASSES (FLOATING CARD DESIGN) ===== */
-/* Brecha elegante de 14px entre la cabecera fija y las tarjetas flotantes */
+/* Brecha elegante de 20px entre la cabecera fija y las tarjetas flotantes */
 .page-wrapper {
-  margin-top: 16px !important;
+  margin-top: 22px !important;
   margin-bottom: 85px !important;
   padding: 0 12px !important;
   position: relative;
@@ -36,7 +36,7 @@
 
 @media (max-width: 600px) {
   .page-wrapper {
-    margin-top: 14px !important;
+    margin-top: 18px !important;
     padding: 0 8px !important;
   }
 }
@@ -3865,9 +3865,9 @@ footer a:hover {
 
 /* Layout Adjustments */
 body {
-  padding-top: 60px !important;
-  /* Space for fixed header */
-  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  padding-top: 70px !important;
+  /* Space for 70px fixed header */
+  padding-bottom: calc(85px + env(safe-area-inset-bottom));
   /* Space for bottom nav + iPhone safe area */
 }
 
