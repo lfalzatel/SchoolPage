@@ -113,11 +113,11 @@ export const DEFAULT_CROP_TYPES = [
   }
 ];
 
-// Bancales por defecto
+// Bancales por defecto con progresión de juego y ámbito institucional
 export const DEFAULT_PLOTS = [
-  { id: "bancal-1", name: "Bancal 1 - Hortalizas de Hoja", description: "Zona con sombra parcial", isActive: true },
-  { id: "bancal-2", name: "Bancal 2 - Raíces y Tubérculos", description: "Suelo profundo y suelto", isActive: true },
-  { id: "bancal-3", name: "Bancal 3 - Frutos y Leguminosas", description: "Zona de pleno sol", isActive: true }
+  { id: "bancal-1", name: "Bancal 1 - Hortalizas de Hoja", description: "Zona con sombra parcial", isActive: true, order: 0, gameStatus: "desbloqueada", unlockedAt: null, unlockedByHarvestOf: null, ownerScope: "colegio", ownerUid: null, ownerName: null, isReal: true },
+  { id: "bancal-2", name: "Bancal 2 - Raíces y Tubérculos", description: "Suelo profundo y suelto", isActive: true, order: 1, gameStatus: "bloqueada", unlockedAt: null, unlockedByHarvestOf: null, ownerScope: "colegio", ownerUid: null, ownerName: null, isReal: true },
+  { id: "bancal-3", name: "Bancal 3 - Frutos y Leguminosas", description: "Zona de pleno sol", isActive: true, order: 2, gameStatus: "bloqueada", unlockedAt: null, unlockedByHarvestOf: null, ownerScope: "colegio", ownerUid: null, ownerName: null, isReal: true }
 ];
 
 // ──────────────────────────────────────────────────────────────
@@ -170,13 +170,112 @@ export async function getCropTypes() {
   return types;
 }
 
-export async function getPlots() {
+export async function getPlots(scope = null, uid = null) {
   const querySnapshot = await getDocs(collection(db, "plots"));
   const plots = [];
   querySnapshot.forEach(doc => {
-    plots.push({ id: doc.id, ...doc.data() });
+    const data = doc.data();
+    // Default fallback para documentos antiguos
+    const plotScope = data.ownerScope || 'colegio';
+    const plotUid = data.ownerUid || null;
+    const isReal = data.isReal !== undefined ? data.isReal : true;
+
+    const item = { id: doc.id, ownerScope: plotScope, ownerUid: plotUid, isReal, ...data };
+
+    if (!scope || scope === 'todos') {
+      plots.push(item);
+    } else if (scope === 'colegio') {
+      if (plotScope === 'colegio') plots.push(item);
+    } else if (scope === 'individual') {
+      if (plotScope === 'individual') {
+        if (!uid || plotUid === uid) plots.push(item);
+      }
+    }
   });
+  plots.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   return plots;
+}
+
+export async function createPracticePlot({ name, description, user }) {
+  if (!user) throw new Error("Debes iniciar sesión para crear una cama de práctica");
+  if (!name) throw new Error("El nombre de la cama de práctica es obligatorio");
+
+  // Validar límite duro de máximo 3 camas de práctica activas por estudiante
+  const allPlots = await getPlots('individual', user.uid);
+  const practicePlots = allPlots.filter(p => p.isReal === false);
+
+  if (practicePlots.length >= 3) {
+    throw new Error("⚠️ Has alcanzado el límite máximo de 3 bancales de práctica activos.");
+  }
+
+  const newPlot = {
+    name,
+    description: description || "Cama virtual de entrenamiento",
+    ownerScope: "individual",
+    ownerUid: user.uid,
+    ownerName: user.displayName || user.email || "Estudiante",
+    isReal: false,
+    order: practicePlots.length,
+    gameStatus: "desbloqueada",
+    isActive: true,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+
+  const docRef = await addDoc(collection(db, "plots"), newPlot);
+  return docRef.id;
+}
+
+export async function assignIndividualRealPlot({ studentUid, studentName, name, description }) {
+  if (!studentUid || !studentName) throw new Error("Debe seleccionar a un estudiante de Green Force");
+  if (!name) throw new Error("El nombre de la parcela es obligatorio");
+
+  const newPlot = {
+    name,
+    description: description || `Bancal físico asignado a ${studentName}`,
+    ownerScope: "individual",
+    ownerUid: studentUid,
+    ownerName: studentName,
+    isReal: true,
+    order: 0,
+    gameStatus: "desbloqueada",
+    isActive: true,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+
+  const docRef = await addDoc(collection(db, "plots"), newPlot);
+  return docRef.id;
+}
+
+export async function awardUserGamification(uid, xp = 0, coins = 0) {
+  if (!uid) return;
+  try {
+    const userRef = doc(db, "users", uid);
+    const snap = await getDoc(userRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      const currentXp = data.farmXp || 0;
+      const currentCoins = data.farmCoins || 0;
+      await updateDoc(userRef, {
+        farmXp: currentXp + xp,
+        farmCoins: currentCoins + coins,
+        updatedAt: serverTimestamp()
+      });
+    }
+  } catch (err) {
+    console.warn("No se pudieron actualizar estadísticas de gamificación:", err);
+  }
+}
+
+export async function saveUserViewPreference(uid, preferredView) {
+  if (!uid) return;
+  try {
+    const userRef = doc(db, "users", uid);
+    await updateDoc(userRef, { preferredView, updatedAt: serverTimestamp() });
+  } catch (err) {
+    console.warn("No se pudo guardar la preferencia de vista:", err);
+  }
 }
 
 export async function addCropType({ name, scientificName, wateringIntervalDays, fertilizingIntervalDays, daysToHarvest, sunlight, notes, icon }) {
@@ -202,6 +301,12 @@ export async function addPlot({ name, description }) {
   const newPlot = {
     name,
     description: description || null,
+    ownerScope: "colegio",
+    ownerUid: null,
+    ownerName: null,
+    isReal: true,
+    order: 0,
+    gameStatus: "desbloqueada",
     isActive: true,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
@@ -210,7 +315,7 @@ export async function addPlot({ name, description }) {
   return docRef.id;
 }
 
-export async function getActiveCrops() {
+export async function getActiveCrops(scope = null, uid = null) {
   const q = query(
     collection(db, "crops"),
     orderBy("plantedDate", "desc")
@@ -218,7 +323,22 @@ export async function getActiveCrops() {
   const querySnapshot = await getDocs(q);
   const crops = [];
   querySnapshot.forEach(doc => {
-    crops.push({ id: doc.id, ...doc.data() });
+    const data = doc.data();
+    const cropScope = data.ownerScope || 'colegio';
+    const cropUid = data.ownerUid || null;
+    const isReal = data.isReal !== undefined ? data.isReal : true;
+
+    const item = { id: doc.id, ownerScope: cropScope, ownerUid: cropUid, isReal, ...data };
+
+    if (!scope || scope === 'todos') {
+      crops.push(item);
+    } else if (scope === 'colegio') {
+      if (cropScope === 'colegio') crops.push(item);
+    } else if (scope === 'individual') {
+      if (cropScope === 'individual') {
+        if (!uid || cropUid === uid) crops.push(item);
+      }
+    }
   });
 
   // Verificar automáticamente cultivos que alcanzaron su fecha estimada de cosecha
@@ -259,9 +379,21 @@ export async function createCrop({ cropTypeId, plotId, quantity, notes, photo = 
   const cropType = cropTypeDoc.data();
 
   let plotName = null;
+  let ownerScope = "colegio";
+  let ownerUid = null;
+  let ownerName = null;
+  let isReal = true;
+
   if (plotId) {
     const plotDoc = await getDoc(doc(db, "plots", plotId));
-    if (plotDoc.exists()) plotName = plotDoc.data().name;
+    if (plotDoc.exists()) {
+      const pData = plotDoc.data();
+      plotName = pData.name;
+      ownerScope = pData.ownerScope || "colegio";
+      ownerUid = pData.ownerUid || null;
+      ownerName = pData.ownerName || null;
+      isReal = pData.isReal !== undefined ? pData.isReal : true;
+    }
   }
 
   const plantedDate = Timestamp.now();
@@ -285,6 +417,10 @@ export async function createCrop({ cropTypeId, plotId, quantity, notes, photo = 
     cropTypeIcon: cropType.icon || "🌱",
     plotId: plotId || null,
     plotName: plotName,
+    ownerScope,
+    ownerUid,
+    ownerName,
+    isReal,
     plantedDate,
     expectedHarvestDate,
     status: "creciendo",
@@ -302,6 +438,19 @@ export async function createCrop({ cropTypeId, plotId, quantity, notes, photo = 
   };
 
   const docRef = await addDoc(collection(db, "crops"), newCrop);
+
+  // Marcar bancal como en_uso si corresponde
+  if (plotId) {
+    try {
+      await updateDoc(doc(db, "plots", plotId), {
+        gameStatus: 'en_uso',
+        updatedAt: serverTimestamp()
+      });
+    } catch (e) {
+      console.warn("No se pudo actualizar estado del bancal:", e);
+    }
+  }
+
   return docRef.id;
 }
 
@@ -381,10 +530,13 @@ export async function logCosecha(cropId, { quantity, unit = "unidades", isFinalH
   const cropRef = doc(db, "crops", cropId);
   const cosechasRef = collection(cropRef, "cosechas");
   const now = Timestamp.now();
+  let plotUnlocked = false;
+  let unlockedPlotName = null;
 
   await runTransaction(db, async (transaction) => {
     const cropSnap = await transaction.get(cropRef);
     if (!cropSnap.exists()) throw new Error("Cultivo no encontrado");
+    const cropData = cropSnap.data();
 
     transaction.set(doc(cosechasRef), {
       date: now,
@@ -401,9 +553,48 @@ export async function logCosecha(cropId, { quantity, unit = "unidades", isFinalH
     const updateData = { updatedAt: serverTimestamp() };
     if (isFinalHarvest) {
       updateData.status = 'cosechado';
+
+      // Si tiene bancal asignado, actualizar estado del bancal y buscar el siguiente a desbloquear
+      if (cropData.plotId) {
+        const plotRef = doc(db, "plots", cropData.plotId);
+        const plotSnap = await transaction.get(plotRef);
+        if (plotSnap.exists()) {
+          const currentPlot = plotSnap.data();
+          const currentOrder = currentPlot.order ?? 0;
+          
+          // El bancal actual vuelve a estar 'desbloqueada' (disponible para otra siembra)
+          transaction.update(plotRef, {
+            gameStatus: 'desbloqueada',
+            updatedAt: serverTimestamp()
+          });
+
+          // Buscar el bancal con orden consecutivo (order = currentOrder + 1)
+          const allPlotsSnap = await getDocs(collection(db, "plots"));
+          let nextPlotDoc = null;
+          allPlotsSnap.forEach(d => {
+            const p = d.data();
+            if ((p.order ?? 0) === currentOrder + 1 && p.gameStatus === 'bloqueada') {
+              nextPlotDoc = { id: d.id, ref: doc(db, "plots", d.id), ...p };
+            }
+          });
+
+          if (nextPlotDoc) {
+            transaction.update(nextPlotDoc.ref, {
+              gameStatus: 'desbloqueada',
+              unlockedAt: now,
+              unlockedByHarvestOf: cropId,
+              updatedAt: serverTimestamp()
+            });
+            plotUnlocked = true;
+            unlockedPlotName = nextPlotDoc.name;
+          }
+        }
+      }
     }
     transaction.update(cropRef, updateData);
   });
+
+  return { plotUnlocked, unlockedPlotName };
 }
 
 export async function logIncidencia(cropId, { type = "otro", description = "", photo = null, user }) {

@@ -750,6 +750,9 @@
     </main>
   </div>
 
+  <!-- VIEW: CONFIGURACIÓN & CENTRO DE CONTROL -->
+  <div id="view-configuracion" class="view-section" style="display: none;"></div>
+
   </div><!-- /#content-to-pdf -->
 
   <div id="documentModal" class="modal">
@@ -1648,6 +1651,10 @@
               }
             }
 
+            if (viewName === 'configuracion' && window.renderSettingsView) {
+              window.renderSettingsView(target);
+            }
+
           } else {
             console.warn("View not found:", viewName);
             showView('home');
@@ -2244,6 +2251,18 @@
   <!-- Toast Container -->
   <div id="toast-container"></div>
 
+  <!-- Módulos de Sonido, Celebración y Configuración -->
+  <script type="module">
+    import { initSettingsDefaults, renderSettingsView } from './settings-view.js';
+    import './sound-effects.js';
+    import './celebration-overlay.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initSettingsDefaults();
+    });
+
+    window.renderSettingsView = renderSettingsView;
+  </script>
 </body>
 
 </html>

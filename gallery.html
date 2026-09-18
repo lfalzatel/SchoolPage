@@ -248,15 +248,14 @@
 
             if (user) {
                 if (overlay) overlay.style.display = 'none';
-                // Simulación de rol admin (igual que en auth.js)
                 if (user.email === 'greenforceiebb@gmail.com') {
                     if (adminPanel) adminPanel.style.display = 'flex';
                 }
-                if (window.loadActivities) window.loadActivities('galleryGridFull');
             } else {
                 if (overlay) overlay.style.display = 'flex';
                 if (adminPanel) adminPanel.style.display = 'none';
             }
+            if (window.loadActivities) window.loadActivities('galleryGridFull');
         });
 
         // ── Year Selector: Sliding Track ──

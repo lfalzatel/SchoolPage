@@ -19,9 +19,15 @@ import {
   logIncidencia,
   getCropEvents,
   addCropType,
-  addPlot
+  addPlot,
+  saveUserViewPreference,
+  awardUserGamification,
+  createPracticePlot,
+  assignIndividualRealPlot
 } from "./huerta-service.js";
 import { uploadOrCompressPhoto } from "./image-utils.js";
+import { renderFarmGame } from "./farm-game.js";
+import { initCelebrationOverlay } from "./celebration-overlay.js";
 
 let currentUser = null;
 let userRole = "integrante"; // 'admin', 'lider', 'integrante'
@@ -29,6 +35,8 @@ let cropTypesList = [];
 let plotsList = [];
 let activeCropsList = [];
 let selectedCropId = null;
+let activeView = "juego"; // 'juego' | 'clasica'
+let activeScope = "colegio"; // 'colegio' | 'individual'
 
 // Elementos DOM
 const authStatusElement = document.getElementById("authStatus");
@@ -42,6 +50,8 @@ const siembraForm = document.getElementById("siembraForm");
 
 // Inicialización de la aplicación
 document.addEventListener("DOMContentLoaded", () => {
+  initCelebrationOverlay();
+
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
@@ -60,13 +70,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   setupEventListeners();
+  setupSettingsModal();
+  setupScopeListeners();
+  setupPracticePlotForm();
 });
 
 async function fetchUserRole(uid) {
   try {
     const userDoc = await getDoc(doc(db, "users", uid));
     if (userDoc.exists()) {
-      userRole = userDoc.data().role || "integrante";
+      const data = userDoc.data();
+      userRole = data.role || "integrante";
+      if (data.preferredView) {
+        activeView = data.preferredView;
+        switchViewTab(activeView);
+      }
     }
   } catch (err) {
     console.warn("Error al cargar rol del usuario:", err);
@@ -90,7 +108,11 @@ function updateAuthUI(user) {
   // Visibilidad de acciones reservadas para Admin / Líder
   const isAdminOrLider = userRole === "admin" || userRole === "lider";
   if (newSiembraBtn) {
-    newSiembraBtn.style.display = isAdminOrLider ? "inline-flex" : "none";
+    newSiembraBtn.style.display = (isAdminOrLider || activeScope === 'individual') ? "inline-flex" : "none";
+  }
+  const practiceBtn = document.getElementById("newPracticePlotBtn");
+  if (practiceBtn) {
+    practiceBtn.style.display = (user && activeScope === 'individual') ? "inline-flex" : "none";
   }
 }
 
@@ -108,10 +130,11 @@ function renderUnauthenticatedState() {
 
 async function loadHuertaData() {
   try {
+    const userUid = currentUser ? currentUser.uid : null;
     [cropTypesList, plotsList, activeCropsList] = await Promise.all([
       getCropTypes(),
-      getPlots(),
-      getActiveCrops()
+      getPlots(activeScope, userUid),
+      getActiveCrops(activeScope, userUid)
     ]);
 
     populateCropTypeOptions();
@@ -119,8 +142,85 @@ async function loadHuertaData() {
     renderPendingTasks();
     renderActiveCrops();
     renderCropTypesCatalog();
+
+    // Renderizar escena de Granja 2.5D
+    const farmContainer = document.getElementById("farmGameContainer");
+    if (farmContainer) {
+      renderFarmGame(farmContainer, {
+        crops: activeCropsList,
+        plots: plotsList,
+        user: currentUser,
+        role: userRole,
+        onRefreshData: loadHuertaData
+      });
+    }
   } catch (err) {
     console.error("Error al cargar datos de la huerta:", err);
+  }
+}
+
+function setupScopeListeners() {
+  const btnColegio = document.getElementById("scopeTabColegio");
+  const btnIndividual = document.getElementById("scopeTabIndividual");
+  const practiceBtn = document.getElementById("newPracticePlotBtn");
+
+  if (btnColegio) {
+    btnColegio.addEventListener("click", async () => {
+      activeScope = "colegio";
+      btnColegio.classList.add("active");
+      if (btnIndividual) btnIndividual.classList.remove("active");
+      if (practiceBtn) practiceBtn.style.display = "none";
+      updateAuthUI(currentUser);
+      await loadHuertaData();
+    });
+  }
+
+  if (btnIndividual) {
+    btnIndividual.addEventListener("click", async () => {
+      if (!currentUser) {
+        alert("Debes iniciar sesión para acceder a 'Mi huerta'.");
+        return;
+      }
+      activeScope = "individual";
+      btnIndividual.classList.add("active");
+      if (btnColegio) btnColegio.classList.remove("active");
+      if (practiceBtn) practiceBtn.style.display = "inline-flex";
+      updateAuthUI(currentUser);
+      await loadHuertaData();
+    });
+  }
+}
+
+function setupPracticePlotForm() {
+  const btnNewPractice = document.getElementById("newPracticePlotBtn");
+  const modalPractice = document.getElementById("practicePlotModal");
+  const closeBtn = document.getElementById("closePracticePlotModalBtn");
+  const formPractice = document.getElementById("practicePlotForm");
+
+  if (btnNewPractice && modalPractice) {
+    btnNewPractice.addEventListener("click", () => modalPractice.classList.add("active"));
+  }
+  if (closeBtn && modalPractice) {
+    closeBtn.addEventListener("click", () => modalPractice.classList.remove("active"));
+  }
+
+  if (formPractice) {
+    formPractice.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+      const name = document.getElementById("practicePlotNameInput").value;
+      const description = document.getElementById("practicePlotDescInput").value;
+
+      try {
+        await createPracticePlot({ name, description, user: currentUser });
+        modalPractice.classList.remove("active");
+        formPractice.reset();
+        await loadHuertaData();
+        alert("🪴 ¡Cama de práctica virtual creada con éxito!");
+      } catch (err) {
+        alert(err.message);
+      }
+    });
   }
 }
 
@@ -344,6 +444,16 @@ function populatePlotOptions() {
 //  EVENT LISTENERS Y ACCIONES RÁPIDAS
 // ──────────────────────────────────────────────────────────────
 function setupEventListeners() {
+  const btnGame = document.getElementById("viewTabGame");
+  const btnClassic = document.getElementById("viewTabClassic");
+
+  if (btnGame) {
+    btnGame.addEventListener("click", () => switchViewTab("juego"));
+  }
+  if (btnClassic) {
+    btnClassic.addEventListener("click", () => switchViewTab("clasica"));
+  }
+
   if (newSiembraBtn) {
     newSiembraBtn.addEventListener("click", () => {
       if (siembraModal) siembraModal.classList.add("active");
@@ -411,6 +521,73 @@ function setupEventListeners() {
   }
 }
 
+function switchViewTab(view) {
+  activeView = view;
+  const gameSection = document.getElementById("farmGameSection");
+  const classicSection = document.getElementById("classicBitacoraSection");
+  const btnGame = document.getElementById("viewTabGame");
+  const btnClassic = document.getElementById("viewTabClassic");
+
+  if (view === "juego") {
+    if (gameSection) gameSection.style.display = "block";
+    if (classicSection) classicSection.style.display = "none";
+    if (btnGame) btnGame.classList.add("active");
+    if (btnClassic) btnClassic.classList.remove("active");
+  } else {
+    if (gameSection) gameSection.style.display = "none";
+    if (classicSection) classicSection.style.display = "block";
+    if (btnGame) btnGame.classList.remove("active");
+    if (btnClassic) btnClassic.classList.add("active");
+  }
+
+  if (currentUser) {
+    saveUserViewPreference(currentUser.uid, view);
+  }
+}
+
+function setupSettingsModal() {
+  const btnSettings = document.getElementById("huertaSettingsBtn");
+  const modalSettings = document.getElementById("huertaSettingsModal");
+  const closeBtn = document.getElementById("closeHuertaSettingsBtn");
+
+  const toggleSound = document.getElementById("toggleSoundMaster");
+  const toggleAnim = document.getElementById("toggleAnimMaster");
+  const toggleAnimals = document.getElementById("toggleAnimalsMaster");
+  const toggleVoice = document.getElementById("toggleVoiceMaster");
+
+  if (toggleSound) {
+    toggleSound.checked = localStorage.getItem("hh_sound_enabled") !== "false";
+    toggleSound.addEventListener("change", (e) => {
+      localStorage.setItem("hh_sound_enabled", e.target.checked ? "true" : "false");
+    });
+  }
+  if (toggleAnim) {
+    toggleAnim.checked = localStorage.getItem("hh_anim_enabled") !== "false";
+    toggleAnim.addEventListener("change", (e) => {
+      localStorage.setItem("hh_anim_enabled", e.target.checked ? "true" : "false");
+    });
+  }
+  if (toggleAnimals) {
+    toggleAnimals.checked = localStorage.getItem("hh_ambient_animals_enabled") !== "false";
+    toggleAnimals.addEventListener("change", (e) => {
+      localStorage.setItem("hh_ambient_animals_enabled", e.target.checked ? "true" : "false");
+    });
+  }
+  if (toggleVoice) {
+    toggleVoice.checked = localStorage.getItem("hh_voice_enabled") === "true";
+    toggleVoice.addEventListener("change", (e) => {
+      localStorage.setItem("hh_voice_enabled", e.target.checked ? "true" : "false");
+    });
+  }
+
+  if (btnSettings && modalSettings) {
+    btnSettings.addEventListener("click", () => modalSettings.classList.add("active"));
+  }
+  if (closeBtn && modalSettings) {
+    closeBtn.addEventListener("click", () => modalSettings.classList.remove("active"));
+  }
+}
+
 // Global quickAction para uso directo desde botones HTML
 window.quickAction = async function(type, cropId) {
   if (!currentUser) {
@@ -426,7 +603,10 @@ window.quickAction = async function(type, cropId) {
     const notes = prompt("Notas adicionales (opcional):", "");
     try {
       await logRiego(cropId, { notes, isRain, user: currentUser });
-      alert("✅ Riego registrado con éxito");
+      window.dispatchEvent(new CustomEvent('huerta:celebrate', {
+        detail: { kind: 'riego', title: `¡Riego Registrado!`, subtitle: '+10 XP' }
+      }));
+      await awardUserGamification(currentUser.uid, 10, 5);
       await loadHuertaData();
     } catch (err) {
       alert("Error al registrar riego: " + err.message);
@@ -437,7 +617,10 @@ window.quickAction = async function(type, cropId) {
     const notes = prompt("Notas del abonado (opcional):", "");
     try {
       await logFertilizacion(cropId, { product, notes, user: currentUser });
-      alert("✅ Abonado registrado con éxito");
+      window.dispatchEvent(new CustomEvent('huerta:celebrate', {
+        detail: { kind: 'abono', title: `¡Abonado Registrado!`, subtitle: '+15 XP' }
+      }));
+      await awardUserGamification(currentUser.uid, 15, 10);
       await loadHuertaData();
     } catch (err) {
       alert("Error al registrar abono: " + err.message);
@@ -448,8 +631,18 @@ window.quickAction = async function(type, cropId) {
     const isFinal = confirm("¿Es esta la cosecha final del cultivo? (Aceptar = marca cultivo como cosechado)");
     const notes = prompt("Notas de la cosecha (opcional):", "");
     try {
-      await logCosecha(cropId, { quantity: Number(qtyStr), isFinalHarvest: isFinal, notes, user: currentUser });
-      alert("✅ Cosecha registrada con éxito");
+      const res = await logCosecha(cropId, { quantity: Number(qtyStr), isFinalHarvest: isFinal, notes, user: currentUser });
+      if (res && res.plotUnlocked) {
+        window.dispatchEvent(new CustomEvent('huerta:celebrate', {
+          detail: { kind: 'desbloqueo', title: `¡Bancal Desbloqueado!`, subtitle: '+50 XP' }
+        }));
+        await awardUserGamification(currentUser.uid, 50, 25);
+      } else {
+        window.dispatchEvent(new CustomEvent('huerta:celebrate', {
+          detail: { kind: 'cosecha', title: `¡Cosecha Registrada!`, subtitle: '+30 XP' }
+        }));
+        await awardUserGamification(currentUser.uid, 30, 15);
+      }
       await loadHuertaData();
     } catch (err) {
       alert("Error al registrar cosecha: " + err.message);

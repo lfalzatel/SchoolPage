@@ -223,18 +223,37 @@ service cloud.firestore {
       allow create, update, delete: if isAdminOrLider();
     }
 
-    // Bancales / Zonas de la huerta
+    // Bancales / Zonas de la huerta (Colegio e Individuales)
     match /plots/{plotId} {
-      allow read: if isAuthenticated();
-      allow create, update, delete: if isAdminOrLider();
+      allow read: if isAuthenticated() && (
+        !('ownerScope' in resource.data) ||
+        resource.data.ownerScope == 'colegio' ||
+        resource.data.ownerUid == request.auth.uid ||
+        isAdminOrLider()
+      );
+      // Docentes pueden crear cualquier bancal; estudiantes pueden crear sus propios bancales de práctica (isReal == false)
+      allow create: if isAdminOrLider() || (
+        isAuthenticated() &&
+        request.resource.data.ownerScope == 'individual' &&
+        request.resource.data.ownerUid == request.auth.uid &&
+        request.resource.data.isReal == false
+      );
+      allow update, delete: if isAdminOrLider() || (
+        isAuthenticated() && resource.data.ownerUid == request.auth.uid
+      );
     }
 
     // Instancias de cultivos sembrados y sus subcolecciones
     match /crops/{cropId} {
-      allow read: if isAuthenticated();
-      allow create, delete: if isAdminOrLider();
-      // Permitir actualizar datos calculados (lastWateredAt, status, etc.) por usuarios autenticados
+      allow read: if isAuthenticated() && (
+        !('ownerScope' in resource.data) ||
+        resource.data.ownerScope == 'colegio' ||
+        resource.data.ownerUid == request.auth.uid ||
+        isAdminOrLider()
+      );
+      allow create: if isAuthenticated();
       allow update: if isAuthenticated();
+      allow delete: if isAdminOrLider() || (isAuthenticated() && resource.data.ownerUid == request.auth.uid);
 
       match /riegos/{riegoId} {
         allow read, create: if isAuthenticated();

@@ -254,17 +254,19 @@ function initBackground(basePath) {
 function initTheme() {
     window.setTheme = (theme) => {
         document.body.classList.remove('dark-mode');
-        if (theme === 'dark') {
+        if (theme === 'dark' || theme === 'noche') {
             document.body.classList.add('dark-mode');
         } else if (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.body.classList.add('dark-mode');
         }
+        const dataTheme = localStorage.getItem('gf_theme') || 'eco';
+        document.documentElement.setAttribute('data-theme', dataTheme);
+        document.body.setAttribute('data-theme', dataTheme);
         localStorage.setItem('green-force-theme', theme);
         localStorage.setItem('selected-theme', theme);
         ['light','dark','system'].forEach(t => {
             const btn = document.getElementById(`theme${t.charAt(0).toUpperCase() + t.slice(1)}`);
             if (btn) btn.classList.toggle('active', t === theme);
-            // Compatibilidad con auth.js
             document.querySelectorAll('.theme-btn').forEach(b => {
                 if (b.getAttribute('onclick')?.includes(`'${theme}'`)) b.classList.add('active');
                 else b.classList.remove('active');
@@ -273,6 +275,10 @@ function initTheme() {
     };
     const saved = localStorage.getItem('green-force-theme') || 'system';
     window.setTheme(saved);
+    const dataTheme = localStorage.getItem('gf_theme') || 'eco';
+    document.documentElement.setAttribute('data-theme', dataTheme);
+    document.body.setAttribute('data-theme', dataTheme);
+
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         if (localStorage.getItem('green-force-theme') === 'system') window.setTheme('system');
     });
