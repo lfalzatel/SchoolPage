@@ -25,9 +25,9 @@
 }
 
 /* ===== GLOBAL LAYOUT CLASSES (FLOATING CARD DESIGN) ===== */
-/* Brecha constante de 4px debajo del header fijo */
+/* Brecha elegante de 14px entre la cabecera fija y las tarjetas flotantes */
 .page-wrapper {
-  margin-top: 4px !important;
+  margin-top: 16px !important;
   margin-bottom: 85px !important;
   padding: 0 12px !important;
   position: relative;
@@ -36,7 +36,7 @@
 
 @media (max-width: 600px) {
   .page-wrapper {
-    margin-top: 4px !important;
+    margin-top: 14px !important;
     padding: 0 8px !important;
   }
 }

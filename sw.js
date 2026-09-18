@@ -1,6 +1,6 @@
 importScripts('./firebase-messaging-sw.js');
 
-const CACHE_NAME = 'green-force-v42';
+const CACHE_NAME = 'green-force-v43';
 const OFFLINE_URL = './offline.html';
 const ASSETS_TO_CACHE = [
   './',
