@@ -229,10 +229,10 @@ export function renderSettingsView(containerEl) {
           </div>
         </div>
 
-        <!-- 5. GESTIÓN DE USUARIOS (ADMIN) -->
+        <!-- 5. GESTIÓN DE USUARIOS Y CIFRAS (ADMIN) -->
         <div class="gf-accordion-item">
           <button class="gf-accordion-header" onclick="window.toggleGFSection(this)">
-            <span><i class="fas fa-users-cog" style="color:#ef4444; margin-right:8px;"></i> 5. Gestión de Usuarios (Admin)</span>
+            <span><i class="fas fa-users-cog" style="color:#ef4444; margin-right:8px;"></i> 5. Panel de Administración</span>
             <i class="fas fa-chevron-down chevron-icon"></i>
           </button>
           <div class="gf-accordion-body">
@@ -241,10 +241,20 @@ export function renderSettingsView(containerEl) {
                 <i class="fas fa-user-shield"></i>
               </div>
               <div class="gf-setting-info">
-                <p class="gf-setting-title">Administrar Roles y Firestore</p>
+                <p class="gf-setting-title">Administrar Roles y Usuarios</p>
                 <p class="gf-setting-subtitle">Panel para cambiar permisos de docentes y estudiantes</p>
               </div>
-              <i class="fas fa-chevron-right" style="color:var(--text-light);"></i>
+              <i class="fas fa-chevron-right" style="color:rgba(255,255,255,0.6);"></i>
+            </div>
+            <div class="gf-setting-row" style="cursor:pointer;" onclick="window.openImpactModal && window.openImpactModal()">
+              <div class="gf-setting-icon" style="background:rgba(16,185,129,0.15); color:#10b981;">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="gf-setting-info">
+                <p class="gf-setting-title">Gestionar Impacto Ambiental</p>
+                <p class="gf-setting-subtitle">Actualizar cifras de reciclaje, árboles plantados, agua y estudiantes</p>
+              </div>
+              <span class="gf-badge">Editar</span>
             </div>
           </div>
         </div>

@@ -365,6 +365,13 @@
             <small>Alcance local de sostenibilidad</small>
           </div>
         </div>
+
+        <!-- Botón Administrador: Abrir Modal de Impacto Ambiental -->
+        <div id="homeAdminImpactWrapper" class="admin-only" style="display: none; text-align: center; margin-top: 28px;">
+          <button onclick="openImpactModal()" style="padding: 12px 24px; border-radius: 16px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #10b981; font-weight: 700; font-size: 0.92rem; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: all 0.25s ease; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15);">
+            <i class="fas fa-edit" style="font-size: 1.1rem;"></i> 📊 Gestionar Cifras de Impacto Ambiental
+          </button>
+        </div>
       </section>
 
       <section id="siguenos" class="social-section">
@@ -1043,6 +1050,7 @@
         const adminPanel = document.getElementById('galleryAdminPanel');
         const overlay = document.getElementById('galleryOverlay');
         const adminImpactCard = document.getElementById('adminImpactCard');
+        const homeAdminImpactWrapper = document.getElementById('homeAdminImpactWrapper');
 
         if (user) {
           overlay.style.display = 'none';
@@ -1051,6 +1059,7 @@
           if (admins.includes(user.email)) {
             if (adminPanel) adminPanel.style.display = 'flex';
             if (adminImpactCard) adminImpactCard.style.display = 'block';
+            if (homeAdminImpactWrapper) homeAdminImpactWrapper.style.display = 'block';
             // Show cronograma new button
             const cronogramaNewBtn = document.getElementById('cronogramaNewBtn');
             if (cronogramaNewBtn) cronogramaNewBtn.style.display = 'flex';
@@ -1063,6 +1072,7 @@
           overlay.style.display = 'flex';
           if (adminPanel) adminPanel.style.display = 'none';
           if (adminImpactCard) adminImpactCard.style.display = 'none';
+          if (homeAdminImpactWrapper) homeAdminImpactWrapper.style.display = 'none';
         }
       });
     });
@@ -2204,43 +2214,50 @@
   </script>
 
 
-  <!-- Modal: Gestionar Impacto (Admin) -->
-  <div id="impactModal" class="modal-premium">
-    <div class="modal-content-premium">
-      <div class="modal-header-premium">
-        <h3><i class="fas fa-chart-line"></i> Gestionar Impacto Ambiental</h3>
-        <button onclick="closeImpactModal()" class="close-modal">&times;</button>
+  <!-- Modal: Gestionar Impacto Ambiental (Admin) -->
+  <div id="impactModal" class="gf-modal-overlay">
+    <div class="gf-modal-card" style="max-width: 520px; text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <h3 class="gf-modal-title" style="margin: 0; color: #ffffff; font-size: 1.25rem;">
+          <i class="fas fa-chart-line" style="color: #10b981;"></i> Gestionar Impacto Ambiental
+        </h3>
+        <button type="button" onclick="closeImpactModal()" style="background: transparent; border: none; color: rgba(255, 255, 255, 0.6); font-size: 1.5rem; cursor: pointer; padding: 0 4px; line-height: 1;">&times;</button>
       </div>
+      <p style="font-size: 0.82rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 18px;">
+        Actualiza las cifras oficiales del proyecto de sostenibilidad ambiental de la IE Barro Blanco.
+      </p>
       <form id="impactForm" onsubmit="handleImpactSubmit(event)">
-        <div class="form-grid-premium">
-          <div class="form-group-premium">
-            <label for="impEstudiantes">Estudiantes Participantes</label>
-            <input type="number" id="impEstudiantes" required min="0" placeholder="Ej: 32">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 22px;">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label for="impEstudiantes" style="font-size: 0.78rem; font-weight: 600; color: rgba(255, 255, 255, 0.85);">👥 Estudiantes</label>
+            <input type="number" id="impEstudiantes" required min="0" placeholder="Ej: 32" class="gf-select" style="width: 100%; box-sizing: border-box;">
           </div>
-          <div class="form-group-premium">
-            <label for="impArboles">Árboles Plantados</label>
-            <input type="number" id="impArboles" required min="0" placeholder="Ej: 1000">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label for="impArboles" style="font-size: 0.78rem; font-weight: 600; color: rgba(255, 255, 255, 0.85);">🌳 Árboles Plantados</label>
+            <input type="number" id="impArboles" required min="0" placeholder="Ej: 1000" class="gf-select" style="width: 100%; box-sizing: border-box;">
           </div>
-          <div class="form-group-premium">
-            <label for="impResiduos">KG Residuos Reciclados</label>
-            <input type="number" id="impResiduos" required min="0" placeholder="Ej: 2340">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label for="impResiduos" style="font-size: 0.78rem; font-weight: 600; color: rgba(255, 255, 255, 0.85);">♻️ KG Reciclados</label>
+            <input type="number" id="impResiduos" required min="0" placeholder="Ej: 2340" class="gf-select" style="width: 100%; box-sizing: border-box;">
           </div>
-          <div class="form-group-premium">
-            <label for="impActividades">Actividades Realizadas</label>
-            <input type="number" id="impActividades" required min="0" placeholder="Ej: 47">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label for="impActividades" style="font-size: 0.78rem; font-weight: 600; color: rgba(255, 255, 255, 0.85);">📅 Actividades</label>
+            <input type="number" id="impActividades" required min="0" placeholder="Ej: 47" class="gf-select" style="width: 100%; box-sizing: border-box;">
           </div>
-          <div class="form-group-premium">
-            <label for="impAgua">Litros Agua Ahorrada</label>
-            <input type="number" id="impAgua" required min="0" placeholder="Ej: 12500">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label for="impAgua" style="font-size: 0.78rem; font-weight: 600; color: rgba(255, 255, 255, 0.85);">💧 Litros Agua Ahorrada</label>
+            <input type="number" id="impAgua" required min="0" placeholder="Ej: 12500" class="gf-select" style="width: 100%; box-sizing: border-box;">
           </div>
-          <div class="form-group-premium">
-            <label for="impComunidad">Residentes Impactados</label>
-            <input type="number" id="impComunidad" required min="0" placeholder="Ej: 1000">
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <label for="impComunidad" style="font-size: 0.78rem; font-weight: 600; color: rgba(255, 255, 255, 0.85);">🌍 Comunidad</label>
+            <input type="number" id="impComunidad" required min="0" placeholder="Ej: 1000" class="gf-select" style="width: 100%; box-sizing: border-box;">
           </div>
         </div>
-        <div class="modal-actions-premium">
-          <button type="button" class="btn-cancel" onclick="closeImpactModal()">Cancelar</button>
-          <button type="submit" class="btn-save-premium">
+        <div style="display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 14px;">
+          <button type="button" onclick="closeImpactModal()" style="padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); background: transparent; color: #ffffff; cursor: pointer; font-size: 0.85rem; font-weight: 600;">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-save-premium" style="padding: 10px 22px; border-radius: 12px; border: none; background: #10b981; color: #ffffff; font-weight: 700; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-save"></i> Guardar Cifras
           </button>
         </div>
