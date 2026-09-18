@@ -33,7 +33,7 @@ function detectActiveNavFromHash() {
     return map[hash] || null;
 }
 
-// ── Bottom Nav — IDÉNTICO al de index.html ──────────────────────────────────
+// ── Bottom Nav — 5 Botones Principales ──────────────────────────────────
 function getNavItems(basePath, activeNav) {
     // En la página inicio: usar #anchor (sin recarga). En otras: index.html#anchor
     const home = isHomePage();
@@ -41,13 +41,10 @@ function getNavItems(basePath, activeNav) {
 
     const items = [
         { id: 'nav-inicio',     href: homeHref('sobre'),      icon: 'fa-home',        label: 'Inicio',     key: 'inicio',     section: 'sobre' },
-        { id: 'nav-cronograma', href: homeHref('cronograma'), icon: 'fa-leaf',        label: 'Agenda',     key: 'cronograma', section: 'cronograma' },
         { id: 'nav-huerta',     href: `${basePath}huerta.html`, icon: 'fa-seedling',   label: 'Huerta',     key: 'huerta' },
+        { id: 'nav-cronograma', href: homeHref('cronograma'), icon: 'fa-calendar-alt', label: 'Agenda',     key: 'cronograma', section: 'cronograma' },
         { id: 'nav-galeria',    href: homeHref('galeria'),    icon: 'fa-images',      label: 'Galería',    key: 'galeria',    section: 'galeria' },
-        { id: 'nav-video',      href: homeHref('video'),      icon: 'fa-play-circle', label: 'Videos',     key: 'video',      section: 'video' },
         { id: 'nav-docs',       href: homeHref('documentos'), icon: 'fa-file-alt',    label: 'Docs',       key: 'docs',       section: 'documentos' },
-        { id: 'nav-chat',       href: 'https://chat.whatsapp.com/L0hrcQ9JWmUB5DQui9ZrXv',
-          icon: 'fa-whatsapp', iconPrefix: 'fab', label: 'Chat', key: 'chat', external: true },
     ];
     // Prioridad: parámetro explícito > hash de URL > ruta
     const currentKey = activeNav || detectActiveNavFromHash() || detectActiveNav();
@@ -78,8 +75,11 @@ function buildHeaderHTML(basePath) {
   </div>
 
   <div class="header-actions">
+    <a href="https://chat.whatsapp.com/L0hrcQ9JWmUB5DQui9ZrXv" target="_blank" rel="noopener noreferrer" class="header-whatsapp-btn" title="Comunidad de WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
     <div class="notifications-wrapper">
-      <div class="notification-bell-btn" id="notifBellBtn">
+      <div class="notification-bell-btn" id="notifBellBtn" title="Notificaciones">
         <i class="fas fa-bell"></i>
         <span id="notificationBadge" class="notification-badge" style="display:none;">0</span>
       </div>
@@ -114,6 +114,13 @@ function buildHeaderHTML(basePath) {
         </div>
 
         <div class="dropdown-menu-list">
+          <a href="${basePath}huerta.html" class="menu-item" onclick="window.closeProfileDropdown()">
+            <div class="menu-item-icon" style="background:linear-gradient(135deg,#10b981,#059669); color:white;">
+              <i class="fas fa-seedling"></i>
+            </div>
+            <span>Huerta Escolar</span>
+            <i class="fas fa-chevron-right arrow-link"></i>
+          </a>
           <a href="${basePath}index.html#galeria" class="menu-item" onclick="window.closeProfileDropdown()">
             <div class="menu-item-icon bg-blue"><i class="fas fa-images"></i></div>
             <span>Gestionar Galería</span>
