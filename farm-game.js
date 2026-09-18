@@ -9,7 +9,16 @@ import {
   logCosecha,
   awardUserGamification
 } from "./huerta-service.js";
-import { playActionBlocked, playAmbientChirp } from "./farm-sounds.js";
+import {
+  playActionBlocked,
+  playAmbientChirp,
+  playWatering,
+  playFertilizing,
+  playHarvest,
+  playUnlockPlot,
+  playClickSound
+} from "./farm-sounds.js";
+import { spawnFloatingText } from "./farm-overworld.js";
 
 let currentCrops = [];
 let currentPlots = [];
@@ -278,6 +287,8 @@ window.executeFarmAction = async function(action, cropId, isAllowed, nextDateStr
     if (action === 'riego') {
       const isRain = confirm(`¿Fue riego por lluvia natural para ${crop.cropTypeName}?`);
       await logRiego(cropId, { isRain, user: currentUser });
+      playWatering();
+      spawnFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 50, "💧 +10 XP • +5 Monedas", "#4fc3f7");
 
       // Disparar evento de celebración
       window.dispatchEvent(new CustomEvent('huerta:celebrate', {
@@ -293,6 +304,8 @@ window.executeFarmAction = async function(action, cropId, isAllowed, nextDateStr
       const product = prompt("Tipo de abono utilizado:", "Compost orgánico escolar");
       if (!product) return;
       await logFertilizacion(cropId, { product, user: currentUser });
+      playFertilizing();
+      spawnFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 50, "🍃 +15 XP • +10 Monedas", "#81c784");
 
       window.dispatchEvent(new CustomEvent('huerta:celebrate', {
         detail: {
@@ -310,6 +323,8 @@ window.executeFarmAction = async function(action, cropId, isAllowed, nextDateStr
       const result = await logCosecha(cropId, { quantity: Number(qtyStr), isFinalHarvest: true, user: currentUser });
 
       if (result.plotUnlocked) {
+        playUnlockPlot();
+        spawnFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 50, "🔓 ¡NUEVO BANCAL DESBLOQUEADO! +50 XP", "#ffd54f");
         window.dispatchEvent(new CustomEvent('huerta:celebrate', {
           detail: {
             kind: 'desbloqueo',
@@ -319,6 +334,8 @@ window.executeFarmAction = async function(action, cropId, isAllowed, nextDateStr
         }));
         await awardUserGamification(currentUser.uid, 50, 25);
       } else {
+        playHarvest();
+        spawnFloatingText(window.innerWidth / 2, window.innerHeight / 2 - 50, "🧺 +30 XP • +15 Monedas", "#ffd54f");
         window.dispatchEvent(new CustomEvent('huerta:celebrate', {
           detail: {
             kind: 'cosecha',

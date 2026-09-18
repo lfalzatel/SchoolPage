@@ -101,8 +101,24 @@ export function playActionBlocked() {
   tone(220, 180, 0.12, 'square', 0.08);
 }
 
+export function playClickSound() {
+  // Tono suave de toque tipo madera/UI
+  tone(600, 800, 0.05, 'triangle', 0.1);
+}
+
+export function playBuildingEnterSound() {
+  // Arpegio mágico de ingreso a edificio estilo Top Heroes (Do-Sol-Mi-Do5)
+  sequence([
+    { freq: 440, duration: 0.08, delay: 0 },
+    { freq: 554.37, duration: 0.08, delay: 0.06 },
+    { freq: 659.25, duration: 0.1, delay: 0.12 },
+    { freq: 880, duration: 0.18, delay: 0.18 }
+  ]);
+}
+
 export function playAmbientChirp() {
   // Sonido ambiental muy tenue de ave o naturaleza
   if (localStorage.getItem('hh_ambient_animals_enabled') === 'false') return;
   tone(1200, 1600, 0.08, 'sine', 0.03);
 }
+

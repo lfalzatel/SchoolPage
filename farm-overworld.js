@@ -3,7 +3,7 @@
 //  farm-overworld.js — Mapa Isométrico Principal (Overworld tipo Top Heroes)
 // ══════════════════════════════════════════════════════════════════════════
 
-import { playAmbientChirp, playActionBlocked } from "./farm-sounds.js";
+import { playAmbientChirp, playActionBlocked, playBuildingEnterSound, playClickSound } from "./farm-sounds.js";
 
 let onSelectZoneCallback = null;
 
@@ -114,6 +114,15 @@ window.enterOverworldZone = function(evt, zone) {
     return;
   }
 
+  playBuildingEnterSound();
+
+  const card = evt ? evt.currentTarget : null;
+  if (card) {
+    card.classList.add("zooming-into-building");
+    const rect = card.getBoundingClientRect();
+    spawnFloatingText(rect.left + rect.width / 2, rect.top, "✨ Entrando...", "#81c784");
+  }
+
   const wrapper = document.getElementById("overworldWrapper");
   if (wrapper) {
     wrapper.classList.add("zoom-out-transition");
@@ -123,5 +132,27 @@ window.enterOverworldZone = function(evt, zone) {
     if (onSelectZoneCallback) {
       onSelectZoneCallback(zone);
     }
-  }, 350);
+  }, 380);
 };
+
+export function spawnFloatingText(x, y, text, color = "#ffd54f") {
+  const el = document.createElement("div");
+  el.className = "floating-game-text";
+  el.innerText = text;
+  el.style.cssText = `
+    position: fixed;
+    left: ${x}px;
+    top: ${y}px;
+    color: ${color};
+    font-weight: 800;
+    font-size: 1.1rem;
+    pointer-events: none;
+    z-index: 99999;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    transform: translate(-50%, 0);
+    animation: floatUpGlow 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  `;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1200);
+}
+
