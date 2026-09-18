@@ -1,0 +1,480 @@
+// ══════════════════════════════════════════════════════════════════════════
+//  Green Force — Módulo Bitácora de Cultivos (Huerta Escolar)
+//  huerta.js — Lógica de Interfaz de Usuario y Controladores
+// ══════════════════════════════════════════════════════════════════════════
+
+import { auth, db } from "./firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import {
+  seedHuertaIfNeeded,
+  getCropTypes,
+  getPlots,
+  getActiveCrops,
+  getCropById,
+  createCrop,
+  logRiego,
+  logFertilizacion,
+  logCosecha,
+  logIncidencia,
+  getCropEvents
+} from "./huerta-service.js";
+
+let currentUser = null;
+let userRole = "integrante"; // 'admin', 'lider', 'integrante'
+let cropTypesList = [];
+let plotsList = [];
+let activeCropsList = [];
+let selectedCropId = null;
+
+// Elementos DOM
+const authStatusElement = document.getElementById("authStatus");
+const pendingTasksContainer = document.getElementById("pendingTasksContainer");
+const activeCropsContainer = document.getElementById("activeCropsContainer");
+const cropTypesContainer = document.getElementById("cropTypesContainer");
+const newSiembraBtn = document.getElementById("newSiembraBtn");
+const siembraModal = document.getElementById("siembraModal");
+const closeSiembraModalBtn = document.getElementById("closeSiembraModalBtn");
+const siembraForm = document.getElementById("siembraForm");
+
+// Inicialización de la aplicación
+document.addEventListener("DOMContentLoaded", () => {
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user;
+      await fetchUserRole(user.uid);
+      updateAuthUI(user);
+
+      // Precargar datos de la huerta
+      await seedHuertaIfNeeded();
+      await loadHuertaData();
+    } else {
+      currentUser = null;
+      userRole = "invitado";
+      updateAuthUI(null);
+      renderUnauthenticatedState();
+    }
+  });
+
+  setupEventListeners();
+});
+
+async function fetchUserRole(uid) {
+  try {
+    const userDoc = await getDoc(doc(db, "users", uid));
+    if (userDoc.exists()) {
+      userRole = userDoc.data().role || "integrante";
+    }
+  } catch (err) {
+    console.warn("Error al cargar rol del usuario:", err);
+    userRole = "integrante";
+  }
+}
+
+function updateAuthUI(user) {
+  if (authStatusElement) {
+    if (user) {
+      authStatusElement.innerHTML = `
+        <span class="user-badge"><i class="fas fa-user-circle"></i> ${user.displayName || user.email} (${userRole})</span>
+      `;
+    } else {
+      authStatusElement.innerHTML = `
+        <a href="login.html" class="btn btn-sm btn-outline"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a>
+      `;
+    }
+  }
+
+  // Visibilidad de acciones reservadas para Admin / Líder
+  const isAdminOrLider = userRole === "admin" || userRole === "lider";
+  if (newSiembraBtn) {
+    newSiembraBtn.style.display = isAdminOrLider ? "inline-flex" : "none";
+  }
+}
+
+function renderUnauthenticatedState() {
+  if (pendingTasksContainer) {
+    pendingTasksContainer.innerHTML = `
+      <div class="glass-card warning-card">
+        <i class="fas fa-lock"></i> Debes iniciar sesión con tu cuenta de Green Force para ver los cultivos y registrar tareas.
+      </div>
+    `;
+  }
+  if (activeCropsContainer) activeCropsContainer.innerHTML = "";
+  if (cropTypesContainer) cropTypesContainer.innerHTML = "";
+}
+
+async function loadHuertaData() {
+  try {
+    [cropTypesList, plotsList, activeCropsList] = await Promise.all([
+      getCropTypes(),
+      getPlots(),
+      getActiveCrops()
+    ]);
+
+    populateCropTypeOptions();
+    populatePlotOptions();
+    renderPendingTasks();
+    renderActiveCrops();
+    renderCropTypesCatalog();
+  } catch (err) {
+    console.error("Error al cargar datos de la huerta:", err);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────
+//  RENDERIZADO: PENDIENTES HOY
+// ──────────────────────────────────────────────────────────────
+function renderPendingTasks() {
+  if (!pendingTasksContainer) return;
+
+  const nowMs = Date.now();
+  const pendingTasks = [];
+
+  activeCropsList.forEach(crop => {
+    if (crop.status === 'cosechado' || crop.status === 'perdido') return;
+
+    // Riego vencido o debido hoy
+    if (crop.nextWateringDue) {
+      const dueMs = crop.nextWateringDue.toMillis();
+      if (dueMs <= nowMs + (12 * 60 * 60 * 1000)) { // Hoy o vencido
+        pendingTasks.push({
+          type: 'riego',
+          title: `Riego pendiente: ${crop.cropTypeName}`,
+          subtitle: crop.plotName || "Sin bancal asignado",
+          cropId: crop.id,
+          icon: "💧",
+          badgeClass: "badge-water"
+        });
+      }
+    }
+
+    // Abonado vencido
+    if (crop.nextFertilizingDue) {
+      const dueMs = crop.nextFertilizingDue.toMillis();
+      if (dueMs <= nowMs + (12 * 60 * 60 * 1000)) {
+        pendingTasks.push({
+          type: 'fertilizacion',
+          title: `Abono pendiente: ${crop.cropTypeName}`,
+          subtitle: crop.plotName || "Sin bancal asignado",
+          cropId: crop.id,
+          icon: "🍃",
+          badgeClass: "badge-fert"
+        });
+      }
+    }
+
+    // Listo para cosecha
+    if (crop.status === 'listo_para_cosecha') {
+      pendingTasks.push({
+        type: 'cosecha',
+        title: `¡Listo para cosecha!: ${crop.cropTypeName}`,
+        subtitle: crop.plotName || "Sin bancal asignado",
+        cropId: crop.id,
+        icon: "🧺",
+        badgeClass: "badge-harvest"
+      });
+    }
+  });
+
+  if (pendingTasks.length === 0) {
+    pendingTasksContainer.innerHTML = `
+      <div class="glass-card success-card">
+        <i class="fas fa-check-circle"></i> ¡Excelente! No hay riegos ni abonos pendientes por hoy en la huerta.
+      </div>
+    `;
+    return;
+  }
+
+  let html = `<div class="tasks-grid">`;
+  pendingTasks.forEach(task => {
+    html += `
+      <div class="task-card ${task.badgeClass}">
+        <div class="task-icon">${task.icon}</div>
+        <div class="task-info">
+          <h4>${task.title}</h4>
+          <p>${task.subtitle}</p>
+        </div>
+        <button class="btn btn-sm btn-action" onclick="window.quickAction('${task.type}', '${task.cropId}')">
+          Registrar ${task.type}
+        </button>
+      </div>
+    `;
+  });
+  html += `</div>`;
+  pendingTasksContainer.innerHTML = html;
+}
+
+// ──────────────────────────────────────────────────────────────
+//  RENDERIZADO: CULTIVOS ACTIVOS
+// ──────────────────────────────────────────────────────────────
+function renderActiveCrops() {
+  if (!activeCropsContainer) return;
+
+  const currentCrops = activeCropsList.filter(c => c.status === 'creciendo' || c.status === 'listo_para_cosecha');
+
+  if (currentCrops.length === 0) {
+    activeCropsContainer.innerHTML = `
+      <div class="glass-card empty-card">
+        <p>No hay cultivos activos sembrados en este momento.</p>
+        ${(userRole === 'admin' || userRole === 'lider') ? '<p><small>Haz clic en "Nueva Siembra" para comenzar.</small></p>' : ''}
+      </div>
+    `;
+    return;
+  }
+
+  let html = `<div class="crops-grid">`;
+  currentCrops.forEach(crop => {
+    const plantedStr = crop.plantedDate ? new Date(crop.plantedDate.toMillis()).toLocaleDateString() : 'N/A';
+    const harvestStr = crop.expectedHarvestDate ? new Date(crop.expectedHarvestDate.toMillis()).toLocaleDateString() : 'N/A';
+
+    const isReady = crop.status === 'listo_para_cosecha';
+    const statusLabel = isReady ? ' Ready for Harvest' : ' En Crecimiento';
+    const statusBadgeClass = isReady ? 'badge-ready' : 'badge-growing';
+
+    html += `
+      <div class="crop-card glass-card">
+        <div class="crop-card-header">
+          <span class="crop-icon">${crop.cropTypeIcon || '🌱'}</span>
+          <div>
+            <h3>${crop.cropTypeName}</h3>
+            <span class="crop-plot">${crop.plotName || 'Sin Bancal'}</span>
+          </div>
+          <span class="status-badge ${statusBadgeClass}">${statusLabel}</span>
+        </div>
+        
+        <div class="crop-card-body">
+          <div class="crop-meta">
+            <span><strong>Siembra:</strong> ${plantedStr}</span>
+            <span><strong>Est. Cosecha:</strong> ${harvestStr}</span>
+            <span><strong>Cantidad:</strong> ${crop.quantity || 1} unidades/m²</span>
+          </div>
+        </div>
+
+        <div class="crop-card-actions">
+          <button class="btn btn-sm btn-water" title="Registrar Riego" onclick="window.quickAction('riego', '${crop.id}')">
+            💧 Regar
+          </button>
+          <button class="btn btn-sm btn-fert" title="Registrar Abono" onclick="window.quickAction('fertilizacion', '${crop.id}')">
+            🍃 Abonar
+          </button>
+          <button class="btn btn-sm btn-harvest" title="Registrar Cosecha" onclick="window.quickAction('cosecha', '${crop.id}')">
+            🧺 Cosechar
+          </button>
+          <button class="btn btn-sm btn-incident" title="Reportar Incidencia" onclick="window.quickAction('incidencia', '${crop.id}')">
+            ⚠️ Alerta
+          </button>
+          <button class="btn btn-sm btn-details" title="Ver Bitácora" onclick="window.viewCropDetails('${crop.id}')">
+            📋 Bitácora
+          </button>
+        </div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+  activeCropsContainer.innerHTML = html;
+}
+
+// ──────────────────────────────────────────────────────────────
+//  RENDERIZADO: CATÁLOGO DE ESPECIES
+// ──────────────────────────────────────────────────────────────
+function renderCropTypesCatalog() {
+  if (!cropTypesContainer) return;
+
+  let html = `<div class="catalog-grid">`;
+  cropTypesList.forEach(item => {
+    html += `
+      <div class="catalog-card glass-card">
+        <div class="catalog-header">
+          <span class="catalog-icon">${item.icon || '🌱'}</span>
+          <div>
+            <h4>${item.name}</h4>
+            <small><em>${item.scientificName || ''}</em></small>
+          </div>
+        </div>
+        <div class="catalog-body">
+          <p><strong>💧 Riego:</strong> Cada ${item.wateringIntervalDays} días</p>
+          <p><strong>🍃 Abono:</strong> Cada ${item.fertilizingIntervalDays || 'N/A'} días</p>
+          <p><strong>⏱️ Días a cosecha:</strong> ${item.daysToHarvest} días</p>
+          <p><strong>☀️ Sol:</strong> ${item.sunlight || 'Pleno sol'}</p>
+          ${item.notes ? `<p class="catalog-notes">${item.notes}</p>` : ''}
+        </div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+  cropTypesContainer.innerHTML = html;
+}
+
+function populateCropTypeOptions() {
+  const select = document.getElementById("cropTypeSelect");
+  if (!select) return;
+  select.innerHTML = `<option value="">-- Seleccionar Especie --</option>`;
+  cropTypesList.forEach(t => {
+    select.innerHTML += `<option value="${t.id}">${t.icon || '🌱'} ${t.name} (${t.daysToHarvest} días a cosecha)</option>`;
+  });
+}
+
+function populatePlotOptions() {
+  const select = document.getElementById("plotSelect");
+  if (!select) return;
+  select.innerHTML = `<option value="">-- Sin Bancal Específico --</option>`;
+  plotsList.forEach(p => {
+    select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+  });
+}
+
+// ──────────────────────────────────────────────────────────────
+//  EVENT LISTENERS Y ACCIONES RÁPIDAS
+// ──────────────────────────────────────────────────────────────
+function setupEventListeners() {
+  if (newSiembraBtn) {
+    newSiembraBtn.addEventListener("click", () => {
+      if (siembraModal) siembraModal.classList.add("active");
+    });
+  }
+
+  if (closeSiembraModalBtn) {
+    closeSiembraModalBtn.addEventListener("click", () => {
+      if (siembraModal) siembraModal.classList.remove("active");
+    });
+  }
+
+  if (siembraForm) {
+    siembraForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const cropTypeId = document.getElementById("cropTypeSelect").value;
+      const plotId = document.getElementById("plotSelect").value;
+      const quantity = document.getElementById("quantityInput").value;
+      const notes = document.getElementById("notesInput").value;
+
+      try {
+        await createCrop({
+          cropTypeId,
+          plotId,
+          quantity,
+          notes,
+          user: currentUser
+        });
+        siembraModal.classList.remove("active");
+        siembraForm.reset();
+        await loadHuertaData();
+      } catch (err) {
+        alert("Error al registrar siembra: " + err.message);
+      }
+    });
+  }
+}
+
+// Global quickAction para uso directo desde botones HTML
+window.quickAction = async function(type, cropId) {
+  if (!currentUser) {
+    alert("Debes iniciar sesión para registrar acciones.");
+    return;
+  }
+
+  const crop = activeCropsList.find(c => c.id === cropId);
+  if (!crop) return;
+
+  if (type === 'riego') {
+    const isRain = confirm(`¿Fue un riego por lluvia natural para ${crop.cropTypeName}? (Aceptar para Lluvia, Cancelar para Riego Manual)`);
+    const notes = prompt("Notas adicionales (opcional):", "");
+    try {
+      await logRiego(cropId, { notes, isRain, user: currentUser });
+      alert("✅ Riego registrado con éxito");
+      await loadHuertaData();
+    } catch (err) {
+      alert("Error al registrar riego: " + err.message);
+    }
+  } else if (type === 'fertilizacion') {
+    const product = prompt("Producto o tipo de abono utilizado:", "Compost orgánico escolar");
+    if (!product) return;
+    const notes = prompt("Notas del abonado (opcional):", "");
+    try {
+      await logFertilizacion(cropId, { product, notes, user: currentUser });
+      alert("✅ Abonado registrado con éxito");
+      await loadHuertaData();
+    } catch (err) {
+      alert("Error al registrar abono: " + err.message);
+    }
+  } else if (type === 'cosecha') {
+    const qtyStr = prompt(`Cantidad cosechada de ${crop.cropTypeName}:`, "1");
+    if (!qtyStr) return;
+    const isFinal = confirm("¿Es esta la cosecha final del cultivo? (Aceptar = marca cultivo como cosechado)");
+    const notes = prompt("Notas de la cosecha (opcional):", "");
+    try {
+      await logCosecha(cropId, { quantity: Number(qtyStr), isFinalHarvest: isFinal, notes, user: currentUser });
+      alert("✅ Cosecha registrada con éxito");
+      await loadHuertaData();
+    } catch (err) {
+      alert("Error al registrar cosecha: " + err.message);
+    }
+  } else if (type === 'incidencia') {
+    const description = prompt("Describe la plaga, enfermedad o alteración climatológica observada:", "");
+    if (!description) return;
+    try {
+      await logIncidencia(cropId, { type: "incidencia", description, user: currentUser });
+      alert("⚠️ Alerta / Incidencia registrada");
+      await loadHuertaData();
+    } catch (err) {
+      alert("Error al registrar incidencia: " + err.message);
+    }
+  }
+};
+
+window.viewCropDetails = async function(cropId) {
+  const crop = await getCropById(cropId);
+  if (!crop) return;
+
+  const events = await getCropEvents(cropId);
+  let modalHtml = `
+    <div class="modal active" id="detailsModal">
+      <div class="modal-content glass-card">
+        <div class="modal-header">
+          <h3>${crop.cropTypeIcon || '🌱'} ${crop.cropTypeName} — Historial y Bitácora</h3>
+          <button class="close-btn" onclick="document.getElementById('detailsModal').remove()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Bancal:</strong> ${crop.plotName || 'Sin asignación'}</p>
+          <p><strong>Sembrado por:</strong> ${crop.plantedByName} (${new Date(crop.plantedDate.toMillis()).toLocaleDateString()})</p>
+          <p><strong>Estado:</strong> ${crop.status}</p>
+          <hr/>
+          <h4>Línea de Tiempo de Eventos</h4>
+          ${events.length === 0 ? '<p>No se han registrado eventos para este cultivo aún.</p>' : ''}
+          <ul class="events-list">
+  `;
+
+  events.forEach(ev => {
+    const evDate = ev.date ? new Date(ev.date.toMillis()).toLocaleString() : '';
+    let icon = "📝";
+    if (ev.eventType === 'riego') icon = ev.isRain ? "🌧️" : "💧";
+    if (ev.eventType === 'fertilizacion') icon = "🍃";
+    if (ev.eventType === 'cosecha') icon = "🧺";
+    if (ev.eventType === 'incidencia') icon = "⚠️";
+
+    modalHtml += `
+      <li class="event-item">
+        <span class="event-icon">${icon}</span>
+        <div>
+          <strong>${ev.eventType.toUpperCase()}</strong> — <small>${evDate}</small><br/>
+          <span>Por: ${ev.doneByName}</span>
+          ${ev.notes ? `<p class="event-notes">${ev.notes}</p>` : ''}
+          ${ev.description ? `<p class="event-notes">${ev.description}</p>` : ''}
+        </div>
+      </li>
+    `;
+  });
+
+  modalHtml += `
+          </ul>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const existingModal = document.getElementById("detailsModal");
+  if (existingModal) existingModal.remove();
+
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
+};

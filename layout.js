@@ -41,7 +41,8 @@ function getNavItems(basePath, activeNav) {
 
     const items = [
         { id: 'nav-inicio',     href: homeHref('sobre'),      icon: 'fa-home',        label: 'Inicio',     key: 'inicio',     section: 'sobre' },
-        { id: 'nav-cronograma', href: homeHref('cronograma'), icon: 'fa-leaf',        label: 'Cronograma', key: 'cronograma', section: 'cronograma' },
+        { id: 'nav-cronograma', href: homeHref('cronograma'), icon: 'fa-leaf',        label: 'Agenda',     key: 'cronograma', section: 'cronograma' },
+        { id: 'nav-huerta',     href: `${basePath}huerta.html`, icon: 'fa-seedling',   label: 'Huerta',     key: 'huerta' },
         { id: 'nav-galeria',    href: homeHref('galeria'),    icon: 'fa-images',      label: 'Galería',    key: 'galeria',    section: 'galeria' },
         { id: 'nav-video',      href: homeHref('video'),      icon: 'fa-play-circle', label: 'Videos',     key: 'video',      section: 'video' },
         { id: 'nav-docs',       href: homeHref('documentos'), icon: 'fa-file-alt',    label: 'Docs',       key: 'docs',       section: 'documentos' },
@@ -55,6 +56,7 @@ function getNavItems(basePath, activeNav) {
 
 function detectActiveNav() {
     const path = window.location.pathname.toLowerCase();
+    if (path.includes('huerta'))                return 'huerta';
     if (path.includes('formulario_asistencia')) return 'inicio'; // Fallback a inicio
     if (path.includes('gallery'))               return 'galeria';
     if (path.includes('gestion_usuarios'))      return null;

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Huerta Escolar — Bitácora de Cultivos | Green Force</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2E7D32">
+  <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Estilos adicionales Glassmorphism para el Módulo Huerta */
+    body {
+      background: radial-gradient(circle at top right, #1b382b, #0f1715, #080c0b);
+      color: #e2f0d9;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      padding-bottom: 90px;
+    }
+
+    .huerta-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 5%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .huerta-header h1 {
+      font-size: 1.5rem;
+      margin: 0;
+      color: #81c784;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .huerta-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 25px 20px;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      color: #a5d6a7;
+      margin: 30px 0 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .tasks-grid, .crops-grid, .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .task-card {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .task-icon { font-size: 2rem; }
+    .task-info h4 { margin: 0; font-size: 1rem; color: #fff; }
+    .task-info p { margin: 2px 0 0 0; font-size: 0.85rem; color: #a0aec0; }
+
+    .badge-water { border-left: 4px solid #4fc3f7; }
+    .badge-fert { border-left: 4px solid #81c784; }
+    .badge-harvest { border-left: 4px solid #ffd54f; }
+
+    .crop-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .crop-icon { font-size: 2.2rem; }
+    .crop-card-header h3 { margin: 0; font-size: 1.15rem; color: #fff; }
+    .crop-plot { font-size: 0.8rem; color: #a5d6a7; display: block; }
+
+    .status-badge {
+      margin-left: auto;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .badge-growing { background: rgba(76, 175, 80, 0.2); color: #81c784; border: 1px solid #81c784; }
+    .badge-ready { background: rgba(255, 193, 7, 0.2); color: #ffd54f; border: 1px solid #ffd54f; }
+
+    .crop-meta {
+      font-size: 0.85rem;
+      color: #cbd5e0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 15px;
+    }
+
+    .crop-card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-action { background: #2e7d32; color: white; margin-left: auto; }
+    .btn-water { background: rgba(3, 169, 244, 0.2); color: #4fc3f7; border: 1px solid #4fc3f7; }
+    .btn-fert { background: rgba(76, 175, 80, 0.2); color: #81c784; border: 1px solid #81c784; }
+    .btn-harvest { background: rgba(255, 193, 7, 0.2); color: #ffd54f; border: 1px solid #ffd54f; }
+    .btn-incident { background: rgba(244, 67, 54, 0.2); color: #e57373; border: 1px solid #e57373; }
+    .btn-details { background: rgba(255, 255, 255, 0.15); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
+
+    .btn-water:hover, .btn-fert:hover, .btn-harvest:hover, .btn-incident:hover, .btn-details:hover {
+      filter: brightness(1.2);
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 20000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: rgba(20, 30, 25, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 25px;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .form-group label { font-size: 0.9rem; color: #a5d6a7; }
+    .form-group input, .form-group select, .form-group textarea {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      color: #fff;
+      font-family: inherit;
+    }
+    .form-group select option {
+      background: #141e19;
+      color: #fff;
+    }
+
+    .events-list {
+      list-style: none;
+      padding: 0;
+      margin: 15px 0 0 0;
+    }
+    .event-item {
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.85rem;
+    }
+    .event-icon { font-size: 1.4rem; }
+    .event-notes { margin: 4px 0 0 0; color: #a0aec0; font-style: italic; }
+
+    /* Floating Bottom Nav */
+    .bottom-nav {
+      display: flex !important;
+      position: fixed !important;
+      bottom: 20px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      width: auto !important;
+      min-width: 320px;
+      max-width: 90%;
+      height: 65px;
+      padding: 0 20px;
+      background: rgba(255, 255, 255, 0.12) !important;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      border-radius: 50px;
+      z-index: 10000 !important;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+    .nav-item i { font-size: 1.2rem; margin-bottom: 2px; }
+    .nav-item.active, .nav-item:hover { color: #81c784; }
+  </style>
+
+  <!-- Script del módulo -->
+  <script type="module" src="huerta.js"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="huerta-header">
+    <a href="index.html" class="btn btn-sm btn-details" style="text-decoration: none;">
+      <i class="fas fa-arrow-left"></i> Inicio Green Force
+    </a>
+    <h1><i class="fas fa-seedling"></i> Bitácora de Cultivos</h1>
+    <div id="authStatus"></div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="huerta-container">
+    
+    <!-- Top Action Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <p style="margin: 0; color: #a0aec0;">Seguimiento en tiempo real del ciclo de vida de la huerta escolar de la IE Barro Blanco.</p>
+      <button id="newSiembraBtn" class="btn btn-sm btn-action" style="display: none; padding: 10px 18px; font-size: 0.9rem;">
+        <i class="fas fa-plus"></i> Nueva Siembra
+      </button>
+    </div>
+
+    <!-- Sección 1: Pendientes Hoy -->
+    <h2 class="section-title"><i class="fas fa-bell"></i> Pendientes Hoy</h2>
+    <div id="pendingTasksContainer">
+      <div class="glass-card">Cargando tareas pendientes...</div>
+    </div>
+
+    <!-- Sección 2: Cultivos Activos -->
+    <h2 class="section-title"><i class="fas fa-leaf"></i> Cultivos Activos</h2>
+    <div id="activeCropsContainer">
+      <div class="glass-card">Cargando cultivos activos...</div>
+    </div>
+
+    <!-- Sección 3: Catálogo de Especies -->
+    <h2 class="section-title"><i class="fas fa-book-open"></i> Catálogo de Especies</h2>
+    <div id="cropTypesContainer">
+      <div class="glass-card">Cargando catálogo...</div>
+    </div>
+
+  </main>
+
+  <!-- Modal Nueva Siembra -->
+  <div class="modal" id="siembraModal">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h3><i class="fas fa-seedling"></i> Registrar Nueva Siembra</h3>
+        <button class="close-btn" id="closeSiembraModalBtn">&times;</button>
+      </div>
+      <form id="siembraForm">
+        <div class="form-group">
+          <label for="cropTypeSelect">Especie a Sembrar *</label>
+          <select id="cropTypeSelect" required>
+            <option value="">Cargando catálogo...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="plotSelect">Bancal / Zona (Opcional)</label>
+          <select id="plotSelect">
+            <option value="">Sin bancal específico</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="quantityInput">Cantidad (Nº Plantas o m²)</label>
+          <input type="number" id="quantityInput" min="1" value="1" required>
+        </div>
+
+        <div class="form-group">
+          <label for="notesInput">Observaciones o Notas de Siembra</label>
+          <textarea id="notesInput" rows="3" placeholder="Ej. Sembrado con abono de compost de la institución."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-action" style="width: 100%; padding: 12px; margin-top: 10px;">
+          Confirmar y Registrar Siembra
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Menú Navegación Flotante Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="index.html#sobre" class="nav-item">
+      <i class="fas fa-home"></i>
+      <span>Inicio</span>
+    </a>
+    <a href="index.html#cronograma" class="nav-item">
+      <i class="fas fa-calendar"></i>
+      <span>Agenda</span>
+    </a>
+    <a href="gallery.html" class="nav-item">
+      <i class="fas fa-images"></i>
+      <span>Galería</span>
+    </a>
+    <a href="huerta.html" class="nav-item active">
+      <i class="fas fa-seedling"></i>
+      <span>Huerta</span>
+    </a>
+    <a href="https://chat.whatsapp.com/L0hrcQ9JWmUB5DQui9ZrXv" class="nav-item" target="_blank" rel="noopener noreferrer">
+      <i class="fas fa-comments"></i>
+      <span>Chat</span>
+    </a>
+  </nav>
+
+</body>
+</html>

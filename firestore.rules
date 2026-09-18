@@ -214,6 +214,51 @@ service cloud.firestore {
 
 
     // ══════════════════════════════════════════════════════════════
+    //  MÓDULO HUERTA ESCOLAR — Bitácora de Cultivos
+    // ══════════════════════════════════════════════════════════════
+
+    // Catálogo de especies de cultivos
+    match /cropTypes/{typeId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdminOrLider();
+    }
+
+    // Bancales / Zonas de la huerta
+    match /plots/{plotId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdminOrLider();
+    }
+
+    // Instancias de cultivos sembrados y sus subcolecciones
+    match /crops/{cropId} {
+      allow read: if isAuthenticated();
+      allow create, delete: if isAdminOrLider();
+      // Permitir actualizar datos calculados (lastWateredAt, status, etc.) por usuarios autenticados
+      allow update: if isAuthenticated();
+
+      match /riegos/{riegoId} {
+        allow read, create: if isAuthenticated();
+        allow update, delete: if isAdminOrLider() || (isAuthenticated() && resource.data.doneByUid == request.auth.uid);
+      }
+
+      match /fertilizaciones/{fertId} {
+        allow read, create: if isAuthenticated();
+        allow update, delete: if isAdminOrLider() || (isAuthenticated() && resource.data.doneByUid == request.auth.uid);
+      }
+
+      match /cosechas/{cosechaId} {
+        allow read, create: if isAuthenticated();
+        allow update, delete: if isAdminOrLider() || (isAuthenticated() && resource.data.doneByUid == request.auth.uid);
+      }
+
+      match /incidencias/{incidenciaId} {
+        allow read, create: if isAuthenticated();
+        allow update, delete: if isAdminOrLider() || (isAuthenticated() && resource.data.doneByUid == request.auth.uid);
+      }
+    }
+
+
+    // ══════════════════════════════════════════════════════════════
     //  REGLA DE SEGURIDAD FINAL
     //  Cualquier colección no listada explícitamente queda bloqueada
     // ══════════════════════════════════════════════════════════════
@@ -223,3 +268,4 @@ service cloud.firestore {
 
   }
 }
+
