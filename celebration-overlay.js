@@ -102,11 +102,36 @@ export function hideCelebrationOverlay() {
   }
 }
 
+export function initCelebrationOverlay() {
+  if (typeof window !== 'undefined') {
+    createOverlayDOM();
+  }
+}
+
 if (typeof window !== 'undefined') {
-  // Escuchar eventos globales `greenforce:celebrate`
+  // Escuchar eventos globales `greenforce:celebrate` y `huerta:celebrate`
   window.addEventListener('greenforce:celebrate', (e) => {
     if (localStorage.getItem('gf_anim_enabled') === 'false') return;
     showCelebrationOverlay(e.detail || {});
+  });
+
+  window.addEventListener('huerta:celebrate', (e) => {
+    if (localStorage.getItem('hh_anim_enabled') === 'false') return;
+    const detail = e.detail || {};
+    const kindIcon = {
+      riego: 'fa-droplet',
+      abono: 'fa-seedling',
+      cosecha: 'fa-basket-shopping',
+      desbloqueo: 'fa-star'
+    }[detail.kind] || 'fa-trophy';
+
+    showCelebrationOverlay({
+      title: detail.title || '¡Acción Completada!',
+      subtitle: detail.subtitle || '',
+      statusText: '🌱 Green Force Huerta Escolar',
+      iconClass: kindIcon,
+      sound: detail.kind === 'desbloqueo' ? 'levelup' : 'fanfare'
+    });
   });
 
   window.GFCelebration = {
