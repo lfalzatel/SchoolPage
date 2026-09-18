@@ -1,5 +1,6 @@
 import { db, storage } from './firebase-config.js';
 import { auth } from './auth.js';
+import { uploadOrCompressPhoto } from './image-utils.js';
 import {
     collection,
     addDoc,
@@ -1042,6 +1043,10 @@ export async function fileToBase64(file, maxWidth = 1000, maxHeight = 1000, qual
 
 // --- UPLOAD HELPERS ---
 async function uploadImage(file, path) {
+    if (file && file.type && file.type.startsWith('image/')) {
+        const folder = path ? path.substring(0, path.lastIndexOf('/')) : 'activities';
+        return await uploadOrCompressPhoto(file, folder);
+    }
     return await fileToBase64(file);
 }
 
