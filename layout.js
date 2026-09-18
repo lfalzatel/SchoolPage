@@ -65,10 +65,9 @@ function detectActiveNav() {
 function buildHeaderHTML(basePath) {
     return `
 <header class="app-header" id="app-header-root">
-  <div class="header-left">
-    <img src="${basePath}assets/images/1. logo 3.jpg" alt="Logo Green Force" class="header-logo"
-         onclick="window.location.href='${basePath}index.html'" style="cursor:pointer;">
-    <div class="header-brand" onclick="window.location.href='${basePath}index.html'" style="cursor:pointer;">
+  <div class="header-left" onclick="window.showSplashScreen && window.showSplashScreen('${basePath}')" style="cursor:pointer;" title="Ver Presentación Green Force">
+    <img src="${basePath}assets/images/1. logo 3.jpg" alt="Logo Green Force" class="header-logo">
+    <div class="header-brand">
       <span class="header-title">Green Force</span>
       <span class="header-subtitle">Sembrando Futuro</span>
     </div>
@@ -535,6 +534,64 @@ export function initLayout(options = {}) {
     loadNotifications();
     initHomeScrollspy();   // ← activa solo en index.html
     initNavClickHandlers(); // ← eventos de click en menú inferior
+}
+
+// ── Modal de Splash Screen de Presentación ──────────────────────────────────
+if (typeof window !== 'undefined') {
+    window.showSplashScreen = function(basePath = '') {
+        let splashModal = document.getElementById('manualSplashModal');
+        if (!splashModal) {
+            splashModal = document.createElement('div');
+            splashModal.id = 'manualSplashModal';
+            splashModal.className = 'gf-modal-overlay active';
+            splashModal.style.zIndex = '999999';
+            splashModal.style.background = 'rgba(4, 15, 10, 0.94)';
+            splashModal.style.backdropFilter = 'blur(16px)';
+            splashModal.style.webkitBackdropFilter = 'blur(16px)';
+            splashModal.style.cursor = 'pointer';
+            splashModal.style.display = 'flex';
+            splashModal.style.flexDirection = 'column';
+            splashModal.style.alignItems = 'center';
+            splashModal.style.justifyContent = 'center';
+            splashModal.style.padding = '20px';
+
+            const logoUrl = `${basePath}assets/images/1. logo 3.jpg`;
+
+            splashModal.innerHTML = `
+                <div class="splash-content" style="text-align:center; padding:28px 24px; max-width:400px; width:90%; border-radius:28px; background:rgba(18,24,27,0.88); border:1px solid rgba(255,255,255,0.15); box-shadow:0 25px 60px rgba(0,0,0,0.7); animation: splashPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;">
+                    <div class="splash-logo-wrap" style="position:relative; width:105px; height:105px; margin:0 auto 16px auto;">
+                        <img src="${logoUrl}" alt="Green Force" class="splash-logo" style="width:105px; height:105px; border-radius:50%; object-fit:cover; box-shadow: 0 0 30px rgba(16,185,129,0.5);">
+                        <div class="splash-ring" style="position:absolute; inset:-8px; border-radius:50%; border:3px solid transparent; border-top-color:#10b981; border-right-color:#10b981; animation:splashSpin 1.2s linear infinite;"></div>
+                    </div>
+                    <h2 class="splash-title" style="font-family:'Poppins',sans-serif; font-size:1.8rem; font-weight:800; color:#ffffff; margin:8px 0 4px 0; letter-spacing:0.5px;">Green Force</h2>
+                    <p class="splash-sub" style="font-family:'Poppins',sans-serif; font-size:0.85rem; color:#10b981; letter-spacing:0.18em; text-transform:uppercase; font-weight:700; margin:0 0 16px 0;">Sembrando Futuro</p>
+                    
+                    <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:18px; padding:14px 16px; margin:0 auto 22px auto; color:#f3f4f6; font-size:0.84rem; line-height:1.5; text-align:center;">
+                        <p style="margin:0 0 4px 0; font-weight:700; color:#ffffff; font-size:0.9rem;">🌱 IE Barro Blanco</p>
+                        <p style="margin:0; color:rgba(255,255,255,0.85);">Proyecto Educativo de Sostenibilidad Ambiental, Huerta Escolar Orgánica y Economía Circular.</p>
+                    </div>
+
+                    <div style="display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:99px; background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.4); color:#10b981; font-size:0.82rem; font-weight:700;">
+                        <span>👆 Toca en cualquier lugar para continuar 🌿</span>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(splashModal);
+
+            splashModal.addEventListener('click', () => {
+                splashModal.classList.remove('active');
+                setTimeout(() => {
+                    splashModal.style.display = 'none';
+                }, 300);
+            });
+        }
+
+        splashModal.style.display = 'flex';
+        requestAnimationFrame(() => {
+            splashModal.classList.add('active');
+        });
+    };
 }
 
 // ── Helpers exportados ──────────────────────────────────────────────────────

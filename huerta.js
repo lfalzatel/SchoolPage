@@ -27,6 +27,7 @@ import {
 } from "./huerta-service.js";
 import { uploadOrCompressPhoto } from "./image-utils.js";
 import { renderFarmGame } from "./farm-game.js";
+import { renderOverworldMap } from "./farm-overworld.js";
 import { initCelebrationOverlay } from "./celebration-overlay.js";
 
 let currentUser = null;
@@ -37,6 +38,7 @@ let activeCropsList = [];
 let selectedCropId = null;
 let activeView = "juego"; // 'juego' | 'clasica'
 let activeScope = "colegio"; // 'colegio' | 'individual'
+let currentGameState = "overworld"; // 'overworld' | 'board'
 
 // Elementos DOM
 const authStatusElement = document.getElementById("authStatus");
@@ -131,11 +133,18 @@ function renderUnauthenticatedState() {
 async function loadHuertaData() {
   try {
     const userUid = currentUser ? currentUser.uid : null;
-    [cropTypesList, plotsList, activeCropsList] = await Promise.all([
+
+    const [types, plots, crops, schoolCrops, personalCrops] = await Promise.all([
       getCropTypes(),
       getPlots(activeScope, userUid),
-      getActiveCrops(activeScope, userUid)
+      getActiveCrops(activeScope, userUid),
+      getActiveCrops('colegio', null),
+      getActiveCrops('individual', userUid)
     ]);
+
+    cropTypesList = types;
+    plotsList = plots;
+    activeCropsList = crops;
 
     populateCropTypeOptions();
     populatePlotOptions();
@@ -143,16 +152,35 @@ async function loadHuertaData() {
     renderActiveCrops();
     renderCropTypesCatalog();
 
-    // Renderizar escena de Granja 2.5D
+    // Renderizado según estado del juego (Overworld vs Board)
     const farmContainer = document.getElementById("farmGameContainer");
     if (farmContainer) {
-      renderFarmGame(farmContainer, {
-        crops: activeCropsList,
-        plots: plotsList,
-        user: currentUser,
-        role: userRole,
-        onRefreshData: loadHuertaData
-      });
+      if (currentGameState === 'overworld') {
+        renderOverworldMap(farmContainer, {
+          schoolCrops,
+          personalCrops,
+          user: currentUser,
+          role: userRole,
+          onSelectZone: (zone) => {
+            activeScope = zone;
+            currentGameState = 'board';
+            loadHuertaData();
+          }
+        });
+      } else {
+        renderFarmGame(farmContainer, {
+          crops: activeCropsList,
+          plots: plotsList,
+          user: currentUser,
+          role: userRole,
+          scope: activeScope,
+          onRefreshData: loadHuertaData,
+          onBackToMap: () => {
+            currentGameState = 'overworld';
+            loadHuertaData();
+          }
+        });
+      }
     }
   } catch (err) {
     console.error("Error al cargar datos de la huerta:", err);

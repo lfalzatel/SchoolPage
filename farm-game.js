@@ -15,21 +15,35 @@ let currentCrops = [];
 let currentPlots = [];
 let currentUser = null;
 let currentRole = "integrante";
+let currentScope = "colegio";
 let onRefreshDataCallback = null;
+let onBackToMapCallback = null;
 let animalTimer = null;
 
-export function renderFarmGame(container, { crops, plots, user, role, onRefreshData }) {
+export function renderFarmGame(container, { crops, plots, user, role, scope = "colegio", onRefreshData, onBackToMap }) {
   currentCrops = crops || [];
   currentPlots = plots || [];
   currentUser = user;
   currentRole = role;
+  currentScope = scope;
   onRefreshDataCallback = onRefreshData;
+  onBackToMapCallback = onBackToMap;
 
   if (!container) return;
 
-  // Estilos 2.5D glassmorphic para la escena de la granja
+  const scopeTitle = scope === 'colegio' 
+    ? '🏫 Huerta Escolar — IE Barro Blanco' 
+    : '🏡 Mi Granja / Huerta Individual';
+
   container.innerHTML = `
-    <div class="farm-scene-wrapper">
+    <div class="farm-scene-wrapper wooden-board-theme">
+      <div class="farm-board-top-nav">
+        <button class="back-to-map-btn" onclick="window.backToOverworldMap()">
+          <i class="fas fa-map-marked-alt"></i> ⬅️ Volver al Mapa
+        </button>
+        <h3 class="board-title-header">${scopeTitle}</h3>
+      </div>
+
       <div class="farm-header-bar">
         <div class="farm-stats">
           <span class="stat-badge xp-badge"><i class="fas fa-star"></i> <strong id="farmXpDisplay">0</strong> XP</span>
@@ -38,12 +52,13 @@ export function renderFarmGame(container, { crops, plots, user, role, onRefreshD
         <div class="farm-status-legend">
           <span>💧 Riego listo</span>
           <span>🍃 Abono listo</span>
-          <span>✨ Listo para cosechar</span>
+          <span>✨ Cosecha madura</span>
         </div>
       </div>
 
-      <div class="farm-grid-25d" id="farmGrid25D">
-        <!-- Renderizado dinámico de bancales 2.5D -->
+      <!-- Tablero 2.5D con Bancales de Madera Reales -->
+      <div class="farm-grid-25d wooden-grid-25d" id="farmGrid25D">
+        <!-- Renderizado dinámico de cajas de madera -->
       </div>
     </div>
   `;
@@ -52,6 +67,12 @@ export function renderFarmGame(container, { crops, plots, user, role, onRefreshD
   startAmbientAnimals(container);
   loadUserGamificationStats();
 }
+
+window.backToOverworldMap = function() {
+  if (onBackToMapCallback) {
+    onBackToMapCallback();
+  }
+};
 
 function renderPlotsGrid() {
   const gridEl = document.getElementById("farmGrid25D");
