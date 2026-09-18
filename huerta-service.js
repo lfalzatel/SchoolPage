@@ -179,6 +179,37 @@ export async function getPlots() {
   return plots;
 }
 
+export async function addCropType({ name, scientificName, wateringIntervalDays, fertilizingIntervalDays, daysToHarvest, sunlight, notes, icon }) {
+  if (!name) throw new Error("El nombre de la especie es obligatorio");
+  const newType = {
+    name,
+    scientificName: scientificName || null,
+    wateringIntervalDays: Number(wateringIntervalDays) || 2,
+    fertilizingIntervalDays: fertilizingIntervalDays ? Number(fertilizingIntervalDays) : null,
+    daysToHarvest: Number(daysToHarvest) || 60,
+    sunlight: sunlight || "pleno sol",
+    notes: notes || null,
+    icon: icon || "🌱",
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+  const docRef = await addDoc(collection(db, "cropTypes"), newType);
+  return docRef.id;
+}
+
+export async function addPlot({ name, description }) {
+  if (!name) throw new Error("El nombre del bancal es obligatorio");
+  const newPlot = {
+    name,
+    description: description || null,
+    isActive: true,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+  const docRef = await addDoc(collection(db, "plots"), newPlot);
+  return docRef.id;
+}
+
 export async function getActiveCrops() {
   const q = query(
     collection(db, "crops"),

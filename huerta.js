@@ -17,7 +17,9 @@ import {
   logFertilizacion,
   logCosecha,
   logIncidencia,
-  getCropEvents
+  getCropEvents,
+  addCropType,
+  addPlot
 } from "./huerta-service.js";
 
 let currentUser = null;
@@ -183,6 +185,20 @@ function renderPendingTasks() {
       </div>
     `;
     return;
+  }
+
+  // Notificación local del navegador (Fase 4: Resiliencia en plan Spark)
+  if ("Notification" in window && Notification.permission === "granted") {
+    try {
+      new Notification("🌱 Green Force — Huerta Escolar", {
+        body: `Tienes ${pendingTasks.length} tarea(s) pendiente(s) en la huerta para el día de hoy.`,
+        icon: "assets/icons/icon-192.png"
+      });
+    } catch (e) {
+      console.warn("No se pudo mostrar la notificación del navegador:", e);
+    }
+  } else if ("Notification" in window && Notification.permission !== "denied") {
+    Notification.requestPermission();
   }
 
   let html = `<div class="tasks-grid">`;
