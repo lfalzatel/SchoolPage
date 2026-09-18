@@ -16,50 +16,15 @@
   <link rel="stylesheet" href="styles.css">
   <style>
     /* Estilos adicionales Glassmorphism para el Módulo Huerta */
-    body {
-      background: radial-gradient(circle at top right, #1b382b, #0f1715, #080c0b);
-      color: #e2f0d9;
-      font-family: 'Poppins', sans-serif;
-      min-height: 100vh;
-      margin: 0;
-      padding-bottom: 90px;
-    }
-
-    .huerta-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 5%;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .huerta-header h1 {
-      font-size: 1.5rem;
-      margin: 0;
-      color: #81c784;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .huerta-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 25px 20px;
-    }
-
     .section-title {
-      font-size: 1.3rem;
+      font-size: 1.15rem;
       color: #a5d6a7;
-      margin: 30px 0 15px 0;
+      margin: 24px 0 12px 0;
       display: flex;
       align-items: center;
       gap: 10px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 8px;
+      padding-bottom: 6px;
     }
 
     .glass-card {
@@ -68,7 +33,7 @@
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 16px;
-      padding: 20px;
+      padding: 16px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
@@ -80,23 +45,23 @@
 
     .tasks-grid, .crops-grid, .catalog-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 16px;
     }
 
     .task-card {
       display: flex;
       align-items: center;
-      gap: 15px;
-      padding: 15px;
+      gap: 12px;
+      padding: 12px;
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
-    .task-icon { font-size: 2rem; }
-    .task-info h4 { margin: 0; font-size: 1rem; color: #fff; }
-    .task-info p { margin: 2px 0 0 0; font-size: 0.85rem; color: #a0aec0; }
+    .task-icon { font-size: 1.8rem; }
+    .task-info h4 { margin: 0; font-size: 0.95rem; color: #fff; }
+    .task-info p { margin: 2px 0 0 0; font-size: 0.8rem; color: #a0aec0; }
 
     .badge-water { border-left: 4px solid #4fc3f7; }
     .badge-fert { border-left: 4px solid #81c784; }
@@ -105,17 +70,17 @@
     .crop-card-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 10px;
     }
-    .crop-icon { font-size: 2.2rem; }
-    .crop-card-header h3 { margin: 0; font-size: 1.15rem; color: #fff; }
-    .crop-plot { font-size: 0.8rem; color: #a5d6a7; display: block; }
+    .crop-icon { font-size: 2rem; }
+    .crop-card-header h3 { margin: 0; font-size: 1.05rem; color: #fff; }
+    .crop-plot { font-size: 0.78rem; color: #a5d6a7; display: block; }
 
     .status-badge {
       margin-left: auto;
-      font-size: 0.75rem;
-      padding: 4px 10px;
+      font-size: 0.72rem;
+      padding: 3px 8px;
       border-radius: 20px;
       font-weight: 600;
     }
@@ -123,30 +88,30 @@
     .badge-ready { background: rgba(255, 193, 7, 0.2); color: #ffd54f; border: 1px solid #ffd54f; }
 
     .crop-meta {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: #cbd5e0;
       display: flex;
       flex-direction: column;
       gap: 4px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
     .crop-card-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
     }
 
     .btn-sm {
-      padding: 6px 12px;
-      font-size: 0.8rem;
+      padding: 5px 10px;
+      font-size: 0.78rem;
       border-radius: 8px;
       border: none;
       cursor: pointer;
       font-weight: 600;
       transition: all 0.2s;
     }
-    .btn-action { background: #2e7d32; color: white; margin-left: auto; }
+    .btn-action { background: #2e7d32; color: white; }
     .btn-water { background: rgba(3, 169, 244, 0.2); color: #4fc3f7; border: 1px solid #4fc3f7; }
     .btn-fert { background: rgba(76, 175, 80, 0.2); color: #81c784; border: 1px solid #81c784; }
     .btn-harvest { background: rgba(255, 193, 7, 0.2); color: #ffd54f; border: 1px solid #ffd54f; }
@@ -178,13 +143,13 @@
       background: rgba(20, 30, 25, 0.95);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 16px;
-      padding: 25px;
+      padding: 20px;
     }
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     .close-btn {
       background: none;
@@ -195,17 +160,17 @@
     }
 
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
     }
-    .form-group label { font-size: 0.9rem; color: #a5d6a7; }
+    .form-group label { font-size: 0.85rem; color: #a5d6a7; }
     .form-group input, .form-group select, .form-group textarea {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
-      padding: 10px;
+      padding: 8px 10px;
       color: #fff;
       font-family: inherit;
     }
@@ -217,52 +182,17 @@
     .events-list {
       list-style: none;
       padding: 0;
-      margin: 15px 0 0 0;
+      margin: 12px 0 0 0;
     }
     .event-item {
       display: flex;
-      gap: 12px;
-      padding: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      font-size: 0.85rem;
-    }
-    .event-icon { font-size: 1.4rem; }
-    .event-notes { margin: 4px 0 0 0; color: #a0aec0; font-style: italic; }
-
-    /* Floating Bottom Nav */
-    .bottom-nav {
-      display: flex !important;
-      position: fixed !important;
-      bottom: 20px !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-      width: auto !important;
-      min-width: 320px;
-      max-width: 90%;
-      height: 65px;
-      padding: 0 20px;
-      background: rgba(255, 255, 255, 0.12) !important;
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-      border-radius: 50px;
-      z-index: 10000 !important;
-      justify-content: space-between;
-      align-items: center;
       gap: 10px;
+      padding: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.82rem;
     }
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      font-size: 0.75rem;
-      transition: all 0.2s;
-    }
-    .nav-item i { font-size: 1.2rem; margin-bottom: 2px; }
-    .nav-item.active, .nav-item:hover { color: #81c784; }
+    .event-icon { font-size: 1.2rem; }
+    .event-notes { margin: 2px 0 0 0; color: #a0aec0; font-style: italic; }
   </style>
 
   <!-- Script del módulo -->
@@ -270,45 +200,48 @@
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="huerta-header">
-    <a href="index.html" class="btn btn-sm btn-details" style="text-decoration: none;">
-      <i class="fas fa-arrow-left"></i> Inicio Green Force
-    </a>
-    <h1><i class="fas fa-seedling"></i> Bitácora de Cultivos</h1>
-    <div id="authStatus"></div>
-  </header>
+  <!-- Fondo dinámico -->
+  <div id="app-background"></div>
 
-  <!-- Main Container -->
-  <main class="huerta-container">
-    
-    <!-- Top Action Bar -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <p style="margin: 0; color: #a0aec0;">Seguimiento en tiempo real del ciclo de vida de la huerta escolar de la IE Barro Blanco.</p>
-      <button id="newSiembraBtn" class="btn btn-sm btn-action" style="display: none; padding: 10px 18px; font-size: 0.9rem;">
-        <i class="fas fa-plus"></i> Nueva Siembra
-      </button>
+  <!-- Header compartido por layout.js -->
+  <div id="app-header-placeholder"></div>
+
+  <!-- Main Content Wrapper -->
+  <div class="page-wrapper">
+    <div class="page-card">
+
+      <div class="page-header-section" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h2><i class="fas fa-seedling" style="margin-right: 8px;"></i>Huerta Escolar — Bitácora de Cultivos</h2>
+          <p>Seguimiento en tiempo real del ciclo de vida de la huerta escolar de la IE Barro Blanco</p>
+        </div>
+        <button id="newSiembraBtn" class="btn btn-sm btn-action" style="display: none; padding: 8px 14px; font-size: 0.85rem; border-radius: 8px;">
+          <i class="fas fa-plus"></i> Nueva Siembra
+        </button>
+      </div>
+
+      <section class="relative-section" style="padding: 20px;">
+        <!-- Sección 1: Pendientes Hoy -->
+        <h2 class="section-title" style="margin-top: 0;"><i class="fas fa-bell"></i> Pendientes Hoy</h2>
+        <div id="pendingTasksContainer">
+          <div class="glass-card">Cargando tareas pendientes...</div>
+        </div>
+
+        <!-- Sección 2: Cultivos Activos -->
+        <h2 class="section-title"><i class="fas fa-leaf"></i> Cultivos Activos</h2>
+        <div id="activeCropsContainer">
+          <div class="glass-card">Cargando cultivos activos...</div>
+        </div>
+
+        <!-- Sección 3: Catálogo de Especies -->
+        <h2 class="section-title"><i class="fas fa-book-open"></i> Catálogo de Especies</h2>
+        <div id="cropTypesContainer">
+          <div class="glass-card">Cargando catálogo...</div>
+        </div>
+      </section>
+
     </div>
-
-    <!-- Sección 1: Pendientes Hoy -->
-    <h2 class="section-title"><i class="fas fa-bell"></i> Pendientes Hoy</h2>
-    <div id="pendingTasksContainer">
-      <div class="glass-card">Cargando tareas pendientes...</div>
-    </div>
-
-    <!-- Sección 2: Cultivos Activos -->
-    <h2 class="section-title"><i class="fas fa-leaf"></i> Cultivos Activos</h2>
-    <div id="activeCropsContainer">
-      <div class="glass-card">Cargando cultivos activos...</div>
-    </div>
-
-    <!-- Sección 3: Catálogo de Especies -->
-    <h2 class="section-title"><i class="fas fa-book-open"></i> Catálogo de Especies</h2>
-    <div id="cropTypesContainer">
-      <div class="glass-card">Cargando catálogo...</div>
-    </div>
-
-  </main>
+  </div>
 
   <!-- Modal Nueva Siembra -->
   <div class="modal" id="siembraModal">
@@ -355,29 +288,14 @@
     </div>
   </div>
 
-  <!-- Menú Navegación Flotante Bottom Nav -->
-  <nav class="bottom-nav">
-    <a href="index.html#sobre" class="nav-item">
-      <i class="fas fa-home"></i>
-      <span>Inicio</span>
-    </a>
-    <a href="huerta.html" class="nav-item active">
-      <i class="fas fa-seedling"></i>
-      <span>Huerta</span>
-    </a>
-    <a href="index.html#cronograma" class="nav-item">
-      <i class="fas fa-calendar-alt"></i>
-      <span>Agenda</span>
-    </a>
-    <a href="index.html#galeria" class="nav-item">
-      <i class="fas fa-images"></i>
-      <span>Galería</span>
-    </a>
-    <a href="index.html#documentos" class="nav-item">
-      <i class="fas fa-file-alt"></i>
-      <span>Docs</span>
-    </a>
-  </nav>
+  <!-- Bottom Nav inyectado por layout.js -->
+  <div id="bottom-nav-placeholder"></div>
+
+  <!-- Layout compartido: header + nav + tema + auth UI -->
+  <script type="module">
+    import { initLayout } from './layout.js';
+    initLayout({ activeNav: 'huerta' });
+  </script>
 
 </body>
 </html>
