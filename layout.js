@@ -114,56 +114,56 @@ function buildHeaderHTML(basePath) {
         </div>
 
         <div class="dropdown-menu-list">
-          <a href="${basePath}huerta.html" class="menu-item" onclick="window.closeProfileDropdown()">
-            <div class="menu-item-icon" style="background:linear-gradient(135deg,#10b981,#059669); color:white;">
-              <i class="fas fa-seedling"></i>
+          <!-- Selector Rápido de Tema (Primero) -->
+          <div class="dropdown-theme-section" style="padding:10px 12px 14px 12px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:8px;">
+            <span class="theme-label" style="font-size:0.72rem; letter-spacing:0.5px; font-weight:700; color:rgba(255,255,255,0.7); display:block; margin-bottom:8px;">TEMA RÁPIDO</span>
+            <div class="theme-selector-group">
+              <button class="theme-btn" id="themeLight" onclick="window.setTheme('light')" title="Modo Claro">
+                <i class="fas fa-sun"></i> Claro
+              </button>
+              <button class="theme-btn" id="themeDark" onclick="window.setTheme('dark')" title="Modo Oscuro">
+                <i class="fas fa-moon"></i> Oscuro
+              </button>
+              <button class="theme-btn" id="themeSystem" onclick="window.setTheme('system')" title="Seguir Sistema">
+                <i class="fas fa-desktop"></i> Auto
+              </button>
             </div>
-            <span>Huerta Escolar</span>
-            <i class="fas fa-chevron-right arrow-link"></i>
-          </a>
-          <a href="${basePath}index.html#galeria" class="menu-item" onclick="window.closeProfileDropdown()">
-            <div class="menu-item-icon bg-blue"><i class="fas fa-images"></i></div>
-            <span>Gestionar Galería</span>
-            <i class="fas fa-chevron-right arrow-link"></i>
-          </a>
-          <a href="${basePath}formulario_asistencia_eventos.html" class="menu-item" onclick="window.closeProfileDropdown()">
-            <div class="menu-item-icon bg-green"><i class="fas fa-poll"></i></div>
-            <span>Encuestas</span>
-            <i class="fas fa-chevron-right arrow-link"></i>
-          </a>
-          <!-- Solo visible para admin -->
-          <a href="${basePath}gestion_usuarios.html" class="menu-item admin-only" id="menuGestionUsuarios"
-             style="display:none;" onclick="window.closeProfileDropdown()">
-            <div class="menu-item-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
-              <i class="fas fa-users-cog"></i>
-            </div>
-            <span>Gestionar Usuarios</span>
-            <i class="fas fa-chevron-right arrow-link"></i>
-          </a>
+          </div>
+
+          <!-- Acceso Directo a Centro de Control / Configuración -->
           <div class="menu-item" onclick="window.showView && window.showView('configuracion'); window.closeProfileDropdown();">
-            <div class="menu-item-icon bg-gray"><i class="fas fa-cog"></i></div>
-            <span>Configuración</span>
+            <div class="menu-item-icon bg-gray"><i class="fas fa-sliders-h"></i></div>
+            <span>Configuración y Ajustes</span>
             <i class="fas fa-chevron-right arrow-link"></i>
           </div>
+
+          <a href="${basePath}formulario_asistencia_eventos.html" class="menu-item" onclick="window.closeProfileDropdown()">
+            <div class="menu-item-icon bg-green"><i class="fas fa-poll"></i></div>
+            <span>Encuestas y Asistencia</span>
+            <i class="fas fa-chevron-right arrow-link"></i>
+          </a>
+
           <div class="menu-item" id="downloadPdfBtnMenu" onclick="window.closeProfileDropdown();">
             <div class="menu-item-icon bg-red"><i class="fas fa-file-pdf"></i></div>
             <span>Descargar Informe PDF</span>
           </div>
+
           <div class="menu-item" id="installAppBtn" style="display:none;"
                onclick="window.installPWA && window.installPWA(); window.closeProfileDropdown();">
             <div class="menu-item-icon bg-green"><i class="fas fa-download"></i></div>
-            <span>Instalar Aplicación</span>
+            <span>Instalar Aplicación PWA</span>
           </div>
+
           <div class="menu-item" onclick="window.shareApp && window.shareApp(); window.closeProfileDropdown();">
-            <div class="menu-item-icon bg-green"><i class="fas fa-share-alt"></i></div>
+            <div class="menu-item-icon bg-blue"><i class="fas fa-share-alt"></i></div>
             <span>Compartir App</span>
             <i class="fas fa-chevron-right arrow-link"></i>
           </div>
 
           <!-- Toggle Alertas Push -->
-          <div class="dropdown-theme-section" style="border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:12px;margin-bottom:12px;">
+          <div class="dropdown-theme-section" style="padding:10px 12px 6px 12px; border-top:1px solid rgba(255,255,255,0.08); margin-top:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-              <span class="theme-label" style="margin:0;display:flex;align-items:center;gap:8px;">
+              <span class="theme-label" style="margin:0;display:flex;align-items:center;gap:8px; font-size:0.75rem; color:rgba(255,255,255,0.8);">
                 <div class="menu-item-icon bg-blue" style="width:24px;height:24px;min-width:24px;font-size:0.7rem;">
                   <i class="fas fa-bell"></i>
                 </div>
@@ -175,22 +175,6 @@ function buildHeaderHTML(basePath) {
                        style="pointer-events:auto;">
                 <span class="toggle-track" style="margin:0;pointer-events:auto;"><span class="toggle-thumb"></span></span>
               </label>
-            </div>
-          </div>
-
-          <!-- Selector de Tema -->
-          <div class="dropdown-theme-section">
-            <span class="theme-label">TEMA</span>
-            <div class="theme-selector-group">
-              <button class="theme-btn" id="themeLight" onclick="window.setTheme('light')" title="Modo Claro">
-                <i class="fas fa-sun"></i>
-              </button>
-              <button class="theme-btn" id="themeDark" onclick="window.setTheme('dark')" title="Modo Oscuro">
-                <i class="fas fa-moon"></i>
-              </button>
-              <button class="theme-btn" id="themeSystem" onclick="window.setTheme('system')" title="Seguir Sistema">
-                <i class="fas fa-desktop"></i>
-              </button>
             </div>
           </div>
 
