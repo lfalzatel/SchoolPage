@@ -218,44 +218,35 @@ function buildNavHTML(navItems) {
     return `<nav class="bottom-nav" id="bottom-nav-root">${itemsHTML}</nav>`;
 }
 
-// ── Fondo dinámico con slideshow ────────────────────────────────────────────
+// ── Fondo dinámico ultraligero ──────────────────────────────────────────────
 function initBackground(basePath) {
     const container = document.getElementById('app-background');
-    if (!container || container.children.length > 0) return; // Ya fue inicializado (por gallery.js)
+    if (!container || container.children.length > 0) return; // Ya inicializado
+
     const images = [
-        'assets/images/WhatsApp Image 2024-05-23 at 8.01.21 AM (1).jpeg',
-        'assets/images/WhatsApp Image 2024-05-23 at 8.01.21 AM.jpeg',
-        'assets/images/WhatsApp Image 2024-05-23 at 8.01.22 AM.jpeg',
-        'assets/images/1. Arboles sembrados 1.jpg',
-        'assets/images/1. logo 3.jpg',
-        'assets/images/2. Cubo innovación 1.jpg',
-        'assets/images/3. UCO investigación 1.jpg',
         'assets/images/4. Huerta escolar 1.jpg',
+        'assets/images/1. Arboles sembrados 1.jpg',
         'assets/images/5. Vertiente Barro Blanco 1.jpg',
-        'assets/images/6. Reciclaje 1.jpg',
-        'assets/images/7. Reserva CAM 1.jpg',
         'assets/images/8. Reforestacion 1.jpg',
-        'assets/images/11. Encuentro departamental 2025 - 1.jpg',
-        'assets/images/12. Visita agrosavia 2025 - 1.jpg',
+        'assets/images/11. Encuentro departamental 2025 - 1.jpg'
     ];
-    // Mezclar aleatoriamente
-    const shuffled = [...images].sort(() => 0.5 - Math.random());
-    shuffled.forEach((src, i) => {
+    // Seleccionar solo 3 imágenes aleatorias para no saturar memoria RAM
+    const selected = [...images].sort(() => 0.5 - Math.random()).slice(0, 3);
+    selected.forEach((src, i) => {
         const slide = document.createElement('div');
         slide.className = 'bg-slide' + (i === 0 ? ' active' : '');
         slide.style.backgroundImage = `url('${basePath}${src}')`;
         container.appendChild(slide);
     });
+
     let current = 0;
     const slides = container.querySelectorAll('.bg-slide');
     if (slides.length > 1) {
         setInterval(() => {
             slides[current].classList.remove('active');
-            let next;
-            do { next = Math.floor(Math.random() * slides.length); } while (next === current);
-            current = next;
+            current = (current + 1) % slides.length;
             slides[current].classList.add('active');
-        }, 6000);
+        }, 8000);
     }
 }
 
@@ -489,7 +480,8 @@ function initNavClickHandlers() {
 
             if (isHomePage()) {
                 if (key === 'huerta') {
-                    // Navegar de forma nativa a huerta.html
+                    e.preventDefault();
+                    window.location.href = href || 'huerta.html';
                     return;
                 }
                 e.preventDefault();
