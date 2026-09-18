@@ -480,6 +480,53 @@ function initHomeScrollspy() {
     });
 }
 
+// ── Clicks y Navegación del Menú Inferior ────────────────────────────────────
+function initNavClickHandlers() {
+    document.querySelectorAll('#bottom-nav-root .nav-item').forEach(a => {
+        a.addEventListener('click', (e) => {
+            const href = a.getAttribute('href');
+            const key = a.id.replace('nav-', '');
+
+            if (isHomePage()) {
+                if (key === 'huerta') {
+                    // Navegar de forma nativa a huerta.html
+                    return;
+                }
+                e.preventDefault();
+                const viewMap = {
+                    'inicio': 'home',
+                    'cronograma': 'cronograma',
+                    'galeria': 'galeria',
+                    'docs': 'documentos'
+                };
+                const targetView = viewMap[key] || key;
+
+                // Actualizar clase activa
+                document.querySelectorAll('#bottom-nav-root .nav-item').forEach(el => el.classList.remove('active'));
+                a.classList.add('active');
+
+                if (window.showView) {
+                    window.showView(targetView);
+                } else if (href && href.startsWith('#')) {
+                    const secId = href.substring(1);
+                    const el = document.getElementById(secId);
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }
+            } else {
+                // En huerta.html u otras subpáginas
+                if (key === 'huerta') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    e.preventDefault();
+                    sessionStorage.setItem('isReload', 'true');
+                    window.location.href = href;
+                }
+            }
+        });
+    });
+}
+
 // ── Función principal ───────────────────────────────────────────────────────
 export function initLayout(options = {}) {
     const opts = { ...DEFAULTS, ...options };
@@ -505,18 +552,7 @@ export function initLayout(options = {}) {
     initAuthUI(opts.basePath);
     loadNotifications();
     initHomeScrollspy();   // ← activa solo en index.html
-
-    // ── Interceptar nav en subpáginas para bypass del splash ───────────────
-    if (!isHomePage()) {
-        document.querySelectorAll('#bottom-nav-root .nav-item:not([target])').forEach(a => {
-            a.addEventListener('click', (e) => {
-                e.preventDefault();
-                // Garantiza que el splash de index.html se salte al volver
-                sessionStorage.setItem('isReload', 'true');
-                window.location.href = a.getAttribute('href');
-            });
-        });
-    }
+    initNavClickHandlers(); // ← eventos de click en menú inferior
 }
 
 // ── Helpers exportados ──────────────────────────────────────────────────────
