@@ -339,7 +339,13 @@
 
         <div class="form-group">
           <label for="notesInput">Observaciones o Notas de Siembra</label>
-          <textarea id="notesInput" rows="3" placeholder="Ej. Sembrado con abono de compost de la institución."></textarea>
+          <textarea id="notesInput" rows="2" placeholder="Ej. Sembrado con abono de compost de la institución."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="photoInput">📷 Foto de la Siembra (Opcional)</label>
+          <input type="file" id="photoInput" accept="image/*" style="font-size: 0.85rem; padding: 6px;">
+          <small style="color: #a0aec0; font-size: 0.75rem;">Se comprimirá automáticamente a WebP ultraligero (~40KB).</small>
         </div>
 
         <button type="submit" class="btn btn-action" style="width: 100%; padding: 12px; margin-top: 10px;">

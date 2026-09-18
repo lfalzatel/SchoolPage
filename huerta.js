@@ -21,6 +21,7 @@ import {
   addCropType,
   addPlot
 } from "./huerta-service.js";
+import { uploadOrCompressPhoto } from "./image-utils.js";
 
 let currentUser = null;
 let userRole = "integrante"; // 'admin', 'lider', 'integrante'
@@ -364,6 +365,14 @@ function setupEventListeners() {
       const plotId = document.getElementById("plotSelect").value;
       const quantity = document.getElementById("quantityInput").value;
       const notes = document.getElementById("notesInput").value;
+      const photoInput = document.getElementById("photoInput");
+
+      let photoUrl = null;
+      if (photoInput && photoInput.files && photoInput.files[0]) {
+        const btnSubmit = siembraForm.querySelector('button[type="submit"]');
+        if (btnSubmit) btnSubmit.innerText = "Comprimiendo y subiendo foto...";
+        photoUrl = await uploadOrCompressPhoto(photoInput.files[0], `huerta/siembras`);
+      }
 
       try {
         await createCrop({
@@ -371,6 +380,7 @@ function setupEventListeners() {
           plotId,
           quantity,
           notes,
+          photo: photoUrl,
           user: currentUser
         });
         siembraModal.classList.remove("active");
@@ -439,6 +449,21 @@ window.quickAction = async function(type, cropId) {
   }
 };
 
+window.openLightbox = function(photoUrl) {
+  if (!photoUrl) return;
+  const modalHtml = `
+    <div class="modal active" id="lightboxModal" style="z-index: 30000;" onclick="document.getElementById('lightboxModal').remove()">
+      <div style="position: relative; max-width: 90vw; max-height: 90vh;">
+        <img src="${photoUrl}" style="max-width: 100%; max-height: 85vh; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);" />
+        <p style="text-align: center; color: #fff; margin-top: 10px;">Clic en cualquier lugar para cerrar</p>
+      </div>
+    </div>
+  `;
+  const existing = document.getElementById("lightboxModal");
+  if (existing) existing.remove();
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
+};
+
 window.viewCropDetails = async function(cropId) {
   const crop = await getCropById(cropId);
   if (!crop) return;
@@ -455,6 +480,7 @@ window.viewCropDetails = async function(cropId) {
           <p><strong>Bancal:</strong> ${crop.plotName || 'Sin asignación'}</p>
           <p><strong>Sembrado por:</strong> ${crop.plantedByName} (${new Date(crop.plantedDate.toMillis()).toLocaleDateString()})</p>
           <p><strong>Estado:</strong> ${crop.status}</p>
+          ${crop.photo ? `<div style="margin: 10px 0;"><img src="${crop.photo}" onclick="window.openLightbox('${crop.photo}')" style="width:100%; max-height:200px; object-fit:cover; border-radius:10px; cursor:pointer;" title="Clic para ampliar foto de siembra" /></div>` : ''}
           <hr/>
           <h4>Línea de Tiempo de Eventos</h4>
           ${events.length === 0 ? '<p>No se han registrado eventos para este cultivo aún.</p>' : ''}
@@ -477,6 +503,7 @@ window.viewCropDetails = async function(cropId) {
           <span>Por: ${ev.doneByName}</span>
           ${ev.notes ? `<p class="event-notes">${ev.notes}</p>` : ''}
           ${ev.description ? `<p class="event-notes">${ev.description}</p>` : ''}
+          ${ev.photo ? `<div style="margin-top:6px;"><img src="${ev.photo}" onclick="window.openLightbox('${ev.photo}')" style="width:60px; height:60px; object-fit:cover; border-radius:6px; cursor:pointer;" title="Clic para ampliar" /></div>` : ''}
         </div>
       </li>
     `;
