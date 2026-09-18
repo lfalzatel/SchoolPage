@@ -29,7 +29,7 @@ export function renderOverworldMap(container, { schoolCrops = [], personalCrops 
   }).length;
 
   container.innerHTML = `
-    <div class="overworld-wrapper">
+    <div class="overworld-wrapper zoom-fade-in" id="overworldWrapper">
       <div class="overworld-sky">
         <div class="overworld-cloud cloud-1">☁️</div>
         <div class="overworld-cloud cloud-2">☁️</div>
@@ -37,13 +37,13 @@ export function renderOverworldMap(container, { schoolCrops = [], personalCrops 
       </div>
 
       <div class="overworld-banner">
-        <span>🗺️ Mapa del Territorio Green Force</span>
+        <span>🗺️ Territorio Green Force — IE Barro Blanco</span>
         <small>Toca un edificio o zona verde para ingresar a cultivar</small>
       </div>
 
       <div class="overworld-map-grid">
         <!-- ZONA 1: ESCUELA IE BARRO BLANCO + HUERTA ESCOLAR -->
-        <div class="overworld-building-card school-zone" onclick="window.enterOverworldZone('colegio')">
+        <div class="overworld-building-card school-zone elastic-touch" onclick="window.enterOverworldZone(event, 'colegio')">
           <div class="building-sprite-wrapper">
             <span class="building-badge-tag">IE BARRO BLANCO</span>
             <div class="building-icon-large">🏫</div>
@@ -58,7 +58,7 @@ export function renderOverworldMap(container, { schoolCrops = [], personalCrops 
         </div>
 
         <!-- ZONA 2: GRANJA PERSONAL / RANCHO DEL ESTUDIANTE -->
-        <div class="overworld-building-card farm-zone" onclick="window.enterOverworldZone('individual')">
+        <div class="overworld-building-card farm-zone elastic-touch" onclick="window.enterOverworldZone(event, 'individual')">
           <div class="building-sprite-wrapper">
             <span class="building-badge-tag">MI GRANJA</span>
             <div class="building-icon-large">🏡</div>
@@ -73,7 +73,7 @@ export function renderOverworldMap(container, { schoolCrops = [], personalCrops 
         </div>
 
         <!-- ZONA 3: COMPOSTERA Y MERCADO VERDE (FUTURO) -->
-        <div class="overworld-building-card locked-zone" onclick="window.enterOverworldZone('locked_compost')">
+        <div class="overworld-building-card locked-zone elastic-touch" onclick="window.enterOverworldZone(event, 'locked_compost')">
           <div class="building-sprite-wrapper">
             <span class="building-badge-tag lock-tag">NIVEL 5</span>
             <div class="building-icon-large dim-icon">♻️</div>
@@ -87,7 +87,7 @@ export function renderOverworldMap(container, { schoolCrops = [], personalCrops 
           </div>
         </div>
 
-        <div class="overworld-building-card locked-zone" onclick="window.enterOverworldZone('locked_market')">
+        <div class="overworld-building-card locked-zone elastic-touch" onclick="window.enterOverworldZone(event, 'locked_market')">
           <div class="building-sprite-wrapper">
             <span class="building-badge-tag lock-tag">NIVEL 10</span>
             <div class="building-icon-large dim-icon">🧺</div>
@@ -107,14 +107,21 @@ export function renderOverworldMap(container, { schoolCrops = [], personalCrops 
   playAmbientChirp();
 }
 
-window.enterOverworldZone = function(zone) {
+window.enterOverworldZone = function(evt, zone) {
   if (zone.startsWith('locked')) {
     playActionBlocked();
     alert("🔒 Este edificio se desbloqueará en niveles superiores de Green Force cuando ganes más XP cultivando.");
     return;
   }
 
-  if (onSelectZoneCallback) {
-    onSelectZoneCallback(zone);
+  const wrapper = document.getElementById("overworldWrapper");
+  if (wrapper) {
+    wrapper.classList.add("zoom-out-transition");
   }
+
+  setTimeout(() => {
+    if (onSelectZoneCallback) {
+      onSelectZoneCallback(zone);
+    }
+  }, 350);
 };
