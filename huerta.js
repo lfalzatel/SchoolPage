@@ -359,22 +359,32 @@ function setupEventListeners() {
   if (siembraForm) {
     siembraForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (!currentUser) return;
-
-      const cropTypeId = document.getElementById("cropTypeSelect").value;
-      const plotId = document.getElementById("plotSelect").value;
-      const quantity = document.getElementById("quantityInput").value;
-      const notes = document.getElementById("notesInput").value;
-      const photoInput = document.getElementById("photoInput");
-
-      let photoUrl = null;
-      if (photoInput && photoInput.files && photoInput.files[0]) {
-        const btnSubmit = siembraForm.querySelector('button[type="submit"]');
-        if (btnSubmit) btnSubmit.innerText = "Comprimiendo y subiendo foto...";
-        photoUrl = await uploadOrCompressPhoto(photoInput.files[0], `huerta/siembras`);
+      if (!currentUser) {
+        alert("Debes iniciar sesión para registrar una siembra.");
+        return;
       }
 
+      const btnSubmit = siembraForm.querySelector('button[type="submit"]');
+      const originalText = btnSubmit ? btnSubmit.innerText : "Confirmar y Registrar Siembra";
+
       try {
+        if (btnSubmit) {
+          btnSubmit.disabled = true;
+          btnSubmit.innerText = "Procesando siembra...";
+        }
+
+        const cropTypeId = document.getElementById("cropTypeSelect").value;
+        const plotId = document.getElementById("plotSelect").value;
+        const quantity = document.getElementById("quantityInput").value;
+        const notes = document.getElementById("notesInput").value;
+        const photoInput = document.getElementById("photoInput");
+
+        let photoUrl = null;
+        if (photoInput && photoInput.files && photoInput.files[0]) {
+          if (btnSubmit) btnSubmit.innerText = "Comprimiendo y procesando foto...";
+          photoUrl = await uploadOrCompressPhoto(photoInput.files[0], `huerta/siembras`);
+        }
+
         await createCrop({
           cropTypeId,
           plotId,
@@ -383,11 +393,19 @@ function setupEventListeners() {
           photo: photoUrl,
           user: currentUser
         });
+
         siembraModal.classList.remove("active");
         siembraForm.reset();
         await loadHuertaData();
+        alert("✅ ¡Siembra registrada exitosamente!");
       } catch (err) {
+        console.error("Error al registrar siembra:", err);
         alert("Error al registrar siembra: " + err.message);
+      } finally {
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.innerText = originalText;
+        }
       }
     });
   }
