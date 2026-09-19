@@ -134,9 +134,15 @@ export function renderOverworldMap(container, {
           <div class="iso-decor fence-r">🪵</div>
           <div class="iso-decor cow-anim">🐮</div>
 
-          <!-- AGRICULTOR CAMINANTE EN EL SENDEROS (AVATAR) -->
+          <!-- AGRICULTOR CAMINANTE EN EL SENDEROS (AVATAR TRABAJADOR) -->
           <div class="iso-farmer-avatar" id="farmerAvatar" style="top: 48%; left: 47%;">
-            <div class="farmer-sprite walk-bounce">👩‍🌾</div>
+            <div class="farmer-action-bubble" id="farmerBubble" style="display: none;">
+              <span id="farmerTaskText">🛠️ Reparando la cerca...</span>
+            </div>
+            <div class="farmer-sprite-wrapper" id="farmerSpriteWrapper">
+              <span class="farmer-emoji" id="farmerEmoji">👩‍🌾</span>
+              <span class="farmer-tool-icon" id="farmerToolIcon" style="display: none;">🔨</span>
+            </div>
             <span class="farmer-shadow"></span>
           </div>
 
@@ -199,9 +205,73 @@ export function renderOverworldMap(container, {
         </div>
       </div>
     </div>
-  `;
-
   playAmbientChirp();
+  initFarmerWorkerAI();
+}
+
+let farmerWorkerTimer = null;
+
+function initFarmerWorkerAI() {
+  if (farmerWorkerTimer) clearInterval(farmerWorkerTimer);
+
+  const farmer = document.getElementById("farmerAvatar");
+  const bubble = document.getElementById("farmerBubble");
+  const taskText = document.getElementById("farmerTaskText");
+  const toolIcon = document.getElementById("farmerToolIcon");
+  const spriteWrapper = document.getElementById("farmerSpriteWrapper");
+
+  if (!farmer || !bubble || !taskText || !toolIcon || !spriteWrapper) return;
+
+  const waypoints = [
+    { top: 62, left: 78, tool: "🔨", text: "🛠️ Reparando el cerco...", duration: 4500 },
+    { top: 38, left: 24, tool: "💧", text: "💧 Regando las plantas...", duration: 4500 },
+    { top: 65, left: 16, tool: "🪴", text: "🪴 Volteando el abono...", duration: 4500 },
+    { top: 38, left: 72, tool: "🌱", text: "🌱 Cuidando brotes...", duration: 4500 },
+    { top: 48, left: 46, tool: "🧹", text: "🧹 Limpiando el camino...", duration: 4500 }
+  ];
+
+  let currentIdx = 0;
+
+  function moveToNextWaypoint() {
+    const farmerEl = document.getElementById("farmerAvatar");
+    if (!farmerEl) return;
+
+    const wp = waypoints[currentIdx];
+    currentIdx = (currentIdx + 1) % waypoints.length;
+
+    bubble.style.display = "none";
+    toolIcon.style.display = "none";
+
+    const currentLeft = parseFloat(farmerEl.style.left) || 47;
+    if (wp.left < currentLeft) {
+      spriteWrapper.classList.add("facing-left");
+    } else {
+      spriteWrapper.classList.remove("facing-left");
+    }
+
+    farmerEl.style.transition = "top 3.2s linear, left 3.2s linear";
+    farmerEl.style.top = `${wp.top}%`;
+    farmerEl.style.left = `${wp.left}%`;
+
+    setTimeout(() => {
+      if (!document.getElementById("farmerAvatar")) return;
+      taskText.innerText = wp.text;
+      toolIcon.innerText = wp.tool;
+      bubble.style.display = "block";
+      toolIcon.style.display = "block";
+
+      playAmbientChirp();
+
+      setTimeout(() => {
+        if (!document.getElementById("farmerAvatar")) return;
+        moveToNextWaypoint();
+      }, wp.duration);
+    }, 3300);
+  }
+
+  setTimeout(() => {
+    moveToNextWaypoint();
+  }, 1200);
 }
 
 // Generador de Bancales de Madera 2.5D integrados directamente en el césped del mapa

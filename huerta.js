@@ -3,7 +3,7 @@
 //  huerta.js — Lógica de Interfaz de Usuario y Controladores
 // ══════════════════════════════════════════════════════════════════════════
 
-import { auth, db } from "./firebase-config.js?v=53";
+import { auth, db } from "./firebase-config.js?v=54";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import {
@@ -24,11 +24,11 @@ import {
   awardUserGamification,
   createPracticePlot,
   assignIndividualRealPlot
-} from "./huerta-service.js?v=53";
-import { uploadOrCompressPhoto } from "./image-utils.js?v=53";
-import { renderFarmGame } from "./farm-game.js?v=53";
-import { renderOverworldMap } from "./farm-overworld.js?v=53";
-import { initCelebrationOverlay } from "./celebration-overlay.js?v=53";
+} from "./huerta-service.js?v=54";
+import { uploadOrCompressPhoto } from "./image-utils.js?v=54";
+import { renderFarmGame } from "./farm-game.js?v=54";
+import { renderOverworldMap } from "./farm-overworld.js?v=54";
+import { initCelebrationOverlay } from "./celebration-overlay.js?v=54";
 
 let currentUser = null;
 let userRole = "integrante"; // 'admin', 'lider', 'integrante'
