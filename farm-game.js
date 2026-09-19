@@ -88,7 +88,33 @@ function renderPlotsGrid() {
   if (!gridEl) return;
 
   if (currentPlots.length === 0) {
-    gridEl.innerHTML = `<div class="glass-card"><p>Cargando bancales de la granja...</p></div>`;
+    if (currentScope === 'individual') {
+      gridEl.innerHTML = `
+        <div class="glass-card empty-plots-card" style="text-align: center; padding: 28px 20px; max-width: 480px; margin: 30px auto; background: rgba(15, 26, 10, 0.85); border: 2px dashed #d9a94e; border-radius: 20px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+          <div style="font-size: 3.2rem; margin-bottom: 10px;">🪴</div>
+          <h3 style="color: #ffd464; font-size: 1.25rem; margin-bottom: 8px;">¡Bienvenido a Tu Huerta Individual!</h3>
+          <p style="color: #cbd5e0; font-size: 0.88rem; line-height: 1.5; margin-bottom: 20px;">
+            Aún no tienes camas de siembra activas. Puedes crear una <strong>Cama de Práctica Virtual</strong> para entrenar y sembrar tus propios cultivos experimentales.
+          </p>
+          <button class="game-btn" onclick="document.getElementById('practicePlotModal').classList.add('active')" style="padding: 12px 22px; font-size: 0.92rem; background: linear-gradient(180deg, #7fc25c, #2e5b22); color: white; border-radius: 14px; border: none; cursor: pointer; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
+            <i class="fas fa-plus-circle"></i> + Crear Cama de Práctica Virtual 🪴
+          </button>
+        </div>
+      `;
+    } else {
+      gridEl.innerHTML = `
+        <div class="glass-card empty-plots-card" style="text-align: center; padding: 28px 20px; max-width: 480px; margin: 30px auto; background: rgba(15, 26, 10, 0.85); border: 2px dashed #81c784; border-radius: 20px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+          <div style="font-size: 3.2rem; margin-bottom: 10px;">🏫</div>
+          <h3 style="color: #a5d6a7; font-size: 1.25rem; margin-bottom: 8px;">Huerta Escolar Colectiva</h3>
+          <p style="color: #cbd5e0; font-size: 0.88rem; line-height: 1.5; margin-bottom: 20px;">
+            No hay bancales activos registrados en la IE Barro Blanco en este momento.
+          </p>
+          <button class="game-btn" onclick="window.backToOverworldMap()" style="padding: 10px 20px; font-size: 0.88rem; background: linear-gradient(180deg, #4c8a3a, #1f4a24); color: white; border-radius: 12px; border: none; cursor: pointer;">
+            ⬅️ Volver al Mapa General
+          </button>
+        </div>
+      `;
+    }
     return;
   }
 

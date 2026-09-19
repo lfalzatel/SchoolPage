@@ -3,7 +3,7 @@
 //  huerta.js — Lógica de Interfaz de Usuario y Controladores
 // ══════════════════════════════════════════════════════════════════════════
 
-import { auth, db } from "./firebase-config.js?v=52";
+import { auth, db } from "./firebase-config.js?v=53";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import {
@@ -24,11 +24,11 @@ import {
   awardUserGamification,
   createPracticePlot,
   assignIndividualRealPlot
-} from "./huerta-service.js?v=52";
-import { uploadOrCompressPhoto } from "./image-utils.js?v=52";
-import { renderFarmGame } from "./farm-game.js?v=52";
-import { renderOverworldMap } from "./farm-overworld.js?v=52";
-import { initCelebrationOverlay } from "./celebration-overlay.js?v=52";
+} from "./huerta-service.js?v=53";
+import { uploadOrCompressPhoto } from "./image-utils.js?v=53";
+import { renderFarmGame } from "./farm-game.js?v=53";
+import { renderOverworldMap } from "./farm-overworld.js?v=53";
+import { initCelebrationOverlay } from "./celebration-overlay.js?v=53";
 
 let currentUser = null;
 let userRole = "integrante"; // 'admin', 'lider', 'integrante'
@@ -200,30 +200,32 @@ function setupScopeListeners() {
   const btnIndividual = document.getElementById("scopeTabIndividual");
   const practiceBtn = document.getElementById("newPracticePlotBtn");
 
+  window.switchScopeGlobal = async (scope) => {
+    if (scope === "individual" && !currentUser) {
+      alert("🌱 Debes iniciar sesión con tu cuenta de Green Force para acceder a 'Mi huerta'.");
+      return;
+    }
+    activeScope = scope;
+    currentGameState = "board";
+    if (btnColegio) {
+      btnColegio.classList.toggle("active", scope === "colegio");
+    }
+    if (btnIndividual) {
+      btnIndividual.classList.toggle("active", scope === "individual");
+    }
+    if (practiceBtn) {
+      practiceBtn.style.display = (currentUser && scope === "individual") ? "inline-flex" : "none";
+    }
+    updateAuthUI(currentUser);
+    await loadHuertaData();
+  };
+
   if (btnColegio) {
-    btnColegio.addEventListener("click", async () => {
-      activeScope = "colegio";
-      btnColegio.classList.add("active");
-      if (btnIndividual) btnIndividual.classList.remove("active");
-      if (practiceBtn) practiceBtn.style.display = "none";
-      updateAuthUI(currentUser);
-      await loadHuertaData();
-    });
+    btnColegio.addEventListener("click", () => window.switchScopeGlobal("colegio"));
   }
 
   if (btnIndividual) {
-    btnIndividual.addEventListener("click", async () => {
-      if (!currentUser) {
-        alert("Debes iniciar sesión para acceder a 'Mi huerta'.");
-        return;
-      }
-      activeScope = "individual";
-      btnIndividual.classList.add("active");
-      if (btnColegio) btnColegio.classList.remove("active");
-      if (practiceBtn) practiceBtn.style.display = "inline-flex";
-      updateAuthUI(currentUser);
-      await loadHuertaData();
-    });
+    btnIndividual.addEventListener("click", () => window.switchScopeGlobal("individual"));
   }
 }
 
@@ -568,7 +570,7 @@ function switchViewTab(view) {
 
   if (view === "juego") {
     if (headerSection) headerSection.style.display = "none";
-    if (scopeControl) scopeControl.style.display = "none";
+    if (scopeControl) scopeControl.style.display = "flex";
     if (gameSection) gameSection.style.display = "block";
     if (classicSection) classicSection.style.display = "none";
     if (btnGame) btnGame.classList.add("active");
