@@ -324,7 +324,6 @@ if (typeof window !== 'undefined') {
     if (!item) return;
     const isActive = item.classList.contains('active');
     item.classList.toggle('active', !isActive);
-    playSoundByProfile(localStorage.getItem('gf_sound_profile') || 'pop');
   };
 }
 
@@ -463,7 +462,6 @@ export function openThemeModal() {
       document.documentElement.setAttribute('data-theme', themeId);
       document.body.setAttribute('data-theme', themeId);
       localStorage.setItem('gf_theme', themeId);
-      playSoundByProfile(localStorage.getItem('gf_sound_profile') || 'pop');
     });
   });
 
