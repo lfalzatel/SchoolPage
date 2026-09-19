@@ -134,13 +134,17 @@ function renderUnauthenticatedState() {
 async function loadHuertaData() {
   try {
     const userUid = currentUser ? currentUser.uid : null;
+    window.currentUserGlobal = currentUser;
+    window.switchHuertaViewModeGlobal = switchViewTab;
 
-    const [types, plots, crops, schoolCrops, personalCrops] = await Promise.all([
+    const [types, plots, crops, schoolCrops, personalCrops, schoolPlots, personalPlots] = await Promise.all([
       getCropTypes(),
       getPlots(activeScope, userUid),
       getActiveCrops(activeScope, userUid),
       getActiveCrops('colegio', null),
-      getActiveCrops('individual', userUid)
+      getActiveCrops('individual', userUid),
+      getPlots('colegio', null),
+      getPlots('individual', userUid)
     ]);
 
     cropTypesList = types;
@@ -160,13 +164,16 @@ async function loadHuertaData() {
         renderOverworldMap(farmContainer, {
           schoolCrops,
           personalCrops,
+          schoolPlots,
+          personalPlots,
           user: currentUser,
           role: userRole,
           onSelectZone: (zone) => {
             activeScope = zone;
             currentGameState = 'board';
             loadHuertaData();
-          }
+          },
+          onRefreshData: loadHuertaData
         });
       } else {
         renderFarmGame(farmContainer, {

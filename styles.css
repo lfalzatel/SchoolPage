@@ -6556,3 +6556,375 @@ body[data-theme] {
   50% { transform: scale(1.15); }
   100% { transform: scale(1); }
 }
+
+/* ── Top Heroes 2.5D Isometric Game Viewport & HUD Engine ── */
+.top-heroes-game-viewport {
+  position: relative;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #132415;
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* HUD Superior de Juego */
+.top-heroes-hud-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(10, 20, 15, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 8px 12px;
+  border-bottom: 2px solid rgba(129, 199, 132, 0.3);
+  position: relative;
+  z-index: 50;
+  gap: 8px;
+}
+
+.hud-player-profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+  border: 2px solid #81c784;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.hud-player-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-player-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.hud-level-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #a5d6a7;
+}
+
+.hud-resource-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.resource-pill {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 3px 10px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.xp-pill { border-color: #ffd54f; color: #ffd54f; }
+.coins-pill { border-color: #81c784; color: #81c784; }
+
+.hud-view-toggle {
+  display: flex;
+  background: rgba(0,0,0,0.5);
+  padding: 2px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.hud-toggle-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
+  padding: 4px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.hud-toggle-btn.active {
+  background: #2e7d32;
+}
+
+/* Quest Tracker Flotante (Abajo Izquierda) */
+.hud-quest-tracker {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 213, 79, 0.4);
+  border-radius: 12px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 40;
+  max-width: 260px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+}
+
+.quest-icon { font-size: 1.2rem; }
+.quest-text { display: flex; flex-direction: column; }
+.quest-label { font-size: 0.62rem; color: #ffd54f; font-weight: 800; letter-spacing: 0.5px; }
+.quest-title { font-size: 0.75rem; color: #fff; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Escenario Isométrico 2.5D */
+.isometric-world-scene {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  background: #254a20;
+  overflow: hidden;
+}
+
+.iso-sky-layer {
+  position: absolute;
+  top: 6px; left: 12px; right: 12px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.8;
+}
+
+.iso-cloud { font-size: 1.4rem; animation: floatCloud 24s linear infinite alternate; }
+.iso-sun-glow { font-size: 1.6rem; filter: drop-shadow(0 0 10px #ffd54f); }
+
+.iso-terrain-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 30% 25%, #2d5a27 0%, transparent 45%),
+    radial-gradient(circle at 75% 75%, #1b3a18 0%, transparent 55%),
+    repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 12px, transparent 12px, transparent 24px);
+}
+
+.iso-paths-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.river-flow {
+  animation: riverDash 2s linear infinite;
+}
+@keyframes riverDash {
+  to { stroke-dashoffset: -12; }
+}
+
+.iso-decor {
+  position: absolute;
+  font-size: 1.6rem;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+}
+.tree-tl { top: 4%; left: 42%; }
+.tree-tr { top: 4%; left: 88%; }
+.tree-bl { top: 78%; left: 42%; }
+.tree-br { top: 78%; left: 88%; }
+.flowers-l { top: 48%; left: 4%; font-size: 1.1rem; }
+.flowers-r { top: 48%; left: 92%; font-size: 1.1rem; }
+.fence-l { top: 46%; left: 34%; font-size: 1.3rem; }
+.fence-r { top: 46%; left: 58%; font-size: 1.3rem; }
+.cow-anim { top: 48%; left: 78%; font-size: 1.5rem; animation: cowChew 3s infinite alternate; }
+@keyframes cowChew { 0% { transform: scale(1); } 100% { transform: scale(1.08) rotate(2deg); } }
+
+/* Avatar Caminante del Agricultor */
+.iso-farmer-avatar {
+  position: absolute;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.farmer-sprite {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+}
+
+.walk-bounce {
+  animation: avatarWalk 0.7s infinite alternate;
+}
+@keyframes avatarWalk {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-5px); }
+}
+
+.farmer-shadow {
+  width: 24px;
+  height: 8px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 50%;
+  margin-top: -6px;
+}
+
+/* Estructura Isométrica de Edificios */
+.iso-building-structure {
+  position: absolute;
+  width: 40%;
+  z-index: 10;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.iso-building-structure:hover {
+  transform: scale(1.05);
+  z-index: 15;
+}
+
+.building-artwork {
+  background: rgba(12, 24, 16, 0.88);
+  border: 2px solid #81c784;
+  border-radius: 16px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.7);
+  position: relative;
+  backdrop-filter: blur(4px);
+}
+
+.school-building .building-artwork { border-color: #81c784; background: radial-gradient(circle at center, rgba(46,125,50,0.45), rgba(0,0,0,0.75)); }
+.farm-building .building-artwork { border-color: #ffd54f; background: radial-gradient(circle at center, rgba(255,193,7,0.35), rgba(0,0,0,0.75)); }
+.locked-building .building-artwork { border-style: dashed; opacity: 0.65; border-color: #718096; }
+
+.structure-badge {
+  font-size: 0.6rem;
+  font-weight: 800;
+  background: #2e7d32;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+}
+.farm-badge { background: #d69e2e; color: #000; }
+.lock-badge { background: #4a5568; }
+
+.artwork-sprite {
+  font-size: 2.8rem;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.7));
+  margin: 2px 0;
+  transition: transform 0.25s ease;
+}
+
+.iso-building-structure:hover .artwork-sprite {
+  transform: scale(1.12) rotate(-3deg);
+}
+
+.structure-title-box {
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 8px;
+  width: 100%;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.iso-crate-badge {
+  position: absolute;
+  top: -12px; right: 4px;
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 2px solid #fff;
+  box-shadow: 0 6px 14px rgba(229,62,62,0.8);
+  z-index: 20;
+}
+.farm-crate { background: linear-gradient(135deg, #d69e2e, #b7791f); }
+
+.pulse-bounce {
+  animation: crateBounceFloat 1.3s infinite alternate ease-in-out;
+}
+@keyframes crateBounceFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-7px); }
+}
+
+/* Bancales de Madera 2.5D Ubicados Directamente en la Hierba */
+.iso-plots-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  justify-content: center;
+  width: 100%;
+}
+
+.on-map-plot-bed {
+  position: relative;
+  flex: 1;
+  max-width: 75px;
+}
+
+.wooden-bed-box {
+  background: linear-gradient(135deg, #4a3525, #2d1e13);
+  border: 2px solid #5d4037;
+  border-radius: 10px;
+  padding: 4px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 4px 10px rgba(0,0,0,0.5);
+  transition: transform 0.2s;
+}
+
+.on-map-plot-bed:hover .wooden-bed-box {
+  transform: translateY(-3px);
+  border-color: #8d6e63;
+}
+
+.bed-crop-sprite { font-size: 1.4rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
+.bed-crop-name { font-size: 0.6rem; color: #a5d6a7; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+/* Burbuja Flotante de 1-Tap Harvest / Riego / Abono */
+.plot-harvest-bubble {
+  position: absolute;
+  top: -24px; left: 50%;
+  transform: translateX(-50%);
+  background: #2e7d32;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 1px solid #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  z-index: 30;
+  white-space: nowrap;
+}
+
+.ready-glow { background: linear-gradient(135deg, #d69e2e, #b7791f); border-color: #ffd54f; color: #000; }
+.water-glow { background: linear-gradient(135deg, #0288d1, #01579b); border-color: #4fc3f7; }
+.fert-glow { background: linear-gradient(135deg, #2e7d32, #1b5e20); border-color: #81c784; }
