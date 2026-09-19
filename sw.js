@@ -1,6 +1,6 @@
 importScripts('./firebase-messaging-sw.js');
 
-const CACHE_NAME = 'green-force-v60';
+const CACHE_NAME = 'green-force-v61';
 const OFFLINE_URL = './offline.html';
 const ASSETS_TO_CACHE = [
   './',
@@ -15,6 +15,11 @@ const ASSETS_TO_CACHE = [
   './settings-view.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
+  './assets/images/farm/building_school.webp',
+  './assets/images/farm/building_house.webp',
+  './assets/images/farm/building_compost.webp',
+  './assets/images/farm/building_market.webp',
+  './assets/images/farm/garden_bed.webp',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap'
 ];

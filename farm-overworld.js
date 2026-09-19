@@ -19,8 +19,9 @@ import {
   logFertilizacion,
   logCosecha,
   awardUserGamification,
-  createPracticePlot
-} from "./huerta-service.js?v=58";
+  createPracticePlot,
+  createCrop
+} from "./huerta-service.js?v=61";
 
 let onSelectZoneCallback = null;
 let onRefreshDataCallback = null;
@@ -251,35 +252,33 @@ export function renderOverworldMap(container, {
             <span class="farmer-shadow"></span>
           </div>
 
-          <!-- EDIFICIO 1: ESCUELA IE BARRO BLANCO (2.5D REAL CON ARQUITECTURA ISOMÉTRICA) -->
+          <!-- EDIFICIO 1: ESCUELA IE BARRO BLANCO (ESTILO TOP HEROES) -->
           <div class="iso-building-structure school-building" id="building_colegio"
                style="left: ${currentLayout.colegio.x}px; top: ${currentLayout.colegio.y}px;"
-               data-zone="colegio"
-               onclick="window.onBuildingClick('colegio')">
+               data-zone="colegio">
             <div class="building-map-pin school-pin">
               <i class="fas fa-map-marker-alt"></i> IE BARRO BLANCO
             </div>
             ${schoolPendingCount > 0 ? `<div class="iso-crate-badge pulse-bounce">🧺 ${schoolPendingCount} pendientes</div>` : ''}
-            <div class="iso-building-sprite">
-              ${getSchool3DSVG()}
+            <div class="iso-building-sprite school-sprite">
+              <img src="assets/images/farm/building_school.webp?v=61" class="iso-building-sprite-img" alt="IE Barro Blanco" draggable="false" />
             </div>
             <div class="building-title-plaque">🌾 Huerta Escolar • Entrar</div>
 
-            <!-- HUERTA CON CERCA DE MADERA Y BANCALES DE CULTIVO (ESTILO TOP HEROES) -->
+            <!-- HUERTA CON CERCA DE MADERA Y BANCALES DE CULTIVO -->
             ${getFencedHuertaGarden3D(currentSchoolCrops, currentSchoolPlots, 'colegio')}
           </div>
 
-          <!-- EDIFICIO 2: MI GRANJA / RANCHO DEL ESTUDIANTE (2.5D REAL) -->
+          <!-- EDIFICIO 2: MI GRANJA / RANCHO DEL ESTUDIANTE (ESTILO TOP HEROES) -->
           <div class="iso-building-structure farm-building" id="building_individual"
                style="left: ${currentLayout.individual.x}px; top: ${currentLayout.individual.y}px;"
-               data-zone="individual"
-               onclick="window.onBuildingClick('individual')">
+               data-zone="individual">
             <div class="building-map-pin farm-pin">
               <i class="fas fa-star"></i> MI GRANJA
             </div>
             ${personalPendingCount > 0 ? `<div class="iso-crate-badge farm-crate pulse-bounce">🪴 ${personalPendingCount} pendientes</div>` : ''}
-            <div class="iso-building-sprite">
-              ${getRanch3DSVG()}
+            <div class="iso-building-sprite ranch-sprite">
+              <img src="assets/images/farm/building_house.webp?v=61" class="iso-building-sprite-img" alt="Mi Granja" draggable="false" />
             </div>
             <div class="building-title-plaque">👩‍🌾 Mi Parcela • Entrar</div>
 
@@ -290,13 +289,12 @@ export function renderOverworldMap(container, {
           <!-- EDIFICIO 3: COMPOSTERA ESCOLAR (Nivel 5) -->
           <div class="iso-building-structure locked-building" id="building_locked_compost"
                style="left: ${currentLayout.locked_compost.x}px; top: ${currentLayout.locked_compost.y}px;"
-               data-zone="locked_compost"
-               onclick="window.onBuildingClick('locked_compost')">
+               data-zone="locked_compost">
             <div class="building-map-pin lock-pin">
               <i class="fas fa-lock"></i> COMPOSTERA
             </div>
-            <div class="iso-building-sprite">
-              ${getCompost3DSVG()}
+            <div class="iso-building-sprite compost-sprite">
+              <img src="assets/images/farm/building_compost.webp?v=61" class="iso-building-sprite-img" alt="Compostera" draggable="false" />
             </div>
             <div class="building-title-plaque" style="background: #4a5568; border-color: #a0aec0;">🔒 Nivel 5: Abonos</div>
           </div>
@@ -304,13 +302,12 @@ export function renderOverworldMap(container, {
           <!-- EDIFICIO 4: MERCADO VERDE (Nivel 10) -->
           <div class="iso-building-structure locked-building" id="building_locked_market"
                style="left: ${currentLayout.locked_market.x}px; top: ${currentLayout.locked_market.y}px;"
-               data-zone="locked_market"
-               onclick="window.onBuildingClick('locked_market')">
+               data-zone="locked_market">
             <div class="building-map-pin lock-pin">
               <i class="fas fa-lock"></i> MERCADO VERDE
             </div>
-            <div class="iso-building-sprite">
-              ${getMarket3DSVG()}
+            <div class="iso-building-sprite market-sprite">
+              <img src="assets/images/farm/building_market.webp?v=61" class="iso-building-sprite-img" alt="Mercado Verde" draggable="false" />
             </div>
             <div class="building-title-plaque" style="background: #4a5568; border-color: #a0aec0;">🔒 Nivel 10: Tienda</div>
           </div>
@@ -339,7 +336,22 @@ export function renderOverworldMap(container, {
             <span class="dialog-hint">💧 Riego • 🍃 Abono • 🧺 Cosecha</span>
           </div>
 
-          <div class="dialog-beds-grid" id="dialogBedsGrid">
+          <!-- ACORDEÓN DESPLEGABLE DE SIEMBRA ("uno escoger que va sembrar de un acordeón") -->
+          <div class="planting-accordion-drawer" id="plantingAccordionDrawer" style="display: none;">
+            <div class="accordion-drawer-header">
+              <div class="accordion-drawer-title">
+                <span>🌱 Sembrar en:</span>
+                <strong id="accordionTargetPlotTitle" style="color: #ffd54f;">Bancal</strong>
+              </div>
+              <button class="accordion-close-btn" onclick="window.closePlantingAccordion()">✖️ Cerrar</button>
+            </div>
+            <div class="seeds-catalog-grid" id="seedsCatalogGrid">
+              <!-- Semillas inyectadas dinámicamente -->
+            </div>
+          </div>
+
+          <!-- PARRILLA VISUAL DE CAMAS DE MADERA 2.5D -->
+          <div class="dialog-beds-visual-grid" id="dialogBedsGrid">
             <!-- Camas generadas dinámicamente -->
           </div>
 
@@ -444,149 +456,34 @@ window.openFarmBuildingModal = function(zone) {
 
     totalPlots.forEach((plot, index) => {
       const crop = currentCrops.find(c => c.plotId === plot.id && c.status !== 'cosechado' && c.status !== 'perdido');
-
-      if (crop) {
-        const plantedMs = crop.plantedDate ? crop.plantedDate.toMillis() : nowMs;
-        const harvestMs = crop.expectedHarvestDate ? crop.expectedHarvestDate.toMillis() : (plantedMs + 30 * 86400000);
-        const totalCycle = Math.max(harvestMs - plantedMs, 1);
-        const elapsed = Math.max(nowMs - plantedMs, 0);
-        const growthRatio = Math.min(elapsed / totalCycle, 1.0);
-
-        const isWaterDue = crop.nextWateringDue && crop.nextWateringDue.toMillis() <= nowMs + 43200000;
-        const isFertDue = crop.nextFertilizingDue && crop.nextFertilizingDue.toMillis() <= nowMs + 43200000;
-        const isReady = crop.status === 'listo_para_cosecha' || growthRatio >= 1.0;
-
-        let stageIcon = crop.cropTypeIcon || '🥬';
-        if (!isReady && growthRatio < 0.3) stageIcon = '🌱';
-        else if (!isReady && growthRatio < 0.6) stageIcon = '🌿';
-
-        html += `
-          <div class="dialog-bed-card">
-            <div class="dialog-bed-header">
-              <span class="dialog-bed-tag">${plot.name || `Bancal #${index + 1}`}</span>
-              <span style="font-size: 0.72rem; color: #ffd54f;">${Math.round(growthRatio * 100)}%</span>
-            </div>
-            <div class="dialog-crop-display">
-              <span class="dialog-crop-emoji">${stageIcon}</span>
-              <span class="dialog-crop-name">${crop.cropTypeName}</span>
-            </div>
-            <div class="dialog-progress-track">
-              <div class="dialog-progress-fill" style="width: ${Math.round(growthRatio * 100)}%;"></div>
-            </div>
-            <div class="dialog-bed-actions">
-              <button class="bed-action-btn btn-action-water" onclick="window.onMapDirectAction(event, 'riego', '${crop.id}')">
-                💧 Regar
-              </button>
-              <button class="bed-action-btn btn-action-fert" onclick="window.onMapDirectAction(event, 'fertilizacion', '${crop.id}')">
-                🍃 Abonar
-              </button>
-              ${isReady ? `
-                <button class="bed-action-btn btn-action-harvest" onclick="window.onMapDirectAction(event, 'cosecha', '${crop.id}')">
-                  🧺 Cosechar
-                </button>
-              ` : ''}
-            </div>
-          </div>
-        `;
-      } else {
-        html += `
-          <div class="dialog-bed-card">
-            <div class="dialog-bed-header">
-              <span class="dialog-bed-tag">${plot.name || `Bancal #${index + 1}`}</span>
-              <span style="font-size: 0.72rem; color: #a5d6a7;">Libre</span>
-            </div>
-            <div class="dialog-crop-display">
-              <span class="dialog-crop-emoji" style="opacity: 0.5;">🪴</span>
-              <span class="dialog-crop-name" style="color: #cbd5e0;">Tierra Labrada</span>
-            </div>
-            <button class="btn-activate-plot" onclick="window.triggerOpenSiembraModal('${plot.id}')">
-              🌱 + Sembrar Cultivo
-            </button>
-          </div>
-        `;
-      }
+      html += renderVisualBedCard(plot, crop, index, nowMs);
     });
   } else {
     // Si es parcela individual (Mi Huerta)
     if (!currentPlots || currentPlots.length === 0) {
       for (let i = 1; i <= 3; i++) {
         html += `
-          <div class="dialog-bed-card">
-            <div class="dialog-bed-header">
-              <span class="dialog-bed-tag">🪴 Cama de Práctica #${i}</span>
-              <span style="font-size: 0.72rem; color: #ffd54f;">Desbloqueada</span>
+          <div class="visual-planter-bed">
+            <div class="visual-bed-header">
+              <span class="visual-bed-title">🪴 Cama de Práctica #${i}</span>
+              <span class="visual-bed-status-pill" style="color: #ffd54f;">Desbloqueada</span>
             </div>
-            <div class="dialog-crop-display">
-              <span class="dialog-crop-emoji">🪴</span>
-              <span class="dialog-crop-name">Parcela Virtual</span>
+            <div class="planter-box-container">
+              <img src="assets/images/farm/garden_bed.webp?v=61" class="planter-box-texture-bg" alt="Cajón de madera" draggable="false" />
+              <div class="empty-bed-action-zone">
+                <span style="font-size: 2.2rem;">🪴</span>
+                <button class="btn-open-planting-accordion" onclick="window.quickActivatePracticePlot(${i})">
+                  ✨ + Activar y Sembrar 🪴
+                </button>
+              </div>
             </div>
-            <p style="font-size: 0.74rem; color: #a0aec0; text-align: center; margin: 4px 0 10px 0;">
-              Activa tu cama de entrenamiento para experimentar siembras sin límite.
-            </p>
-            <button class="btn-activate-plot" onclick="window.quickActivatePracticePlot(${i})">
-              ✨ + Activar y Sembrar 🪴
-            </button>
           </div>
         `;
       }
     } else {
       currentPlots.forEach((plot, index) => {
         const crop = currentCrops.find(c => c.plotId === plot.id && c.status !== 'cosechado' && c.status !== 'perdido');
-        if (crop) {
-          const plantedMs = crop.plantedDate ? crop.plantedDate.toMillis() : nowMs;
-          const harvestMs = crop.expectedHarvestDate ? crop.expectedHarvestDate.toMillis() : (plantedMs + 30 * 86400000);
-          const totalCycle = Math.max(harvestMs - plantedMs, 1);
-          const elapsed = Math.max(nowMs - plantedMs, 0);
-          const growthRatio = Math.min(elapsed / totalCycle, 1.0);
-
-          let stageIcon = crop.cropTypeIcon || '🥬';
-          const isReady = crop.status === 'listo_para_cosecha' || growthRatio >= 1.0;
-
-          html += `
-            <div class="dialog-bed-card">
-              <div class="dialog-bed-header">
-                <span class="dialog-bed-tag">${plot.name}</span>
-                <span style="font-size: 0.72rem; color: #ffd54f;">${Math.round(growthRatio * 100)}%</span>
-              </div>
-              <div class="dialog-crop-display">
-                <span class="dialog-crop-emoji">${stageIcon}</span>
-                <span class="dialog-crop-name">${crop.cropTypeName}</span>
-              </div>
-              <div class="dialog-progress-track">
-                <div class="dialog-progress-fill" style="width: ${Math.round(growthRatio * 100)}%;"></div>
-              </div>
-              <div class="dialog-bed-actions">
-                <button class="bed-action-btn btn-action-water" onclick="window.onMapDirectAction(event, 'riego', '${crop.id}')">
-                  💧 Regar
-                </button>
-                <button class="bed-action-btn btn-action-fert" onclick="window.onMapDirectAction(event, 'fertilizacion', '${crop.id}')">
-                  🍃 Abonar
-                </button>
-                ${isReady ? `
-                  <button class="bed-action-btn btn-action-harvest" onclick="window.onMapDirectAction(event, 'cosecha', '${crop.id}')">
-                    🧺 Cosechar
-                  </button>
-                ` : ''}
-              </div>
-            </div>
-          `;
-        } else {
-          html += `
-            <div class="dialog-bed-card">
-              <div class="dialog-bed-header">
-                <span class="dialog-bed-tag">${plot.name}</span>
-                <span style="font-size: 0.72rem; color: #a5d6a7;">Disponible</span>
-              </div>
-              <div class="dialog-crop-display">
-                <span class="dialog-crop-emoji" style="opacity: 0.6;">🪴</span>
-                <span class="dialog-crop-name" style="color: #cbd5e0;">Lista para Sembrar</span>
-              </div>
-              <button class="btn-activate-plot" onclick="window.triggerOpenSiembraModal('${plot.id}')">
-                🌱 + Sembrar Cultivo
-              </button>
-            </div>
-          `;
-        }
+        html += renderVisualBedCard(plot, crop, index, nowMs);
       });
     }
   }
@@ -594,6 +491,170 @@ window.openFarmBuildingModal = function(zone) {
   gridEl.innerHTML = html;
   modal.classList.add("active");
   modal.style.display = "flex";
+};
+
+function renderVisualBedCard(plot, crop, index, nowMs) {
+  if (crop) {
+    const plantedMs = crop.plantedDate ? crop.plantedDate.toMillis() : nowMs;
+    const harvestMs = crop.expectedHarvestDate ? crop.expectedHarvestDate.toMillis() : (plantedMs + 30 * 86400000);
+    const totalCycle = Math.max(harvestMs - plantedMs, 1);
+    const elapsed = Math.max(nowMs - plantedMs, 0);
+    const growthRatio = Math.min(elapsed / totalCycle, 1.0);
+
+    const isWaterDue = crop.nextWateringDue && crop.nextWateringDue.toMillis() <= nowMs + 43200000;
+    const isFertDue = crop.nextFertilizingDue && crop.nextFertilizingDue.toMillis() <= nowMs + 43200000;
+    const isReady = crop.status === 'listo_para_cosecha' || growthRatio >= 1.0;
+
+    let stageIcon = crop.cropTypeIcon || '🥬';
+    if (!isReady && growthRatio < 0.3) stageIcon = '🌱';
+    else if (!isReady && growthRatio < 0.6) stageIcon = '🌿';
+
+    const statusText = isReady ? '🧺 Cosecha Lista' : (isWaterDue ? '💧 Regar' : (isFertDue ? '🍃 Abonar' : '🌿 Creciendo'));
+
+    return `
+      <div class="visual-planter-bed">
+        <div class="visual-bed-header">
+          <span class="visual-bed-title">${plot.name || `Bancal #${index + 1}`}</span>
+          <span class="visual-bed-status-pill">${statusText} • ${Math.round(growthRatio * 100)}%</span>
+        </div>
+        <div class="planter-box-container">
+          <img src="assets/images/farm/garden_bed.webp?v=61" class="planter-box-texture-bg" alt="Cajón de madera" draggable="false" />
+          <div class="crop-growth-avatar">
+            <span class="crop-big-emoji">${stageIcon}</span>
+            <span class="crop-variety-label">${crop.cropTypeName}</span>
+          </div>
+        </div>
+        <div class="dialog-progress-track">
+          <div class="dialog-progress-fill" style="width: ${Math.round(growthRatio * 100)}%;"></div>
+        </div>
+        <div class="dialog-bed-actions">
+          <button class="bed-action-btn btn-action-water" onclick="window.onMapDirectAction(event, 'riego', '${crop.id}')">
+            💧 Regar
+          </button>
+          <button class="bed-action-btn btn-action-fert" onclick="window.onMapDirectAction(event, 'fertilizacion', '${crop.id}')">
+            🍃 Abonar
+          </button>
+          ${isReady ? `
+            <button class="bed-action-btn btn-action-harvest" onclick="window.onMapDirectAction(event, 'cosecha', '${crop.id}')">
+              🧺 Cosechar
+            </button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  } else {
+    return `
+      <div class="visual-planter-bed">
+        <div class="visual-bed-header">
+          <span class="visual-bed-title">${plot.name || `Bancal #${index + 1}`}</span>
+          <span class="visual-bed-status-pill" style="color: #a5d6a7;">Tierra Fértil</span>
+        </div>
+        <div class="planter-box-container">
+          <img src="assets/images/farm/garden_bed.webp?v=61" class="planter-box-texture-bg" alt="Cajón de madera" draggable="false" />
+          <div class="empty-bed-action-zone">
+            <span style="font-size: 2.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));">🪴</span>
+            <button class="btn-open-planting-accordion" onclick="window.openPlantingAccordion('${plot.id}', '${plot.name || `Bancal #${index + 1}`}')">
+              🌱 + Sembrar Cultivo
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+let activePlantingPlotId = null;
+
+window.openPlantingAccordion = function(plotId, plotName) {
+  playClickSound();
+  activePlantingPlotId = plotId;
+  const drawer = document.getElementById("plantingAccordionDrawer");
+  const titleEl = document.getElementById("accordionTargetPlotTitle");
+  const grid = document.getElementById("seedsCatalogGrid");
+
+  if (!drawer || !grid) return;
+  if (titleEl) titleEl.textContent = plotName || "Bancal Seleccionado";
+
+  const availableSeeds = [
+    { id: "zanahoria", name: "Zanahoria", icon: "🥕", days: 75, water: 2 },
+    { id: "lechuga", name: "Lechuga", icon: "🥬", days: 45, water: 2 },
+    { id: "tomate", name: "Tomate", icon: "🍅", days: 90, water: 2 },
+    { id: "cilantro", name: "Cilantro", icon: "🌿", days: 40, water: 2 },
+    { id: "fresa", name: "Fresa", icon: "🍓", days: 60, water: 2 },
+    { id: "rabano", name: "Rábano", icon: "🪴", days: 30, water: 2 },
+    { id: "albahaca", name: "Albahaca", icon: "🌱", days: 35, water: 2 },
+    { id: "pimenton", name: "Pimentón", icon: "🫑", days: 80, water: 2 }
+  ];
+
+  let seedsHtml = '';
+  availableSeeds.forEach(seed => {
+    seedsHtml += `
+      <div class="seed-option-card" onclick="window.quickDirectPlant('${seed.id}', '${plotId}', '${seed.name}')">
+        <span class="seed-card-icon">${seed.icon}</span>
+        <span class="seed-card-name">${seed.name}</span>
+        <span class="seed-card-meta">⏱️ ${seed.days}d • 💧 c/${seed.water}d</span>
+        <button class="btn-plant-this-seed">🌱 Sembrar</button>
+      </div>
+    `;
+  });
+
+  grid.innerHTML = seedsHtml;
+  drawer.style.display = "block";
+  drawer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+window.closePlantingAccordion = function() {
+  playClickSound();
+  const drawer = document.getElementById("plantingAccordionDrawer");
+  if (drawer) drawer.style.display = "none";
+};
+
+window.quickDirectPlant = async function(cropTypeId, plotId, seedName) {
+  playClickSound();
+  const user = window.currentUserGlobal || null;
+  if (!user) {
+    if (typeof window.showGameToast === 'function') {
+      window.showGameToast("Debes iniciar sesión con tu cuenta de Green Force para sembrar.", "🔒", "Acceso Requerido");
+    }
+    return;
+  }
+
+  try {
+    const drawer = document.getElementById("plantingAccordionDrawer");
+    if (drawer) drawer.style.display = "none";
+
+    await createCrop({
+      cropTypeId,
+      plotId,
+      quantity: 4,
+      notes: "Sembrado desde el jardín 2.5D",
+      user
+    });
+
+    playUnlockPlot();
+    window.showGameToast(`¡${seedName} sembrada exitosamente en el bancal!`, "🌱", "Siembra Exitosa");
+
+    window.dispatchEvent(new CustomEvent('huerta:celebrate', {
+      detail: {
+        kind: 'siembra',
+        title: `¡${seedName} Sembrada!`,
+        subtitle: '+20 XP • Bancal activo'
+      }
+    }));
+
+    await awardUserGamification(user.uid, 20, 10);
+
+    if (onRefreshDataCallback) {
+      await onRefreshDataCallback();
+      const isSchool = selectedPoiZone === 'colegio';
+      setTimeout(() => {
+        window.openFarmBuildingModal(isSchool ? 'colegio' : 'individual');
+      }, 300);
+    }
+  } catch (err) {
+    console.error("Error al sembrar desde acordeón:", err);
+    window.showGameToast("No se pudo sembrar: " + err.message, "⚠️", "Error");
+  }
 };
 
 window.closeBuildingDialog = function() {
