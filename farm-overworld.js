@@ -12,17 +12,23 @@ import {
   playFertilizing,
   playHarvest,
   playUnlockPlot
-} from "./farm-sounds.js";
+} from "./farm-sounds.js?v=58";
 
 import {
   logRiego,
   logFertilizacion,
   logCosecha,
-  awardUserGamification
-} from "./huerta-service.js";
+  awardUserGamification,
+  createPracticePlot
+} from "./huerta-service.js?v=58";
 
 let onSelectZoneCallback = null;
 let onRefreshDataCallback = null;
+
+let currentSchoolCrops = [];
+let currentPersonalCrops = [];
+let currentSchoolPlots = [];
+let currentPersonalPlots = [];
 
 // Coordenadas Predeterminadas de los 4 Edificios Principales en el mapa 1200x1000
 const DEFAULT_BUILDING_LAYOUT = {
@@ -85,16 +91,21 @@ export function renderOverworldMap(container, {
 }) {
   onSelectZoneCallback = onSelectZone;
   onRefreshDataCallback = onRefreshData;
+  currentSchoolCrops = schoolCrops || [];
+  currentPersonalCrops = personalCrops || [];
+  currentSchoolPlots = schoolPlots || [];
+  currentPersonalPlots = personalPlots || [];
+
   if (!container) return;
 
-  const schoolPendingCount = schoolCrops.filter(c => {
+  const schoolPendingCount = currentSchoolCrops.filter(c => {
     const isWaterDue = c.nextWateringDue && c.nextWateringDue.toMillis() <= Date.now() + 43200000;
     const isFertDue = c.nextFertilizingDue && c.nextFertilizingDue.toMillis() <= Date.now() + 43200000;
     const isReady = c.status === 'listo_para_cosecha';
     return isWaterDue || isFertDue || isReady;
   }).length;
 
-  const personalPendingCount = personalCrops.filter(c => {
+  const personalPendingCount = currentPersonalCrops.filter(c => {
     const isWaterDue = c.nextWateringDue && c.nextWateringDue.toMillis() <= Date.now() + 43200000;
     const isFertDue = c.nextFertilizingDue && c.nextFertilizingDue.toMillis() <= Date.now() + 43200000;
     const isReady = c.status === 'listo_para_cosecha';
@@ -255,7 +266,7 @@ export function renderOverworldMap(container, {
             <div class="building-title-plaque">🌾 Huerta Escolar • Entrar</div>
 
             <!-- HUERTA CON CERCA DE MADERA Y BANCALES DE CULTIVO (ESTILO TOP HEROES) -->
-            ${getFencedHuertaGarden3D(schoolCrops, schoolPlots, 'colegio')}
+            ${getFencedHuertaGarden3D(currentSchoolCrops, currentSchoolPlots, 'colegio')}
           </div>
 
           <!-- EDIFICIO 2: MI GRANJA / RANCHO DEL ESTUDIANTE (2.5D REAL) -->
@@ -273,7 +284,7 @@ export function renderOverworldMap(container, {
             <div class="building-title-plaque">👩‍🌾 Mi Parcela • Entrar</div>
 
             <!-- HUERTA CON CERCA DE MADERA Y BANCALES DE CULTIVO -->
-            ${getFencedHuertaGarden3D(personalCrops, personalPlots, 'individual')}
+            ${getFencedHuertaGarden3D(currentPersonalCrops, currentPersonalPlots, 'individual')}
           </div>
 
           <!-- EDIFICIO 3: COMPOSTERA ESCOLAR (Nivel 5) -->
@@ -308,15 +319,30 @@ export function renderOverworldMap(container, {
 
       </div>
 
-      <!-- TARJETA FLOTANTE INFERIOR PROMINENTE (POR ENCIMA DEL MENÚ) -->
-      <div class="map-selected-poi-card" id="mapSelectedPoiCard" style="display: none;">
-        <div class="poi-info">
-          <span class="poi-title" id="poiCardTitle">🏫 IE Barro Blanco</span>
-          <span class="poi-subtitle" id="poiCardSubtitle">Huerta Escolar Colectiva</span>
+      <!-- MODAL FLOTANTE DE INTERIOR DE EDIFICIO Y BANCALES 2.5D (POR ENCIMA DEL MAPA) -->
+      <div class="farm-building-modal-overlay" id="farmBuildingModal" style="display: none;" onclick="if(event.target===this) window.closeBuildingDialog()">
+        <div class="farm-building-dialog-box">
+          <div class="game-dialog-header">
+            <div class="dialog-title-wrapper">
+              <span class="dialog-building-icon" id="dialogBuildingIcon">🏫</span>
+              <div class="dialog-titles">
+                <h3 class="dialog-main-title" id="dialogBuildingTitle">IE Barro Blanco</h3>
+                <span class="dialog-sub-title" id="dialogBuildingSubtitle">🌾 Camas de Siembra Colectiva</span>
+              </div>
+            </div>
+            <button class="dialog-close-btn" onclick="window.closeBuildingDialog()">&times;</button>
+          </div>
+
+          <div class="dialog-stats-bar">
+            <span class="stat-badge xp-badge"><i class="fas fa-star"></i> <strong id="dialogXp">0</strong> XP</span>
+            <span class="stat-badge coins-badge"><i class="fas fa-coins"></i> <strong id="dialogCoins">0</strong> Monedas</span>
+            <span class="dialog-hint">💧 Riego • 🍃 Abono • 🧺 Cosecha</span>
+          </div>
+
+          <div class="dialog-beds-grid" id="dialogBedsGrid">
+            <!-- Camas generadas dinámicamente -->
+          </div>
         </div>
-        <button class="game-btn" id="poiCardEnterBtn" onclick="window.confirmEnterSelectedZone()">
-          <i class="fas fa-door-open"></i> Entrar al Cultivo
-        </button>
       </div>
 
     </div>
@@ -328,6 +354,294 @@ export function renderOverworldMap(container, {
   initFarmerWorkerAI();
   initAnimalWanderingAI();
 }
+
+// ══════════════════════════════════════════════════════════════════════════
+//  NOTIFICACIONES TOAST DE VIDEOJUEGO (HUD TOAST CON ESTILO RPG)
+// ══════════════════════════════════════════════════════════════════════════
+
+window.showGameToast = function(msg, icon = '🌱', title = null) {
+  let container = document.getElementById("gameToastContainer");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "gameToastContainer";
+    container.className = "game-toast-container";
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "game-toast-bubble";
+  toast.innerHTML = `
+    <div class="toast-icon-badge">${icon}</div>
+    <div class="toast-content-body">
+      ${title ? `<strong class="toast-title-text">${title}</strong>` : ''}
+      <span class="toast-msg-text">${msg}</span>
+    </div>
+    <button class="toast-close-btn" onclick="this.parentElement.remove()">&times;</button>
+  `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("toast-fade-out");
+    setTimeout(() => {
+      if (toast && toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 350);
+  }, 3200);
+};
+
+// Sobrescribir alert nativo para que nunca salgan ventanas feas del navegador
+window.alert = function(msg) {
+  window.showGameToast(msg, "🌱", "Green Force");
+};
+
+// ══════════════════════════════════════════════════════════════════════════
+//  MODAL DE INTERIOR DE EDIFICIO Y CAMAS DE MADERA 2.5D (SOBRE EL MAPA)
+// ══════════════════════════════════════════════════════════════════════════
+
+window.openFarmBuildingModal = function(zone) {
+  const modal = document.getElementById("farmBuildingModal");
+  const iconEl = document.getElementById("dialogBuildingIcon");
+  const titleEl = document.getElementById("dialogBuildingTitle");
+  const subEl = document.getElementById("dialogBuildingSubtitle");
+  const xpEl = document.getElementById("dialogXp");
+  const coinsEl = document.getElementById("dialogCoins");
+  const gridEl = document.getElementById("dialogBedsGrid");
+
+  if (!modal || !gridEl) return;
+
+  playBuildingEnterSound();
+
+  const isSchool = zone === 'colegio';
+  if (iconEl) iconEl.textContent = isSchool ? '🏫' : '🏡';
+  if (titleEl) titleEl.textContent = isSchool ? 'IE Barro Blanco' : 'Mi Granja / Rancho';
+  if (subEl) subEl.textContent = isSchool ? '🌾 Huerta Escolar Colectiva' : '👩‍🌾 Parcela de Práctica y Entrenamiento';
+
+  const user = window.currentUserGlobal || null;
+  if (xpEl) xpEl.textContent = user ? (user.farmXp || 0) : 0;
+  if (coinsEl) coinsEl.textContent = user ? (user.farmCoins || 0) : 0;
+
+  const currentCrops = isSchool ? currentSchoolCrops : currentPersonalCrops;
+  const currentPlots = isSchool ? currentSchoolPlots : currentPersonalPlots;
+
+  let html = '';
+  const nowMs = Date.now();
+
+  if (isSchool) {
+    const totalPlots = (currentPlots && currentPlots.length > 0) ? currentPlots : [
+      { id: 'p1', name: 'Bancal A1 - Hortalizas' },
+      { id: 'p2', name: 'Bancal A2 - Aromáticas' },
+      { id: 'p3', name: 'Bancal B1 - Legumbres' },
+      { id: 'p4', name: 'Bancal B2 - Frutales' },
+      { id: 'p5', name: 'Bancal C1 - Semillero' },
+      { id: 'p6', name: 'Bancal C2 - Compostera' }
+    ];
+
+    totalPlots.forEach((plot, index) => {
+      const crop = currentCrops.find(c => c.plotId === plot.id && c.status !== 'cosechado' && c.status !== 'perdido');
+
+      if (crop) {
+        const plantedMs = crop.plantedDate ? crop.plantedDate.toMillis() : nowMs;
+        const harvestMs = crop.expectedHarvestDate ? crop.expectedHarvestDate.toMillis() : (plantedMs + 30 * 86400000);
+        const totalCycle = Math.max(harvestMs - plantedMs, 1);
+        const elapsed = Math.max(nowMs - plantedMs, 0);
+        const growthRatio = Math.min(elapsed / totalCycle, 1.0);
+
+        const isWaterDue = crop.nextWateringDue && crop.nextWateringDue.toMillis() <= nowMs + 43200000;
+        const isFertDue = crop.nextFertilizingDue && crop.nextFertilizingDue.toMillis() <= nowMs + 43200000;
+        const isReady = crop.status === 'listo_para_cosecha' || growthRatio >= 1.0;
+
+        let stageIcon = crop.cropTypeIcon || '🥬';
+        if (!isReady && growthRatio < 0.3) stageIcon = '🌱';
+        else if (!isReady && growthRatio < 0.6) stageIcon = '🌿';
+
+        html += `
+          <div class="dialog-bed-card">
+            <div class="dialog-bed-header">
+              <span class="dialog-bed-tag">${plot.name || `Bancal #${index + 1}`}</span>
+              <span style="font-size: 0.72rem; color: #ffd54f;">${Math.round(growthRatio * 100)}%</span>
+            </div>
+            <div class="dialog-crop-display">
+              <span class="dialog-crop-emoji">${stageIcon}</span>
+              <span class="dialog-crop-name">${crop.cropTypeName}</span>
+            </div>
+            <div class="dialog-progress-track">
+              <div class="dialog-progress-fill" style="width: ${Math.round(growthRatio * 100)}%;"></div>
+            </div>
+            <div class="dialog-bed-actions">
+              <button class="bed-action-btn btn-action-water" onclick="window.onMapDirectAction(event, 'riego', '${crop.id}')">
+                💧 Regar
+              </button>
+              <button class="bed-action-btn btn-action-fert" onclick="window.onMapDirectAction(event, 'fertilizacion', '${crop.id}')">
+                🍃 Abonar
+              </button>
+              ${isReady ? `
+                <button class="bed-action-btn btn-action-harvest" onclick="window.onMapDirectAction(event, 'cosecha', '${crop.id}')">
+                  🧺 Cosechar
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="dialog-bed-card">
+            <div class="dialog-bed-header">
+              <span class="dialog-bed-tag">${plot.name || `Bancal #${index + 1}`}</span>
+              <span style="font-size: 0.72rem; color: #a5d6a7;">Libre</span>
+            </div>
+            <div class="dialog-crop-display">
+              <span class="dialog-crop-emoji" style="opacity: 0.5;">🪴</span>
+              <span class="dialog-crop-name" style="color: #cbd5e0;">Tierra Labrada</span>
+            </div>
+            <button class="btn-activate-plot" onclick="window.triggerOpenSiembraModal('${plot.id}')">
+              🌱 + Sembrar Cultivo
+            </button>
+          </div>
+        `;
+      }
+    });
+  } else {
+    // Si es parcela individual (Mi Huerta)
+    if (!currentPlots || currentPlots.length === 0) {
+      for (let i = 1; i <= 3; i++) {
+        html += `
+          <div class="dialog-bed-card">
+            <div class="dialog-bed-header">
+              <span class="dialog-bed-tag">🪴 Cama de Práctica #${i}</span>
+              <span style="font-size: 0.72rem; color: #ffd54f;">Desbloqueada</span>
+            </div>
+            <div class="dialog-crop-display">
+              <span class="dialog-crop-emoji">🪴</span>
+              <span class="dialog-crop-name">Parcela Virtual</span>
+            </div>
+            <p style="font-size: 0.74rem; color: #a0aec0; text-align: center; margin: 4px 0 10px 0;">
+              Activa tu cama de entrenamiento para experimentar siembras sin límite.
+            </p>
+            <button class="btn-activate-plot" onclick="window.quickActivatePracticePlot(${i})">
+              ✨ + Activar y Sembrar 🪴
+            </button>
+          </div>
+        `;
+      }
+    } else {
+      currentPlots.forEach((plot, index) => {
+        const crop = currentCrops.find(c => c.plotId === plot.id && c.status !== 'cosechado' && c.status !== 'perdido');
+        if (crop) {
+          const plantedMs = crop.plantedDate ? crop.plantedDate.toMillis() : nowMs;
+          const harvestMs = crop.expectedHarvestDate ? crop.expectedHarvestDate.toMillis() : (plantedMs + 30 * 86400000);
+          const totalCycle = Math.max(harvestMs - plantedMs, 1);
+          const elapsed = Math.max(nowMs - plantedMs, 0);
+          const growthRatio = Math.min(elapsed / totalCycle, 1.0);
+
+          let stageIcon = crop.cropTypeIcon || '🥬';
+          const isReady = crop.status === 'listo_para_cosecha' || growthRatio >= 1.0;
+
+          html += `
+            <div class="dialog-bed-card">
+              <div class="dialog-bed-header">
+                <span class="dialog-bed-tag">${plot.name}</span>
+                <span style="font-size: 0.72rem; color: #ffd54f;">${Math.round(growthRatio * 100)}%</span>
+              </div>
+              <div class="dialog-crop-display">
+                <span class="dialog-crop-emoji">${stageIcon}</span>
+                <span class="dialog-crop-name">${crop.cropTypeName}</span>
+              </div>
+              <div class="dialog-progress-track">
+                <div class="dialog-progress-fill" style="width: ${Math.round(growthRatio * 100)}%;"></div>
+              </div>
+              <div class="dialog-bed-actions">
+                <button class="bed-action-btn btn-action-water" onclick="window.onMapDirectAction(event, 'riego', '${crop.id}')">
+                  💧 Regar
+                </button>
+                <button class="bed-action-btn btn-action-fert" onclick="window.onMapDirectAction(event, 'fertilizacion', '${crop.id}')">
+                  🍃 Abonar
+                </button>
+                ${isReady ? `
+                  <button class="bed-action-btn btn-action-harvest" onclick="window.onMapDirectAction(event, 'cosecha', '${crop.id}')">
+                    🧺 Cosechar
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="dialog-bed-card">
+              <div class="dialog-bed-header">
+                <span class="dialog-bed-tag">${plot.name}</span>
+                <span style="font-size: 0.72rem; color: #a5d6a7;">Disponible</span>
+              </div>
+              <div class="dialog-crop-display">
+                <span class="dialog-crop-emoji" style="opacity: 0.6;">🪴</span>
+                <span class="dialog-crop-name" style="color: #cbd5e0;">Lista para Sembrar</span>
+              </div>
+              <button class="btn-activate-plot" onclick="window.triggerOpenSiembraModal('${plot.id}')">
+                🌱 + Sembrar Cultivo
+              </button>
+            </div>
+          `;
+        }
+      });
+    }
+  }
+
+  gridEl.innerHTML = html;
+  modal.style.display = "flex";
+};
+
+window.closeBuildingDialog = function() {
+  playClickSound();
+  const modal = document.getElementById("farmBuildingModal");
+  if (modal) modal.style.display = "none";
+};
+
+window.quickActivatePracticePlot = async function(slotNumber) {
+  playClickSound();
+  const user = window.currentUserGlobal || null;
+  if (!user) {
+    window.showGameToast("Debes iniciar sesión con tu cuenta de Green Force.", "🌱", "Acceso Requerido");
+    return;
+  }
+  try {
+    const name = `Cama de Práctica #${slotNumber}`;
+    const description = "Parcela individual virtual de entrenamiento";
+    await createPracticePlot({ name, description, user });
+    window.showGameToast(`¡Cama de Práctica #${slotNumber} activada!`, "🪴", "Nueva Parcela");
+    if (onRefreshDataCallback) {
+      await onRefreshDataCallback();
+      setTimeout(() => {
+        window.openFarmBuildingModal('individual');
+      }, 350);
+    }
+  } catch (err) {
+    window.showGameToast(err.message, "⚠️", "Atención");
+  }
+};
+
+window.triggerOpenSiembraModal = function(plotId) {
+  playClickSound();
+  window.closeBuildingDialog();
+  const modal = document.getElementById("siembraModal");
+  const selectPlot = document.getElementById("plotSelect");
+  if (selectPlot && plotId) selectPlot.value = plotId;
+  if (modal) modal.classList.add("active");
+};
+
+window.focusBuildingOnMap = function(zone) {
+  const buildingEl = document.getElementById(`building_${zone}`);
+  const viewport = document.getElementById("overworldViewport");
+  if (!buildingEl || !viewport) return;
+
+  const bLeft = parseFloat(buildingEl.style.left) || 200;
+  const bTop = parseFloat(buildingEl.style.top) || 200;
+  const vpWidth = viewport.clientWidth || 380;
+  const vpHeight = viewport.clientHeight || 520;
+
+  cameraState.x = (vpWidth / 2) - ((bLeft + 100) * cameraState.scale);
+  cameraState.y = (vpHeight / 2) - ((bTop + 100) * cameraState.scale);
+  clampCameraBounds(vpWidth, vpHeight);
+  applyCameraTransform();
+};
 
 // ══════════════════════════════════════════════════════════════════════════
 //  MODELOS SVG 2.5D ISOMÉTRICOS DE ALTA FIDELIDAD (ESTILO TOP HEROES)
@@ -365,47 +679,37 @@ function getSchool3DSVG() {
 
       <ellipse cx="120" cy="180" rx="95" ry="24" fill="rgba(0,0,0,0.35)" />
 
-      <!-- Cimientos de piedra escalonados -->
       <polygon points="35,160 120,135 205,160 120,185" fill="#546e7a" />
       <polygon points="35,160 120,185 120,192 35,167" fill="#37474f" />
       <polygon points="120,185 205,160 205,167 120,192" fill="#263238" />
 
-      <!-- Fachada Izquierda Principal (Sombra) -->
       <polygon points="50,150 120,130 120,80 50,100" fill="url(#schWallL)" />
-      <!-- Fachada Derecha Principal (Luz) -->
       <polygon points="120,130 190,150 190,100 120,80" fill="url(#schWallR)" />
 
-      <!-- Ventanas Arqueadas Iluminadas -->
       <polygon points="62,118 78,113 78,135 62,140" fill="url(#goldGlow)" stroke="#37474f" stroke-width="1.5" />
       <polygon points="88,110 104,105 104,127 88,132" fill="url(#goldGlow)" stroke="#37474f" stroke-width="1.5" />
       <polygon points="136,105 152,110 152,132 136,127" fill="url(#goldGlow)" stroke="#37474f" stroke-width="1.5" />
       <polygon points="162,113 178,118 178,140 162,135" fill="url(#goldGlow)" stroke="#37474f" stroke-width="1.5" />
 
-      <!-- Puerta Principal Arqueada -->
       <polygon points="110,133 130,127 130,165 110,171" fill="url(#schDoor)" stroke="#271810" stroke-width="2" />
       <circle cx="116" cy="151" r="1.8" fill="#ffd54f" />
       <circle cx="124" cy="148" r="1.8" fill="#ffd54f" />
 
-      <!-- Techo Principal a Dos Aguas en 2.5D -->
       <polygon points="40,100 120,65 120,78 40,113" fill="url(#schRoofL)" />
       <polygon points="120,65 200,100 200,113 120,78" fill="url(#schRoofR)" />
 
-      <!-- Torre Central de Reloj y Campanario -->
       <polygon points="100,75 140,65 140,25 100,35" fill="url(#schWallL)" />
       <polygon points="140,65 155,70 155,30 140,25" fill="url(#schWallR)" />
       <polygon points="95,36 120,5 145,26" fill="#c0392b" />
       <polygon points="120,5 160,31 145,26" fill="#e74c3c" />
 
-      <!-- Esfera del Reloj Escolar -->
       <circle cx="120" cy="48" r="11" fill="#fffde7" stroke="#b78103" stroke-width="2" />
       <line x1="120" y1="48" x2="120" y2="40" stroke="#333" stroke-width="2" stroke-linecap="round" />
       <line x1="120" y1="48" x2="126" y2="48" stroke="#333" stroke-width="1.8" stroke-linecap="round" />
 
-      <!-- Bandera de la Escuela Waving -->
       <line x1="120" y1="5" x2="120" y2="-15" stroke="#eceff1" stroke-width="2" />
       <path d="M 120 -15 Q 135 -20 145 -13 Q 135 -8 120 -10 Z" fill="#2e7d32" stroke="#1b5e20" stroke-width="0.8" />
 
-      <!-- Arbustos Florales en la Entrada -->
       <circle cx="45" cy="162" r="8" fill="#43a047" />
       <circle cx="53" cy="166" r="6" fill="#66bb6a" />
       <circle cx="195" cy="162" r="8" fill="#43a047" />
@@ -440,49 +744,39 @@ function getRanch3DSVG() {
 
       <ellipse cx="120" cy="180" rx="90" ry="24" fill="rgba(0,0,0,0.35)" />
 
-      <!-- Chimenea con Humo Transparente -->
       <polygon points="150,70 165,65 165,30 150,35" fill="#546e7a" />
       <polygon points="165,65 175,68 175,33 165,30" fill="#78909c" />
       <circle cx="168" cy="18" r="6" fill="rgba(236,239,241,0.5)" />
       <circle cx="173" cy="8" r="8" fill="rgba(236,239,241,0.4)" />
       <circle cx="180" cy="-4" r="10" fill="rgba(236,239,241,0.3)" />
 
-      <!-- Cimientos de Madera -->
       <polygon points="40,165 120,140 195,165 120,190" fill="#4e342e" />
 
-      <!-- Fachada Izquierda (Sombra) -->
       <polygon points="50,155 120,135 120,85 50,105" fill="url(#rnchWoodL)" />
       <line x1="50" y1="105" x2="120" y2="135" stroke="#3e2723" stroke-width="2.5" />
       <line x1="50" y1="155" x2="120" y2="85" stroke="#3e2723" stroke-width="2.5" />
 
-      <!-- Fachada Derecha (Luz) -->
       <polygon points="120,135 190,155 190,105 120,85" fill="url(#rnchWoodR)" />
       <line x1="120" y1="85" x2="190" y2="155" stroke="#4a2e1b" stroke-width="2.5" />
       <line x1="120" y1="135" x2="190" y2="105" stroke="#4a2e1b" stroke-width="2.5" />
 
-      <!-- Ventana de Pajar con Paja Asomada -->
       <polygon points="112,98 128,94 128,110 112,114" fill="#3e2723" />
       <path d="M 112 112 Q 120 122 130 112 Z" fill="#ffd54f" stroke="#f57f17" stroke-width="1" />
 
-      <!-- Puerta Establo -->
       <polygon points="110,140 130,134 130,172 110,178" fill="#3e2723" stroke="#211510" stroke-width="2" />
       <polygon points="112,143 128,138 128,170 112,175" fill="#6d4c41" />
 
-      <!-- Techo a Dos Aguas de Tejas Rojas de Granja -->
       <polygon points="40,105 120,65 120,78 40,118" fill="url(#rnchRoofL)" />
       <polygon points="120,65 200,105 200,118 120,78" fill="url(#rnchRoofR)" />
 
-      <!-- Linterna Colgante en la Entrada -->
       <line x1="102" y1="135" x2="102" y2="145" stroke="#333" stroke-width="1.5" />
       <circle cx="102" cy="148" r="4.5" fill="#ffe082" stroke="#ffb300" stroke-width="1.2" />
 
-      <!-- Barril de Agua al Costado -->
       <ellipse cx="65" cy="165" rx="7" ry="4" fill="#8d5b36" stroke="#4e342e" stroke-width="1.5" />
       <rect x="58" y="165" width="14" height="14" fill="#6d4c41" stroke="#4e342e" stroke-width="1.2" rx="2" />
       <line x1="58" y1="170" x2="72" y2="170" stroke="#333" stroke-width="1" />
       <line x1="58" y1="175" x2="72" y2="175" stroke="#333" stroke-width="1" />
 
-      <!-- Rueda de Carreta de Madera -->
       <circle cx="180" cy="168" r="9" fill="none" stroke="#5d4037" stroke-width="2" />
       <circle cx="180" cy="168" r="2.5" fill="#3e2723" />
       <line x1="171" y1="168" x2="189" y2="168" stroke="#5d4037" stroke-width="1.5" />
@@ -496,33 +790,27 @@ function getCompost3DSVG() {
     <svg viewBox="0 0 200 170" width="170" height="145" class="iso-svg-building" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="100" cy="145" rx="75" ry="18" fill="rgba(0,0,0,0.35)" />
 
-      <!-- Cajones de Madera de Compostaje -->
       <polygon points="25,125 100,105 175,125 100,145" fill="#3e2723" />
       <polygon points="30,120 100,102 100,65 30,83" fill="#5d4037" />
       <polygon points="100,102 170,120 170,83 100,65" fill="#795548" />
 
-      <!-- Ranuras entre tablas -->
       <line x1="30" y1="95" x2="100" y2="77" stroke="#271810" stroke-width="2" />
       <line x1="30" y1="107" x2="100" y2="89" stroke="#271810" stroke-width="2" />
       <line x1="100" y1="77" x2="170" y2="95" stroke="#271810" stroke-width="2" />
       <line x1="100" y1="89" x2="170" y2="107" stroke="#271810" stroke-width="2" />
 
-      <!-- Montículo de Tierra y Abono Orgánico -->
       <ellipse cx="100" cy="62" rx="42" ry="16" fill="#1b120c" />
       <circle cx="90" cy="58" r="8" fill="#2d1d13" />
       <circle cx="105" cy="56" r="10" fill="#3e2723" />
       <circle cx="118" cy="60" r="7" fill="#4e342e" />
 
-      <!-- Hojas Verdes -->
       <circle cx="85" cy="58" r="4" fill="#4caf50" />
       <circle cx="112" cy="54" r="3.5" fill="#81c784" />
       <circle cx="98" cy="64" r="4.5" fill="#388e3c" />
 
-      <!-- Pala Plantada en la Tierra -->
       <line x1="130" y1="62" x2="148" y2="15" stroke="#d7ccc8" stroke-width="3" stroke-linecap="round" />
       <rect x="144" y="10" width="10" height="7" rx="1.5" fill="#ffb300" stroke="#333" stroke-width="1" />
 
-      <!-- Medallón de Reciclaje -->
       <circle cx="100" cy="100" r="14" fill="#2e7d32" stroke="#ffd54f" stroke-width="2" />
       <text x="100" y="105" font-size="14" text-anchor="middle" fill="#fff">♻️</text>
     </svg>
@@ -534,17 +822,14 @@ function getMarket3DSVG() {
     <svg viewBox="0 0 200 170" width="170" height="145" class="iso-svg-building" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="100" cy="145" rx="75" ry="18" fill="rgba(0,0,0,0.35)" />
 
-      <!-- Mostrador y Plataforma de Madera -->
       <polygon points="30,125 100,105 170,125 100,145" fill="#5d4037" />
       <polygon points="30,125 100,145 100,120 30,100" fill="#4e342e" />
       <polygon points="100,145 170,125 170,100 100,120" fill="#3e2723" />
 
-      <!-- Postes de Madera del Toldo -->
       <line x1="42" y1="108" x2="42" y2="45" stroke="#8d5b36" stroke-width="4" stroke-linecap="round" />
       <line x1="158" y1="108" x2="158" y2="45" stroke="#8d5b36" stroke-width="4" stroke-linecap="round" />
       <line x1="100" y1="120" x2="100" y2="52" stroke="#5a371c" stroke-width="4" stroke-linecap="round" />
 
-      <!-- Cajas de Verduras Frescas -->
       <rect x="50" y="98" width="22" height="14" rx="2" fill="#8d6e63" stroke="#4e342e" stroke-width="1.5" />
       <circle cx="56" cy="103" r="3" fill="#e53935" />
       <circle cx="64" cy="103" r="3" fill="#e53935" />
@@ -557,7 +842,6 @@ function getMarket3DSVG() {
       <circle cx="112" cy="108" r="4" fill="#43a047" />
       <circle cx="120" cy="108" r="4" fill="#66bb6a" />
 
-      <!-- Toldo Rayado Verde y Blanco en 2.5D -->
       <polygon points="25,50 100,20 175,50 100,75" fill="#ffffff" />
       <polygon points="40,44 55,38 70,62 55,68" fill="#2e7d32" />
       <polygon points="70,32 85,26 100,50 85,56" fill="#2e7d32" />
@@ -566,7 +850,6 @@ function getMarket3DSVG() {
 
       <path d="M 25 50 Q 37 60 50 54 Q 62 65 75 58 Q 87 70 100 65 Q 112 70 125 58 Q 137 65 150 54 Q 162 60 175 50" fill="none" stroke="#1b5e20" stroke-width="3" />
 
-      <!-- Balanza de Latón -->
       <line x1="140" y1="62" x2="140" y2="78" stroke="#ffb300" stroke-width="1.5" />
       <line x1="133" y1="78" x2="147" y2="78" stroke="#ffb300" stroke-width="2" />
       <ellipse cx="133" cy="85" rx="4" ry="2" fill="#ffe082" />
@@ -630,7 +913,7 @@ function getFencedHuertaGarden3D(cropsList, plotsList, scope) {
     }
 
     bedsHtml += `
-      <div class="iso-crop-bed-cell" title="Bancal ${i + 1}" onclick="event.stopPropagation(); window.enterIsoZone(event, '${scope}');">
+      <div class="iso-crop-bed-cell" title="Bancal ${i + 1}" onclick="event.stopPropagation(); window.openFarmBuildingModal('${scope}');">
         ${bubbleAction ? `<div class="mini-harvest-bubble ${bubbleClass}" onclick="event.stopPropagation(); window.onMapDirectAction(event, '${bubbleAction}', '${crop ? crop.id : ''}')">${bubbleText}</div>` : ''}
         <span class="bed-sprite-crop">${stageIcon}</span>
       </div>
@@ -638,7 +921,7 @@ function getFencedHuertaGarden3D(cropsList, plotsList, scope) {
   }
 
   return `
-    <div class="iso-fenced-garden" onclick="event.stopPropagation(); window.enterIsoZone(event, '${scope}');">
+    <div class="iso-fenced-garden" onclick="event.stopPropagation(); window.openFarmBuildingModal('${scope}');">
       <div class="fenced-garden-banner">
         <span>${label}</span>
         <small class="tap-hint"><i class="fas fa-door-open"></i> Entrar</small>
@@ -790,12 +1073,10 @@ window.toggleMapEditMode = function() {
   const viewport = document.getElementById("overworldViewport");
   const banner = document.getElementById("editModeBanner");
   const btn = document.getElementById("btnToggleEditMode");
-  const poiCard = document.getElementById("mapSelectedPoiCard");
 
   if (viewport) viewport.classList.toggle("is-edit-mode", cameraState.isEditMode);
   if (banner) banner.style.display = cameraState.isEditMode ? "flex" : "none";
   if (btn) btn.classList.toggle("active-mode", cameraState.isEditMode);
-  if (poiCard && cameraState.isEditMode) poiCard.style.display = "none";
 };
 
 function setupBuildingDragHandlers() {
@@ -867,7 +1148,7 @@ function setupBuildingDragHandlers() {
 window.saveMapLayout = function() {
   saveBuildingLayout(currentLayout);
   playBuildingEnterSound();
-  alert("✨ ¡Distribución de edificios guardada con éxito!");
+  window.showGameToast("Distribución de edificios guardada con éxito.", "✨", "Mapa Guardado");
   window.toggleMapEditMode();
 };
 
@@ -912,55 +1193,21 @@ window.onBuildingClick = function(zone) {
     }
   }
 
-  // Si es un edificio activo (Colegio o Mi Huerta), ENTRAR DIRECTAMENTE
+  // Si es un edificio activo (Colegio o Mi Huerta), ABRIR EL DIÁLOGO DEL EDIFICIO SOBRE EL MAPA
   if (zone === 'colegio' || zone === 'individual') {
-    window.enterIsoZone(null, zone);
+    window.openFarmBuildingModal(zone);
     return;
   }
 
-  // Si está bloqueado (Compostera o Mercado), notificar requerimiento
+  // Si está bloqueado (Compostera o Mercado), notificar con Game Toast con diseño
   if (zone.startsWith('locked')) {
     playActionBlocked();
-    const msg = zone === 'locked_compost'
-      ? "🔒 Compostera Escolar: Requiere Nivel 5 de experiencia realizando riegos y cosechas."
-      : "🔒 Mercado Verde: Requiere Nivel 10 para comerciar semillas y cosechas.";
-    alert(msg);
-  }
-};
-
-window.confirmEnterSelectedZone = function() {
-  if (selectedPoiZone.startsWith('locked')) {
-    playActionBlocked();
-    alert("🔒 Este edificio requiere subir de nivel realizando riegos y cosechas en la huerta escolar.");
-    return;
-  }
-  window.enterIsoZone(null, selectedPoiZone);
-};
-
-window.enterIsoZone = function(evt, zone) {
-  if (evt) evt.stopPropagation();
-  playClickSound();
-
-  if (zone.startsWith('locked')) {
-    setTimeout(() => {
-      playActionBlocked();
-      alert("🔒 Este edificio requiere Nivel 5 o Nivel 10 de experiencia ambiental.");
-    }, 300);
-    return;
-  }
-
-  playBuildingEnterSound();
-  const viewport = document.getElementById("overworldViewport");
-  if (viewport) {
-    viewport.style.transition = "filter 0.3s ease";
-    viewport.style.filter = "brightness(1.25)";
-  }
-
-  setTimeout(() => {
-    if (onSelectZoneCallback) {
-      onSelectZoneCallback(zone);
+    if (zone === 'locked_compost') {
+      window.showGameToast("Requiere Nivel 5 de experiencia realizando labores de huerta.", "🔒", "Compostera Bloqueada");
+    } else {
+      window.showGameToast("Requiere Nivel 10 para comerciar semillas y cosechas.", "🔒", "Mercado Verde Bloqueado");
     }
-  }, 280);
+  }
 };
 
 // Acción directa en 1-tap sobre los bancales del mapa
@@ -970,7 +1217,7 @@ window.onMapDirectAction = async function(evt, action, cropId) {
 
   const user = window.currentUserGlobal || null;
   if (!user) {
-    alert("🌱 Debes iniciar sesión con tu cuenta de Green Force para registrar labores de la huerta.");
+    window.showGameToast("Debes iniciar sesión para registrar labores de la huerta.", "🌱", "Acceso Requerido");
     return;
   }
 
@@ -984,16 +1231,19 @@ window.onMapDirectAction = async function(evt, action, cropId) {
       spawnFloatingText("💧 +10 XP", clickX, clickY, "#4fc3f7");
       await logRiego(cropId, "Riego rápido desde el mapa 2.5D", user.displayName || "Estudiante");
       await awardUserGamification(user.uid, 10, 5);
+      window.showGameToast("¡Cultivo regado con éxito! +10 XP", "💧", "Labor Registrada");
     } else if (action === 'fertilizacion') {
       playFertilizing();
       spawnFloatingText("🍃 +15 XP", clickX, clickY, "#81c784");
       await logFertilizacion(cropId, "Abono rápido desde el mapa 2.5D", "Compost escolar", user.displayName || "Estudiante");
       await awardUserGamification(user.uid, 15, 8);
+      window.showGameToast("¡Abono orgánico aplicado! +15 XP", "🍃", "Labor Registrada");
     } else if (action === 'cosecha') {
       playHarvest();
       spawnFloatingText("🧺 +50 XP ¡Cosechado!", clickX, clickY, "#ffd54f");
       await logCosecha(cropId, 1, "kg", "Cosecha desde el mapa 2.5D", user.displayName || "Estudiante");
       await awardUserGamification(user.uid, 50, 25);
+      window.showGameToast("¡Cosecha recolectada con éxito! +50 XP", "🧺", "Gran Cosecha");
     }
 
     if (onRefreshDataCallback) {

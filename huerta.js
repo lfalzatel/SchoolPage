@@ -3,7 +3,7 @@
 //  huerta.js — Lógica de Interfaz de Usuario y Controladores
 // ══════════════════════════════════════════════════════════════════════════
 
-import { auth, db } from "./firebase-config.js?v=55";
+import { auth, db } from "./firebase-config.js?v=59";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import {
@@ -24,11 +24,19 @@ import {
   awardUserGamification,
   createPracticePlot,
   assignIndividualRealPlot
-} from "./huerta-service.js?v=58";
-import { uploadOrCompressPhoto } from "./image-utils.js?v=58";
-import { renderFarmGame } from "./farm-game.js?v=58";
-import { renderOverworldMap } from "./farm-overworld.js?v=58";
-import { initCelebrationOverlay } from "./celebration-overlay.js?v=58";
+} from "./huerta-service.js?v=59";
+import { uploadOrCompressPhoto } from "./image-utils.js?v=59";
+import { renderFarmGame } from "./farm-game.js?v=59";
+import { renderOverworldMap } from "./farm-overworld.js?v=59";
+import { initCelebrationOverlay } from "./celebration-overlay.js?v=59";
+
+function showGameAlert(message, icon = "🌱", title = "Green Force") {
+  if (typeof window.showGameToast === "function") {
+    window.showGameToast(message, icon, title);
+  } else {
+    alert(message);
+  }
+}
 
 let currentUser = null;
 let userRole = "integrante"; // 'admin', 'lider', 'integrante'
@@ -170,8 +178,12 @@ async function loadHuertaData() {
           role: userRole,
           onSelectZone: (zone) => {
             activeScope = zone;
-            currentGameState = 'board';
-            loadHuertaData();
+            if (typeof window.openFarmBuildingModal === 'function') {
+              window.openFarmBuildingModal(zone);
+            } else {
+              currentGameState = 'board';
+              loadHuertaData();
+            }
           },
           onRefreshData: loadHuertaData
         });
@@ -202,11 +214,10 @@ function setupScopeListeners() {
 
   window.switchScopeGlobal = async (scope) => {
     if (scope === "individual" && !currentUser) {
-      alert("🌱 Debes iniciar sesión con tu cuenta de Green Force para acceder a 'Mi huerta'.");
+      showGameAlert("Debes iniciar sesión con tu cuenta de Green Force para acceder a 'Mi huerta'.", "🔒", "Acceso Requerido");
       return;
     }
     activeScope = scope;
-    currentGameState = "board";
     if (btnColegio) {
       btnColegio.classList.toggle("active", scope === "colegio");
     }
@@ -217,7 +228,19 @@ function setupScopeListeners() {
       practiceBtn.style.display = (currentUser && scope === "individual") ? "inline-flex" : "none";
     }
     updateAuthUI(currentUser);
-    await loadHuertaData();
+
+    if (activeView === 'juego') {
+      currentGameState = "overworld";
+      if (typeof window.focusBuildingOnMap === 'function') {
+        window.focusBuildingOnMap(scope);
+      }
+      if (typeof window.openFarmBuildingModal === 'function') {
+        window.openFarmBuildingModal(scope);
+      }
+    } else {
+      currentGameState = "board";
+      await loadHuertaData();
+    }
   };
 
   if (btnColegio) {
@@ -254,9 +277,9 @@ function setupPracticePlotForm() {
         modalPractice.classList.remove("active");
         formPractice.reset();
         await loadHuertaData();
-        alert("🪴 ¡Cama de práctica virtual creada con éxito!");
+        showGameAlert("¡Cama de práctica virtual creada con éxito!", "🪴", "Bancal Creado");
       } catch (err) {
-        alert(err.message);
+        showGameAlert(err.message, "⚠️", "Error");
       }
     });
   }
@@ -508,7 +531,7 @@ function setupEventListeners() {
     siembraForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (!currentUser) {
-        alert("Debes iniciar sesión para registrar una siembra.");
+        showGameAlert("Debes iniciar sesión para registrar una siembra.", "🔒", "Acceso Requerido");
         return;
       }
 
@@ -545,10 +568,10 @@ function setupEventListeners() {
         siembraModal.classList.remove("active");
         siembraForm.reset();
         await loadHuertaData();
-        alert("✅ ¡Siembra registrada exitosamente!");
+        showGameAlert("¡Siembra registrada exitosamente!", "🌱", "Siembra Exitosa");
       } catch (err) {
         console.error("Error al registrar siembra:", err);
-        alert("Error al registrar siembra: " + err.message);
+        showGameAlert("Error al registrar siembra: " + err.message, "⚠️", "Error de Siembra");
       } finally {
         if (btnSubmit) {
           btnSubmit.disabled = false;
@@ -635,7 +658,7 @@ function setupSettingsModal() {
 // Global quickAction para uso directo desde botones HTML
 window.quickAction = async function(type, cropId) {
   if (!currentUser) {
-    alert("Debes iniciar sesión para registrar acciones.");
+    showGameAlert("Debes iniciar sesión para registrar acciones.", "🔒", "Acceso Requerido");
     return;
   }
 
@@ -653,7 +676,7 @@ window.quickAction = async function(type, cropId) {
       await awardUserGamification(currentUser.uid, 10, 5);
       await loadHuertaData();
     } catch (err) {
-      alert("Error al registrar riego: " + err.message);
+      showGameAlert("Error al registrar riego: " + err.message, "⚠️", "Error");
     }
   } else if (type === 'fertilizacion') {
     const product = prompt("Producto o tipo de abono utilizado:", "Compost orgánico escolar");
@@ -667,7 +690,7 @@ window.quickAction = async function(type, cropId) {
       await awardUserGamification(currentUser.uid, 15, 10);
       await loadHuertaData();
     } catch (err) {
-      alert("Error al registrar abono: " + err.message);
+      showGameAlert("Error al registrar abono: " + err.message, "⚠️", "Error");
     }
   } else if (type === 'cosecha') {
     const qtyStr = prompt(`Cantidad cosechada de ${crop.cropTypeName}:`, "1");
@@ -689,17 +712,17 @@ window.quickAction = async function(type, cropId) {
       }
       await loadHuertaData();
     } catch (err) {
-      alert("Error al registrar cosecha: " + err.message);
+      showGameAlert("Error al registrar cosecha: " + err.message, "⚠️", "Error");
     }
   } else if (type === 'incidencia') {
     const description = prompt("Describe la plaga, enfermedad o alteración climatológica observada:", "");
     if (!description) return;
     try {
       await logIncidencia(cropId, { type: "incidencia", description, user: currentUser });
-      alert("⚠️ Alerta / Incidencia registrada");
+      showGameAlert("Alerta / Incidencia registrada", "⚠️", "Incidencia");
       await loadHuertaData();
     } catch (err) {
-      alert("Error al registrar incidencia: " + err.message);
+      showGameAlert("Error al registrar incidencia: " + err.message, "⚠️", "Error");
     }
   }
 };

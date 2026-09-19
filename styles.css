@@ -7719,3 +7719,347 @@ body[data-theme] {
   font-size: 0.75rem;
   color: #cbd5e0;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SISTEMA DE NOTIFICACIONES TOAST DE VIDEOJUEGO (HUD TOAST)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.game-toast-container {
+  position: fixed;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 92vw;
+  width: 380px;
+}
+
+.game-toast-bubble {
+  pointer-events: auto;
+  background: linear-gradient(180deg, rgba(32, 48, 24, 0.98), rgba(16, 26, 12, 0.98));
+  border: 2px solid #ffd54f;
+  border-radius: 16px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 213, 79, 0.4);
+  animation: toastDrop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: #fff;
+  width: 100%;
+}
+
+@keyframes toastDrop {
+  from { transform: translateY(-30px) scale(0.9); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.toast-fade-out {
+  animation: toastFade 0.35s forwards ease-in;
+}
+
+@keyframes toastFade {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-20px); }
+}
+
+.toast-icon-badge {
+  font-size: 1.6rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.toast-content-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.toast-title-text {
+  font-family: var(--font-game);
+  font-size: 0.88rem;
+  color: #ffd54f;
+  margin-bottom: 2px;
+}
+
+.toast-msg-text {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  line-height: 1.35;
+}
+
+.toast-close-btn {
+  background: none;
+  border: none;
+  color: #cbd5e0;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MODAL DE INTERIOR DE EDIFICIO Y BANCALES 2.5D (SOBRE EL MAPA)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.farm-building-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 18, 8, 0.8);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 10010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  animation: fadeInModal 0.25s ease-out;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.farm-building-dialog-box {
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  background: linear-gradient(180deg, #2b1a0e 0%, #170d06 100%);
+  border: 3px solid #d9a94e;
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.85), 0 0 20px rgba(217, 169, 78, 0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popDialog 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popDialog {
+  from { transform: scale(0.88) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.game-dialog-header {
+  background: linear-gradient(180deg, #8a5a34, #5c3a1e);
+  border-bottom: 2px solid #d9a94e;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dialog-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dialog-building-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+
+.dialog-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-main-title {
+  margin: 0;
+  font-family: var(--font-game);
+  font-size: 1.05rem;
+  color: #ffd464;
+  text-shadow: 0 1px 2px #000;
+}
+
+.dialog-sub-title {
+  font-size: 0.75rem;
+  color: #a5d6a7;
+}
+
+.dialog-close-btn {
+  background: rgba(0,0,0,0.4);
+  border: 1.5px solid #d9a94e;
+  color: #ffd464;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.dialog-close-btn:hover {
+  transform: scale(1.1);
+  background: #d32f2f;
+  color: #fff;
+  border-color: #fff;
+}
+
+.dialog-stats-bar {
+  background: rgba(0, 0, 0, 0.45);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-size: 0.8rem;
+}
+
+.dialog-hint {
+  color: #a0aec0;
+  font-size: 0.75rem;
+}
+
+.dialog-beds-grid {
+  padding: 16px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+/* Camas de Madera 2.5D en el Diálogo */
+.dialog-bed-card {
+  background: radial-gradient(circle at 50% 25%, #4a2d18 0%, #2b1709 70%, #150903 100%);
+  border: 3px solid #8d5b36;
+  border-bottom: 6px solid #5a371c;
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.6), inset 0 2px 6px rgba(0,0,0,0.7);
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.dialog-bed-card:hover {
+  transform: translateY(-3px);
+  border-color: #ffd54f;
+}
+
+.dialog-bed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.dialog-bed-tag {
+  font-size: 0.75rem;
+  background: rgba(0,0,0,0.6);
+  color: #a5d6a7;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  font-weight: 600;
+}
+
+.dialog-crop-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 6px 0;
+}
+
+.dialog-crop-emoji {
+  font-size: 3rem;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+  line-height: 1;
+}
+
+.dialog-crop-name {
+  font-family: var(--font-game);
+  font-size: 0.92rem;
+  color: #ffd464;
+  margin-top: 4px;
+}
+
+.dialog-progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 6px 0;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.dialog-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #81c784, #ffd54f);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.dialog-bed-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.bed-action-btn {
+  flex: 1;
+  padding: 8px 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #fff;
+  transition: transform 0.15s, filter 0.15s;
+}
+.bed-action-btn:active {
+  transform: scale(0.95);
+}
+.btn-action-water {
+  background: linear-gradient(180deg, #0288d1, #01579b);
+  box-shadow: 0 3px 8px rgba(2, 136, 209, 0.4);
+}
+.btn-action-fert {
+  background: linear-gradient(180deg, #43a047, #1b5e20);
+  box-shadow: 0 3px 8px rgba(67, 160, 71, 0.4);
+}
+.btn-action-harvest {
+  background: linear-gradient(180deg, #fbc02d, #f57f17);
+  color: #1a120b;
+  box-shadow: 0 3px 8px rgba(251, 192, 45, 0.5);
+  font-weight: 800;
+  animation: pulseHarvest 1.2s infinite alternate;
+}
+@keyframes pulseHarvest {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+.btn-activate-plot {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(180deg, #7fc25c, #2e5b22);
+  color: #fff;
+  font-family: var(--font-game);
+  font-weight: 800;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: transform 0.15s;
+}
+.btn-activate-plot:hover {
+  transform: scale(1.03);
+}

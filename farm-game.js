@@ -18,7 +18,7 @@ import {
   playUnlockPlot,
   playClickSound
 } from "./farm-sounds.js";
-import { spawnFloatingText } from "./farm-overworld.js?v=58";
+import { spawnFloatingText } from "./farm-overworld.js?v=59";
 
 let currentCrops = [];
 let currentPlots = [];
@@ -297,12 +297,20 @@ window.executeFarmAction = async function(action, cropId, isAllowed, nextDateStr
 
   if (!isAllowed) {
     playActionBlocked();
-    alert(`⏳ ¡Tranquilo! La planta no requiere ${action} en este momento. Próxima fecha estipulada: ${nextDateStr}`);
+    if (typeof window.showGameToast === 'function') {
+      window.showGameToast(`La planta no requiere ${action} en este momento. Próxima: ${nextDateStr}`, "⏳", "Labor no requerida");
+    } else {
+      alert(`⏳ ¡Tranquilo! La planta no requiere ${action} en este momento. Próxima fecha estipulada: ${nextDateStr}`);
+    }
     return;
   }
 
   if (!currentUser) {
-    alert("Debes iniciar sesión para registrar labores.");
+    if (typeof window.showGameToast === 'function') {
+      window.showGameToast("Debes iniciar sesión para registrar labores.", "🔒", "Acceso Requerido");
+    } else {
+      alert("Debes iniciar sesión para registrar labores.");
+    }
     return;
   }
 
@@ -377,7 +385,11 @@ window.executeFarmAction = async function(action, cropId, isAllowed, nextDateStr
     loadUserGamificationStats();
   } catch (err) {
     console.error("Error ejecutando acción de granja:", err);
-    alert("Error: " + err.message);
+    if (typeof window.showGameToast === 'function') {
+      window.showGameToast("Error: " + err.message, "⚠️", "Error");
+    } else {
+      alert("Error: " + err.message);
+    }
   }
 };
 
