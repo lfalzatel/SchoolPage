@@ -1,6 +1,6 @@
 // ══════════════════════════════════════════════════════════════════════════
 //  Green Force — Módulo Huerta Escolar
-//  farm-overworld.js — Motor de Mapa Isométrico 2.5D Estilo Top Heroes
+//  farm-overworld.js — Motor de Mapa Isométrico 2.5D (Edificaciones 3D & Huerta)
 // ══════════════════════════════════════════════════════════════════════════
 
 import {
@@ -24,12 +24,12 @@ import {
 let onSelectZoneCallback = null;
 let onRefreshDataCallback = null;
 
-// Configuración de Coordenadas Predeterminadas (en píxeles dentro del mapa 1200x1000)
+// Coordenadas Predeterminadas de los 4 Edificios Principales en el mapa 1200x1000
 const DEFAULT_BUILDING_LAYOUT = {
-  colegio: { x: 200, y: 140 },
-  individual: { x: 680, y: 140 },
-  locked_compost: { x: 200, y: 580 },
-  locked_market: { x: 680, y: 580 }
+  colegio: { x: 180, y: 120 },
+  individual: { x: 680, y: 120 },
+  locked_compost: { x: 180, y: 560 },
+  locked_market: { x: 680, y: 560 }
 };
 
 const STORAGE_KEY_LAYOUT = "green_force_building_layout_v1";
@@ -42,7 +42,7 @@ function loadBuildingLayout() {
       return { ...DEFAULT_BUILDING_LAYOUT, ...parsed };
     }
   } catch (e) {
-    console.warn("Error cargando layout:", e);
+    console.warn("Error cargando distribución de edificios:", e);
   }
   return { ...DEFAULT_BUILDING_LAYOUT };
 }
@@ -51,7 +51,7 @@ function saveBuildingLayout(layout) {
   try {
     localStorage.setItem(STORAGE_KEY_LAYOUT, JSON.stringify(layout));
   } catch (e) {
-    console.error("Error guardando layout:", e);
+    console.error("Error guardando distribución:", e);
   }
 }
 
@@ -87,26 +87,20 @@ export function renderOverworldMap(container, {
   onRefreshDataCallback = onRefreshData;
   if (!container) return;
 
-  const nowMs = Date.now();
-  
-  // Conteo de tareas pendientes
   const schoolPendingCount = schoolCrops.filter(c => {
-    if (c.status === 'cosechado' || c.status === 'perdido') return false;
-    const isWater = c.nextWateringDue && c.nextWateringDue.toMillis() <= nowMs + (12 * 3600 * 1000);
-    const isFert = c.nextFertilizingDue && c.nextFertilizingDue.toMillis() <= nowMs + (12 * 3600 * 1000);
+    const isWaterDue = c.nextWateringDue && c.nextWateringDue.toMillis() <= Date.now() + 43200000;
+    const isFertDue = c.nextFertilizingDue && c.nextFertilizingDue.toMillis() <= Date.now() + 43200000;
     const isReady = c.status === 'listo_para_cosecha';
-    return isWater || isFert || isReady;
+    return isWaterDue || isFertDue || isReady;
   }).length;
 
   const personalPendingCount = personalCrops.filter(c => {
-    if (c.status === 'cosechado' || c.status === 'perdido') return false;
-    const isWater = c.nextWateringDue && c.nextWateringDue.toMillis() <= nowMs + (12 * 3600 * 1000);
-    const isFert = c.nextFertilizingDue && c.nextFertilizingDue.toMillis() <= nowMs + (12 * 3600 * 1000);
+    const isWaterDue = c.nextWateringDue && c.nextWateringDue.toMillis() <= Date.now() + 43200000;
+    const isFertDue = c.nextFertilizingDue && c.nextFertilizingDue.toMillis() <= Date.now() + 43200000;
     const isReady = c.status === 'listo_para_cosecha';
-    return isWater || isFert || isReady;
+    return isWaterDue || isFertDue || isReady;
   }).length;
 
-  // Renderizado del HUD de Top Heroes + Escenario Isométrico
   currentLayout = loadBuildingLayout();
 
   container.innerHTML = `
@@ -147,7 +141,7 @@ export function renderOverworldMap(container, {
         <button class="map-ctrl-btn" id="btnToggleEditMode" onclick="window.toggleMapEditMode()" title="Mover / Reubicar Edificios">🏗️</button>
       </div>
 
-      <!-- BANNER SUPERIOR DEL MODO EDICIÓN (REUBICAR) -->
+      <!-- BANNER SUPERIOR DEL MODO EDICIÓN -->
       <div class="edit-mode-banner" id="editModeBanner" style="display: none;">
         <span>🏗️ Modo Mover: Arrastra los edificios para cambiarlos de lugar</span>
         <div style="display: flex; gap: 4px;">
@@ -156,7 +150,7 @@ export function renderOverworldMap(container, {
         </div>
       </div>
 
-      <!-- 2. TRACKER DE MISIÓN FLOTANTE (Abajo Izquierda) -->
+      <!-- 2. TRACKER DE MISIÓN FLOTANTE -->
       <div class="hud-quest-tracker">
         <div class="quest-icon">📜</div>
         <div class="quest-text">
@@ -189,21 +183,33 @@ export function renderOverworldMap(container, {
           <div class="flying-butterfly butterfly-1">🦋</div>
           <div class="flying-butterfly butterfly-2">🦋</div>
 
-          <!-- SVG DE CAMINOS Y RÍO DE AGUA ANIMADA -->
+          <!-- SVG DE CAMINOS Y RÍO NATURAL (SIN CARRETES NI RAYAS EXTRAÑAS) -->
           <svg class="iso-paths-svg" viewBox="0 0 1200 1000" preserveAspectRatio="none">
-            <!-- Río caudaloso en diagonal con curvas suaves -->
-            <path d="M 0 500 Q 300 620 600 480 T 1200 580" stroke="#0277bd" stroke-width="64" fill="none" opacity="0.85" />
-            <path d="M 0 500 Q 300 620 600 480 T 1200 580" stroke="#4fc3f7" stroke-width="28" stroke-dasharray="8,8" fill="none" class="river-flow" />
-            
-            <!-- Puente de Madera de Roble -->
-            <rect x="540" y="440" width="120" height="90" fill="#5d4037" rx="6" stroke="#3e2723" stroke-width="4" />
-            
-            <!-- Senderos de empedrado diagonal que unen los edificios -->
-            <path d="M 280 280 L 600 480 L 760 280" stroke="#d7ccc8" stroke-width="24" stroke-dasharray="6,6" fill="none" opacity="0.9" />
-            <path d="M 280 720 L 600 480 L 760 720" stroke="#d7ccc8" stroke-width="24" stroke-dasharray="6,6" fill="none" opacity="0.9" />
+            <!-- Orilla y Río Caudaloso con Aguas Turquesa Naturales -->
+            <path d="M 0 740 Q 300 650 600 720 T 1200 760" stroke="#bcaaa4" stroke-width="110" fill="none" opacity="0.6" stroke-linecap="round" />
+            <path d="M 0 740 Q 300 650 600 720 T 1200 760" stroke="#0288d1" stroke-width="84" fill="none" opacity="0.9" stroke-linecap="round" />
+            <path d="M 0 740 Q 300 650 600 720 T 1200 760" stroke="#4fc3f7" stroke-width="40" stroke-dasharray="16, 12" fill="none" class="river-flow" opacity="0.75" />
+            <path d="M 0 740 Q 300 650 600 720 T 1200 760" stroke="#ffffff" stroke-width="6" stroke-dasharray="6, 24" fill="none" class="river-flow" opacity="0.8" />
+
+            <!-- Puente de Vigas de Roble sobre el Río -->
+            <rect x="520" y="660" width="160" height="100" fill="#6d4c41" rx="8" stroke="#3e2723" stroke-width="5" />
+            <line x1="535" y1="660" x2="535" y2="760" stroke="#4e342e" stroke-width="3" />
+            <line x1="560" y1="660" x2="560" y2="760" stroke="#4e342e" stroke-width="3" />
+            <line x1="585" y1="660" x2="585" y2="760" stroke="#4e342e" stroke-width="3" />
+            <line x1="610" y1="660" x2="610" y2="760" stroke="#4e342e" stroke-width="3" />
+            <line x1="635" y1="660" x2="635" y2="760" stroke="#4e342e" stroke-width="3" />
+            <line x1="660" y1="660" x2="660" y2="760" stroke="#4e342e" stroke-width="3" />
+            <rect x="520" y="656" width="160" height="8" fill="#8d6e63" stroke="#3e2723" stroke-width="2" rx="2" />
+            <rect x="520" y="756" width="160" height="8" fill="#8d6e63" stroke="#3e2723" stroke-width="2" rx="2" />
+
+            <!-- Senderos Naturales de Tierra Suave entre Edificios -->
+            <path d="M 290 280 Q 420 360 600 470 Q 720 360 790 280" stroke="#d7ccc8" stroke-width="40" fill="none" opacity="0.4" stroke-linecap="round" />
+            <path d="M 290 280 Q 420 360 600 470 Q 720 360 790 280" stroke="#bcaaa4" stroke-width="24" fill="none" opacity="0.65" stroke-linecap="round" />
+            <path d="M 600 470 L 600 660" stroke="#bcaaa4" stroke-width="26" fill="none" opacity="0.65" stroke-linecap="round" />
+            <path d="M 290 680 Q 450 560 600 470 Q 750 560 790 680" stroke="#bcaaa4" stroke-width="24" fill="none" opacity="0.65" stroke-linecap="round" />
           </svg>
 
-          <!-- DECORACIONES NATURALES (Árboles Grandes y Arbustos) -->
+          <!-- DECORACIONES NATURALES (Árboles Grandes y Flores) -->
           <div class="iso-decor tree-tl">🌲</div>
           <div class="iso-decor tree-tr">🌳</div>
           <div class="iso-decor tree-bl">🌲</div>
@@ -211,8 +217,6 @@ export function renderOverworldMap(container, {
           <div class="iso-decor tree-mid">🌲</div>
           <div class="iso-decor flowers-l">🌸</div>
           <div class="iso-decor flowers-r">🌼</div>
-          <div class="iso-decor fence-l">🪵</div>
-          <div class="iso-decor fence-r">🪵</div>
 
           <!-- ANIMALES CAMINANDO Y PASTANDO EN EL TERRENO -->
           <div class="iso-animal-walker cow-walker" id="cowWalker">
@@ -225,9 +229,9 @@ export function renderOverworldMap(container, {
           </div>
 
           <!-- AGRICULTOR CAMINANTE EN EL SENDEROS (AVATAR TRABAJADOR) -->
-          <div class="iso-farmer-avatar" id="farmerAvatar" style="top: 480px; left: 580px;">
+          <div class="iso-farmer-avatar" id="farmerAvatar" style="top: 470px; left: 580px;">
             <div class="farmer-action-bubble" id="farmerBubble" style="display: none;">
-              <span id="farmerTaskText">🛠️ Reparando la cerca...</span>
+              <span id="farmerTaskText">🛠️ Cuidando las plantas...</span>
             </div>
             <div class="farmer-sprite-wrapper" id="farmerSpriteWrapper">
               <span class="farmer-emoji" id="farmerEmoji">👩‍🌾</span>
@@ -236,71 +240,67 @@ export function renderOverworldMap(container, {
             <span class="farmer-shadow"></span>
           </div>
 
-          <!-- EDIFICIO 1: ESCUELA IE BARRO BLANCO (2.5D REAL - CERO TARJETAS) -->
+          <!-- EDIFICIO 1: ESCUELA IE BARRO BLANCO (2.5D REAL CON ARQUITECTURA ISOMÉTRICA) -->
           <div class="iso-building-structure school-building" id="building_colegio"
                style="left: ${currentLayout.colegio.x}px; top: ${currentLayout.colegio.y}px;"
-               data-zone="colegio">
+               data-zone="colegio"
+               onclick="window.onBuildingClick('colegio')">
             <div class="building-map-pin school-pin">
               <i class="fas fa-map-marker-alt"></i> IE BARRO BLANCO
             </div>
             ${schoolPendingCount > 0 ? `<div class="iso-crate-badge pulse-bounce">🧺 ${schoolPendingCount} pendientes</div>` : ''}
             <div class="iso-building-sprite">
-              <span class="building-emoji-art">🏫</span>
+              ${getSchool3DSVG()}
             </div>
-            <div class="building-ground-shadow"></div>
-            <div class="building-title-plaque">🌾 Huerta Escolar</div>
+            <div class="building-title-plaque">🌾 Huerta Escolar • Entrar</div>
 
-            <!-- Camas de Siembra de Madera en el Suelo -->
-            <div class="iso-plots-cluster">
-              ${renderOnMapTilledBeds(schoolCrops, schoolPlots, 'colegio')}
-            </div>
+            <!-- HUERTA CON CERCA DE MADERA Y BANCALES DE CULTIVO (ESTILO TOP HEROES) -->
+            ${getFencedHuertaGarden3D(schoolCrops, schoolPlots, 'colegio')}
           </div>
 
           <!-- EDIFICIO 2: MI GRANJA / RANCHO DEL ESTUDIANTE (2.5D REAL) -->
           <div class="iso-building-structure farm-building" id="building_individual"
                style="left: ${currentLayout.individual.x}px; top: ${currentLayout.individual.y}px;"
-               data-zone="individual">
+               data-zone="individual"
+               onclick="window.onBuildingClick('individual')">
             <div class="building-map-pin farm-pin">
               <i class="fas fa-star"></i> MI GRANJA
             </div>
             ${personalPendingCount > 0 ? `<div class="iso-crate-badge farm-crate pulse-bounce">🪴 ${personalPendingCount} pendientes</div>` : ''}
             <div class="iso-building-sprite">
-              <span class="building-emoji-art">🏡</span>
+              ${getRanch3DSVG()}
             </div>
-            <div class="building-ground-shadow"></div>
-            <div class="building-title-plaque">👩‍🌾 Rancho & Práctica</div>
+            <div class="building-title-plaque">👩‍🌾 Mi Parcela • Entrar</div>
 
-            <!-- Camas de Siembra de Madera en el Suelo -->
-            <div class="iso-plots-cluster">
-              ${renderOnMapTilledBeds(personalCrops, personalPlots, 'individual')}
-            </div>
+            <!-- HUERTA CON CERCA DE MADERA Y BANCALES DE CULTIVO -->
+            ${getFencedHuertaGarden3D(personalCrops, personalPlots, 'individual')}
           </div>
 
           <!-- EDIFICIO 3: COMPOSTERA ESCOLAR (Nivel 5) -->
           <div class="iso-building-structure locked-building" id="building_locked_compost"
                style="left: ${currentLayout.locked_compost.x}px; top: ${currentLayout.locked_compost.y}px;"
-               data-zone="locked_compost">
+               data-zone="locked_compost"
+               onclick="window.onBuildingClick('locked_compost')">
             <div class="building-map-pin lock-pin">
               <i class="fas fa-lock"></i> COMPOSTERA
             </div>
             <div class="iso-building-sprite">
-              <span class="building-emoji-art" style="filter: grayscale(0.5);">♻️</span>
+              ${getCompost3DSVG()}
             </div>
-            <div class="building-ground-shadow"></div>
             <div class="building-title-plaque" style="background: #4a5568; border-color: #a0aec0;">🔒 Nivel 5: Abonos</div>
           </div>
 
           <!-- EDIFICIO 4: MERCADO VERDE (Nivel 10) -->
           <div class="iso-building-structure locked-building" id="building_locked_market"
                style="left: ${currentLayout.locked_market.x}px; top: ${currentLayout.locked_market.y}px;"
-               data-zone="locked_market">
+               data-zone="locked_market"
+               onclick="window.onBuildingClick('locked_market')">
             <div class="building-map-pin lock-pin">
               <i class="fas fa-lock"></i> MERCADO VERDE
             </div>
             <div class="iso-building-sprite">
-              <span class="building-emoji-art" style="filter: grayscale(0.5);">🧺</span>
+              ${getMarket3DSVG()}
             </div>
-            <div class="building-ground-shadow"></div>
             <div class="building-title-plaque" style="background: #4a5568; border-color: #a0aec0;">🔒 Nivel 10: Tienda</div>
           </div>
 
@@ -308,7 +308,7 @@ export function renderOverworldMap(container, {
 
       </div>
 
-      <!-- TARJETA INFERIOR DE DESTINO SELECCIONADO (TIPO UBER / HUD DE JUEGO) -->
+      <!-- TARJETA FLOTANTE INFERIOR PROMINENTE (POR ENCIMA DEL MENÚ) -->
       <div class="map-selected-poi-card" id="mapSelectedPoiCard" style="display: none;">
         <div class="poi-info">
           <span class="poi-title" id="poiCardTitle">🏫 IE Barro Blanco</span>
@@ -322,27 +322,279 @@ export function renderOverworldMap(container, {
     </div>
   `;
 
-  // Inicializar Motor de Cámara y Gestos Táctiles
   setupCameraControls();
-
-  // Inicializar Sistema de Arrastre de Edificios en Modo Edición
   setupBuildingDragHandlers();
-
-  // Inicializar IA de Granjero y Animales
   playAmbientChirp();
   initFarmerWorkerAI();
   initAnimalWanderingAI();
 }
 
-// Generador de Bancales de Madera 2.5D con Tierra Labrada
-function renderOnMapTilledBeds(cropsList, plotsList, scope) {
-  if (!plotsList || plotsList.length === 0) return '';
-  const nowMs = Date.now();
-  let html = '';
+// ══════════════════════════════════════════════════════════════════════════
+//  MODELOS SVG 2.5D ISOMÉTRICOS DE ALTA FIDELIDAD (ESTILO TOP HEROES)
+// ══════════════════════════════════════════════════════════════════════════
 
-  const displayPlots = plotsList.slice(0, 2);
-  displayPlots.forEach((plot) => {
-    const crop = cropsList.find(c => c.plotId === plot.id && c.status !== 'cosechado' && c.status !== 'perdido');
+function getSchool3DSVG() {
+  return `
+    <svg viewBox="0 0 240 210" width="220" height="195" class="iso-svg-building" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="schRoofL" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#34495e"/>
+          <stop offset="100%" stop-color="#1c2833"/>
+        </linearGradient>
+        <linearGradient id="schRoofR" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#4a6572"/>
+          <stop offset="100%" stop-color="#2c3e50"/>
+        </linearGradient>
+        <linearGradient id="schWallL" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#b0bec5"/>
+          <stop offset="100%" stop-color="#78909c"/>
+        </linearGradient>
+        <linearGradient id="schWallR" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#cfd8dc"/>
+          <stop offset="100%" stop-color="#90a4ae"/>
+        </linearGradient>
+        <linearGradient id="schDoor" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#8d5b36"/>
+          <stop offset="100%" stop-color="#4a2e1b"/>
+        </linearGradient>
+        <linearGradient id="goldGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#fff59d"/>
+          <stop offset="100%" stop-color="#fbc02d"/>
+        </linearGradient>
+      </defs>
+
+      <ellipse cx="120" cy="180" rx="95" ry="24" fill="rgba(0,0,0,0.35)" />
+
+      <!-- Cimientos de piedra escalonados -->
+      <polygon points="35,160 120,135 205,160 120,185" fill="#546e7a" />
+      <polygon points="35,160 120,185 120,192 35,167" fill="#37474f" />
+      <polygon points="120,185 205,160 205,167 120,192" fill="#263238" />
+
+      <!-- Fachada Izquierda Principal (Sombra) -->
+      <polygon points="50,150 120,130 120,80 50,100" fill="url(#schWallL)" />
+      <!-- Fachada Derecha Principal (Luz) -->
+      <polygon points="120,130 190,150 190,100 120,80" fill="url(#schWallR)" />
+
+      <!-- Ventanas Arqueadas Iluminadas -->
+      <polygon points="62,118 78,113 78,135 62,140" fill="url(#goldGlow)" stroke="#37474f" stroke-width="1.5" />
+      <polygon points="88,110 104,105 104,127 88,132" fill="url(#goldGlow)" stroke="#37474f" stroke-width="1.5" />
+      <polygon points="136,105 152,110 152,132 136,127" fill="url(#goldGlow)" stroke="#37474f" stroke-width="1.5" />
+      <polygon points="162,113 178,118 178,140 162,135" fill="url(#goldGlow)" stroke="#37474f" stroke-width="1.5" />
+
+      <!-- Puerta Principal Arqueada -->
+      <polygon points="110,133 130,127 130,165 110,171" fill="url(#schDoor)" stroke="#271810" stroke-width="2" />
+      <circle cx="116" cy="151" r="1.8" fill="#ffd54f" />
+      <circle cx="124" cy="148" r="1.8" fill="#ffd54f" />
+
+      <!-- Techo Principal a Dos Aguas en 2.5D -->
+      <polygon points="40,100 120,65 120,78 40,113" fill="url(#schRoofL)" />
+      <polygon points="120,65 200,100 200,113 120,78" fill="url(#schRoofR)" />
+
+      <!-- Torre Central de Reloj y Campanario -->
+      <polygon points="100,75 140,65 140,25 100,35" fill="url(#schWallL)" />
+      <polygon points="140,65 155,70 155,30 140,25" fill="url(#schWallR)" />
+      <polygon points="95,36 120,5 145,26" fill="#c0392b" />
+      <polygon points="120,5 160,31 145,26" fill="#e74c3c" />
+
+      <!-- Esfera del Reloj Escolar -->
+      <circle cx="120" cy="48" r="11" fill="#fffde7" stroke="#b78103" stroke-width="2" />
+      <line x1="120" y1="48" x2="120" y2="40" stroke="#333" stroke-width="2" stroke-linecap="round" />
+      <line x1="120" y1="48" x2="126" y2="48" stroke="#333" stroke-width="1.8" stroke-linecap="round" />
+
+      <!-- Bandera de la Escuela Waving -->
+      <line x1="120" y1="5" x2="120" y2="-15" stroke="#eceff1" stroke-width="2" />
+      <path d="M 120 -15 Q 135 -20 145 -13 Q 135 -8 120 -10 Z" fill="#2e7d32" stroke="#1b5e20" stroke-width="0.8" />
+
+      <!-- Arbustos Florales en la Entrada -->
+      <circle cx="45" cy="162" r="8" fill="#43a047" />
+      <circle cx="53" cy="166" r="6" fill="#66bb6a" />
+      <circle cx="195" cy="162" r="8" fill="#43a047" />
+      <circle cx="187" cy="166" r="6" fill="#66bb6a" />
+      <circle cx="47" cy="160" r="2.5" fill="#e91e63" />
+      <circle cx="193" cy="160" r="2.5" fill="#ffeb3b" />
+    </svg>
+  `;
+}
+
+function getRanch3DSVG() {
+  return `
+    <svg viewBox="0 0 240 210" width="220" height="195" class="iso-svg-building" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="rnchRoofL" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#b71c1c"/>
+          <stop offset="100%" stop-color="#7f0000"/>
+        </linearGradient>
+        <linearGradient id="rnchRoofR" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#e53935"/>
+          <stop offset="100%" stop-color="#c62828"/>
+        </linearGradient>
+        <linearGradient id="rnchWoodL" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#8d5b36"/>
+          <stop offset="100%" stop-color="#5a371c"/>
+        </linearGradient>
+        <linearGradient id="rnchWoodR" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#b27946"/>
+          <stop offset="100%" stop-color="#824c24"/>
+        </linearGradient>
+      </defs>
+
+      <ellipse cx="120" cy="180" rx="90" ry="24" fill="rgba(0,0,0,0.35)" />
+
+      <!-- Chimenea con Humo Transparente -->
+      <polygon points="150,70 165,65 165,30 150,35" fill="#546e7a" />
+      <polygon points="165,65 175,68 175,33 165,30" fill="#78909c" />
+      <circle cx="168" cy="18" r="6" fill="rgba(236,239,241,0.5)" />
+      <circle cx="173" cy="8" r="8" fill="rgba(236,239,241,0.4)" />
+      <circle cx="180" cy="-4" r="10" fill="rgba(236,239,241,0.3)" />
+
+      <!-- Cimientos de Madera -->
+      <polygon points="40,165 120,140 195,165 120,190" fill="#4e342e" />
+
+      <!-- Fachada Izquierda (Sombra) -->
+      <polygon points="50,155 120,135 120,85 50,105" fill="url(#rnchWoodL)" />
+      <line x1="50" y1="105" x2="120" y2="135" stroke="#3e2723" stroke-width="2.5" />
+      <line x1="50" y1="155" x2="120" y2="85" stroke="#3e2723" stroke-width="2.5" />
+
+      <!-- Fachada Derecha (Luz) -->
+      <polygon points="120,135 190,155 190,105 120,85" fill="url(#rnchWoodR)" />
+      <line x1="120" y1="85" x2="190" y2="155" stroke="#4a2e1b" stroke-width="2.5" />
+      <line x1="120" y1="135" x2="190" y2="105" stroke="#4a2e1b" stroke-width="2.5" />
+
+      <!-- Ventana de Pajar con Paja Asomada -->
+      <polygon points="112,98 128,94 128,110 112,114" fill="#3e2723" />
+      <path d="M 112 112 Q 120 122 130 112 Z" fill="#ffd54f" stroke="#f57f17" stroke-width="1" />
+
+      <!-- Puerta Establo -->
+      <polygon points="110,140 130,134 130,172 110,178" fill="#3e2723" stroke="#211510" stroke-width="2" />
+      <polygon points="112,143 128,138 128,170 112,175" fill="#6d4c41" />
+
+      <!-- Techo a Dos Aguas de Tejas Rojas de Granja -->
+      <polygon points="40,105 120,65 120,78 40,118" fill="url(#rnchRoofL)" />
+      <polygon points="120,65 200,105 200,118 120,78" fill="url(#rnchRoofR)" />
+
+      <!-- Linterna Colgante en la Entrada -->
+      <line x1="102" y1="135" x2="102" y2="145" stroke="#333" stroke-width="1.5" />
+      <circle cx="102" cy="148" r="4.5" fill="#ffe082" stroke="#ffb300" stroke-width="1.2" />
+
+      <!-- Barril de Agua al Costado -->
+      <ellipse cx="65" cy="165" rx="7" ry="4" fill="#8d5b36" stroke="#4e342e" stroke-width="1.5" />
+      <rect x="58" y="165" width="14" height="14" fill="#6d4c41" stroke="#4e342e" stroke-width="1.2" rx="2" />
+      <line x1="58" y1="170" x2="72" y2="170" stroke="#333" stroke-width="1" />
+      <line x1="58" y1="175" x2="72" y2="175" stroke="#333" stroke-width="1" />
+
+      <!-- Rueda de Carreta de Madera -->
+      <circle cx="180" cy="168" r="9" fill="none" stroke="#5d4037" stroke-width="2" />
+      <circle cx="180" cy="168" r="2.5" fill="#3e2723" />
+      <line x1="171" y1="168" x2="189" y2="168" stroke="#5d4037" stroke-width="1.5" />
+      <line x1="180" y1="159" x2="180" y2="177" stroke="#5d4037" stroke-width="1.5" />
+    </svg>
+  `;
+}
+
+function getCompost3DSVG() {
+  return `
+    <svg viewBox="0 0 200 170" width="170" height="145" class="iso-svg-building" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="145" rx="75" ry="18" fill="rgba(0,0,0,0.35)" />
+
+      <!-- Cajones de Madera de Compostaje -->
+      <polygon points="25,125 100,105 175,125 100,145" fill="#3e2723" />
+      <polygon points="30,120 100,102 100,65 30,83" fill="#5d4037" />
+      <polygon points="100,102 170,120 170,83 100,65" fill="#795548" />
+
+      <!-- Ranuras entre tablas -->
+      <line x1="30" y1="95" x2="100" y2="77" stroke="#271810" stroke-width="2" />
+      <line x1="30" y1="107" x2="100" y2="89" stroke="#271810" stroke-width="2" />
+      <line x1="100" y1="77" x2="170" y2="95" stroke="#271810" stroke-width="2" />
+      <line x1="100" y1="89" x2="170" y2="107" stroke="#271810" stroke-width="2" />
+
+      <!-- Montículo de Tierra y Abono Orgánico -->
+      <ellipse cx="100" cy="62" rx="42" ry="16" fill="#1b120c" />
+      <circle cx="90" cy="58" r="8" fill="#2d1d13" />
+      <circle cx="105" cy="56" r="10" fill="#3e2723" />
+      <circle cx="118" cy="60" r="7" fill="#4e342e" />
+
+      <!-- Hojas Verdes -->
+      <circle cx="85" cy="58" r="4" fill="#4caf50" />
+      <circle cx="112" cy="54" r="3.5" fill="#81c784" />
+      <circle cx="98" cy="64" r="4.5" fill="#388e3c" />
+
+      <!-- Pala Plantada en la Tierra -->
+      <line x1="130" y1="62" x2="148" y2="15" stroke="#d7ccc8" stroke-width="3" stroke-linecap="round" />
+      <rect x="144" y="10" width="10" height="7" rx="1.5" fill="#ffb300" stroke="#333" stroke-width="1" />
+
+      <!-- Medallón de Reciclaje -->
+      <circle cx="100" cy="100" r="14" fill="#2e7d32" stroke="#ffd54f" stroke-width="2" />
+      <text x="100" y="105" font-size="14" text-anchor="middle" fill="#fff">♻️</text>
+    </svg>
+  `;
+}
+
+function getMarket3DSVG() {
+  return `
+    <svg viewBox="0 0 200 170" width="170" height="145" class="iso-svg-building" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="100" cy="145" rx="75" ry="18" fill="rgba(0,0,0,0.35)" />
+
+      <!-- Mostrador y Plataforma de Madera -->
+      <polygon points="30,125 100,105 170,125 100,145" fill="#5d4037" />
+      <polygon points="30,125 100,145 100,120 30,100" fill="#4e342e" />
+      <polygon points="100,145 170,125 170,100 100,120" fill="#3e2723" />
+
+      <!-- Postes de Madera del Toldo -->
+      <line x1="42" y1="108" x2="42" y2="45" stroke="#8d5b36" stroke-width="4" stroke-linecap="round" />
+      <line x1="158" y1="108" x2="158" y2="45" stroke="#8d5b36" stroke-width="4" stroke-linecap="round" />
+      <line x1="100" y1="120" x2="100" y2="52" stroke="#5a371c" stroke-width="4" stroke-linecap="round" />
+
+      <!-- Cajas de Verduras Frescas -->
+      <rect x="50" y="98" width="22" height="14" rx="2" fill="#8d6e63" stroke="#4e342e" stroke-width="1.5" />
+      <circle cx="56" cy="103" r="3" fill="#e53935" />
+      <circle cx="64" cy="103" r="3" fill="#e53935" />
+
+      <rect x="76" y="104" width="22" height="14" rx="2" fill="#8d6e63" stroke="#4e342e" stroke-width="1.5" />
+      <polygon points="80,106 87,112 85,104" fill="#fb8c00" />
+      <polygon points="88,106 95,112 93,104" fill="#ff9800" />
+
+      <rect x="105" y="104" width="22" height="14" rx="2" fill="#8d6e63" stroke="#4e342e" stroke-width="1.5" />
+      <circle cx="112" cy="108" r="4" fill="#43a047" />
+      <circle cx="120" cy="108" r="4" fill="#66bb6a" />
+
+      <!-- Toldo Rayado Verde y Blanco en 2.5D -->
+      <polygon points="25,50 100,20 175,50 100,75" fill="#ffffff" />
+      <polygon points="40,44 55,38 70,62 55,68" fill="#2e7d32" />
+      <polygon points="70,32 85,26 100,50 85,56" fill="#2e7d32" />
+      <polygon points="100,20 115,26 130,50 115,44" fill="#2e7d32" />
+      <polygon points="130,32 145,38 160,62 145,56" fill="#2e7d32" />
+
+      <path d="M 25 50 Q 37 60 50 54 Q 62 65 75 58 Q 87 70 100 65 Q 112 70 125 58 Q 137 65 150 54 Q 162 60 175 50" fill="none" stroke="#1b5e20" stroke-width="3" />
+
+      <!-- Balanza de Latón -->
+      <line x1="140" y1="62" x2="140" y2="78" stroke="#ffb300" stroke-width="1.5" />
+      <line x1="133" y1="78" x2="147" y2="78" stroke="#ffb300" stroke-width="2" />
+      <ellipse cx="133" cy="85" rx="4" ry="2" fill="#ffe082" />
+      <ellipse cx="147" cy="85" rx="4" ry="2" fill="#ffe082" />
+    </svg>
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  HUERTA CON CERCA DE MADERA Y BANCALES ARADOS 2.5D (ESTILO TOP HEROES)
+// ══════════════════════════════════════════════════════════════════════════
+
+function getFencedHuertaGarden3D(cropsList, plotsList, scope) {
+  const isSchool = scope === 'colegio';
+  const label = isSchool ? '🌾 Huerta Escolar' : '🪴 Mi Parcela de Práctica';
+  const nowMs = Date.now();
+
+  let bedsHtml = '';
+  const totalBeds = 6;
+
+  for (let i = 0; i < totalBeds; i++) {
+    const plot = (plotsList && plotsList[i]) ? plotsList[i] : null;
+    const crop = (plot && cropsList) ? cropsList.find(c => c.plotId === plot.id && c.status !== 'cosechado' && c.status !== 'perdido') : null;
+
+    let stageIcon = '🌱';
+    let bubbleAction = null;
+    let bubbleText = '';
+    let bubbleClass = '';
 
     if (crop) {
       const plantedMs = crop.plantedDate ? crop.plantedDate.toMillis() : nowMs;
@@ -351,49 +603,65 @@ function renderOnMapTilledBeds(cropsList, plotsList, scope) {
       const elapsed = Math.max(nowMs - plantedMs, 0);
       const growthRatio = Math.min(elapsed / totalCycle, 1.0);
 
-      const isWaterDue = crop.nextWateringDue && crop.nextWateringDue.toMillis() <= nowMs + (12 * 3600 * 1000);
-      const isFertDue = crop.nextFertilizingDue && crop.nextFertilizingDue.toMillis() <= nowMs + (12 * 3600 * 1000);
+      const isWaterDue = crop.nextWateringDue && crop.nextWateringDue.toMillis() <= nowMs + 43200000;
+      const isFertDue = crop.nextFertilizingDue && crop.nextFertilizingDue.toMillis() <= nowMs + 43200000;
       const isReady = crop.status === 'listo_para_cosecha' || growthRatio >= 1.0;
 
-      let stageIcon = '🌱';
       if (isReady) stageIcon = crop.cropTypeIcon || '🥬';
       else if (growthRatio >= 0.6) stageIcon = crop.cropTypeIcon || '🪴';
       else if (growthRatio >= 0.2) stageIcon = '🌿';
 
-      let bubbleAction = null;
-      let bubbleText = '';
-      let bubbleClass = '';
-
       if (isReady) {
         bubbleAction = 'cosecha';
-        bubbleText = '🧺 Cosechar';
+        bubbleText = '🧺';
         bubbleClass = 'ready-glow';
       } else if (isWaterDue) {
         bubbleAction = 'riego';
-        bubbleText = '💧 Regar';
+        bubbleText = '💧';
         bubbleClass = 'water-glow';
       } else if (isFertDue) {
         bubbleAction = 'fertilizacion';
-        bubbleText = '🍃 Abonar';
+        bubbleText = '🍃';
         bubbleClass = 'fert-glow';
       }
-
-      html += `
-        <div class="tilled-soil-bed-25d" onclick="event.stopPropagation(); window.onBuildingClick('${scope}');">
-          ${bubbleAction ? `<div class="plot-harvest-bubble ${bubbleClass}" onclick="window.onMapDirectAction(event, '${bubbleAction}', '${crop.id}')">${bubbleText}</div>` : ''}
-          <span class="bed-crop-icon">${stageIcon}</span>
-        </div>
-      `;
     } else {
-      html += `
-        <div class="tilled-soil-bed-25d" onclick="event.stopPropagation(); window.onBuildingClick('${scope}');" title="Bancal Libre">
-          <span class="bed-crop-icon" style="opacity: 0.6;">🪴</span>
-        </div>
-      `;
+      const sampleIcons = ['🌱', '🥬', '🥕', '🍅', '🌽', '🌻'];
+      stageIcon = sampleIcons[i % sampleIcons.length];
     }
-  });
 
-  return html;
+    bedsHtml += `
+      <div class="iso-crop-bed-cell" title="Bancal ${i + 1}" onclick="event.stopPropagation(); window.enterIsoZone(event, '${scope}');">
+        ${bubbleAction ? `<div class="mini-harvest-bubble ${bubbleClass}" onclick="event.stopPropagation(); window.onMapDirectAction(event, '${bubbleAction}', '${crop ? crop.id : ''}')">${bubbleText}</div>` : ''}
+        <span class="bed-sprite-crop">${stageIcon}</span>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="iso-fenced-garden" onclick="event.stopPropagation(); window.enterIsoZone(event, '${scope}');">
+      <div class="fenced-garden-banner">
+        <span>${label}</span>
+        <small class="tap-hint"><i class="fas fa-door-open"></i> Entrar</small>
+      </div>
+      <div class="fenced-garden-fence-top">
+        <span class="fence-post">🪵</span>
+        <span class="fence-rail">════</span>
+        <span class="fence-post">🪵</span>
+        <span class="fence-rail">════</span>
+        <span class="fence-post">🪵</span>
+      </div>
+      <div class="fenced-garden-soil-field">
+        ${bedsHtml}
+      </div>
+      <div class="fenced-garden-fence-bottom">
+        <span class="fence-post">🪵</span>
+        <span class="fence-rail">════</span>
+        <span class="fence-post">🪵</span>
+        <span class="fence-rail">════</span>
+        <span class="fence-post">🪵</span>
+      </div>
+    </div>
+  `;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -406,8 +674,9 @@ function setupCameraControls() {
   if (!viewport || !stage) return;
 
   const vpWidth = viewport.clientWidth || 380;
-  const vpHeight = viewport.clientHeight || 560;
-  cameraState.scale = Math.min(vpWidth / 580, 1.0);
+  const vpHeight = viewport.clientHeight || 520;
+
+  cameraState.scale = Math.min(vpWidth / 580, 0.95);
   cameraState.x = (vpWidth - (1200 * cameraState.scale)) / 2;
   cameraState.y = (vpHeight - (1000 * cameraState.scale)) / 2;
 
@@ -478,65 +747,66 @@ function clampCameraBounds(vpWidth, vpHeight) {
 
 function applyCameraTransform() {
   const stage = document.getElementById("worldCameraStage");
-  if (stage) {
-    stage.style.transform = `translate3d(${cameraState.x}px, ${cameraState.y}px, 0) scale(${cameraState.scale})`;
-  }
+  if (!stage) return;
+  stage.style.transform = `translate3d(${cameraState.x}px, ${cameraState.y}px, 0px) scale(${cameraState.scale})`;
 }
 
 window.mapZoomIn = function() {
-  playClickSound();
   cameraState.scale = Math.min(1.5, cameraState.scale + 0.15);
+  const viewport = document.getElementById("overworldViewport");
+  if (viewport) clampCameraBounds(viewport.clientWidth, viewport.clientHeight);
   applyCameraTransform();
+  playClickSound();
 };
 
 window.mapZoomOut = function() {
-  playClickSound();
   cameraState.scale = Math.max(0.55, cameraState.scale - 0.15);
+  const viewport = document.getElementById("overworldViewport");
+  if (viewport) clampCameraBounds(viewport.clientWidth, viewport.clientHeight);
   applyCameraTransform();
+  playClickSound();
 };
 
 window.resetCameraView = function() {
-  playClickSound();
   const viewport = document.getElementById("overworldViewport");
-  const vpWidth = viewport?.clientWidth || 380;
-  const vpHeight = viewport?.clientHeight || 560;
-  cameraState.scale = Math.min(vpWidth / 580, 1.0);
+  if (!viewport) return;
+  const vpWidth = viewport.clientWidth || 380;
+  const vpHeight = viewport.clientHeight || 520;
+  cameraState.scale = Math.min(vpWidth / 580, 0.95);
   cameraState.x = (vpWidth - (1200 * cameraState.scale)) / 2;
   cameraState.y = (vpHeight - (1000 * cameraState.scale)) / 2;
   applyCameraTransform();
+  playClickSound();
 };
 
 // ══════════════════════════════════════════════════════════════════════════
-//  SISTEMA DE MODO EDICIÓN (REUBICAR EDIFICIOS 🏗️)
+//  SISTEMA DE EDICIÓN Y REUBICACIÓN DE EDIFICIOS (DRAG & DROP)
 // ══════════════════════════════════════════════════════════════════════════
 
 window.toggleMapEditMode = function() {
-  playClickSound();
   cameraState.isEditMode = !cameraState.isEditMode;
+  playClickSound();
 
   const viewport = document.getElementById("overworldViewport");
   const banner = document.getElementById("editModeBanner");
   const btn = document.getElementById("btnToggleEditMode");
-
-  if (viewport && banner && btn) {
-    viewport.classList.toggle("is-edit-mode", cameraState.isEditMode);
-    banner.style.display = cameraState.isEditMode ? "flex" : "none";
-    btn.classList.toggle("active-mode", cameraState.isEditMode);
-  }
-
   const poiCard = document.getElementById("mapSelectedPoiCard");
-  if (poiCard) poiCard.style.display = "none";
+
+  if (viewport) viewport.classList.toggle("is-edit-mode", cameraState.isEditMode);
+  if (banner) banner.style.display = cameraState.isEditMode ? "flex" : "none";
+  if (btn) btn.classList.toggle("active-mode", cameraState.isEditMode);
+  if (poiCard && cameraState.isEditMode) poiCard.style.display = "none";
 };
 
 function setupBuildingDragHandlers() {
   const buildings = document.querySelectorAll(".iso-building-structure");
 
-  buildings.forEach(el => {
-    let isDraggingThis = false;
+  buildings.forEach((el) => {
     let startX = 0;
     let startY = 0;
     let origLeft = 0;
     let origTop = 0;
+    let isDraggingThis = false;
 
     const onPointerDown = (e) => {
       if (!cameraState.isEditMode) {
@@ -566,8 +836,8 @@ function setupBuildingDragHandlers() {
       let newLeft = Math.round(origLeft + dx);
       let newTop = Math.round(origTop + dy);
 
-      newLeft = Math.max(60, Math.min(1000, newLeft));
-      newTop = Math.max(80, Math.min(840, newTop));
+      newLeft = Math.max(40, Math.min(1000, newLeft));
+      newTop = Math.max(60, Math.min(840, newTop));
 
       el.style.left = `${newLeft}px`;
       el.style.top = `${newTop}px`;
@@ -615,7 +885,7 @@ window.cancelMapLayout = function() {
 };
 
 // ══════════════════════════════════════════════════════════════════════════
-//  SELECCIÓN Y ENTRADA A EDIFICIOS (CERO TARJETAS)
+//  SELECCIÓN Y ENTRADA INMEDIATA A LA HUERTA
 // ══════════════════════════════════════════════════════════════════════════
 
 window.onBuildingClick = function(zone) {
@@ -636,41 +906,25 @@ window.onBuildingClick = function(zone) {
         if (bLeft < currentLeft) spriteWrapper.classList.add("facing-left");
         else spriteWrapper.classList.remove("facing-left");
       }
-      farmer.style.transition = "top 1.2s cubic-bezier(0.25, 1, 0.5, 1), left 1.2s cubic-bezier(0.25, 1, 0.5, 1)";
-      farmer.style.top = `${bTop + 60}px`;
-      farmer.style.left = `${bLeft + 20}px`;
+      farmer.style.transition = "top 0.8s cubic-bezier(0.25, 1, 0.5, 1), left 0.8s cubic-bezier(0.25, 1, 0.5, 1)";
+      farmer.style.top = `${bTop + 80}px`;
+      farmer.style.left = `${bLeft + 30}px`;
     }
   }
 
-  const card = document.getElementById("mapSelectedPoiCard");
-  const title = document.getElementById("poiCardTitle");
-  const subtitle = document.getElementById("poiCardSubtitle");
-  const enterBtn = document.getElementById("poiCardEnterBtn");
+  // Si es un edificio activo (Colegio o Mi Huerta), ENTRAR DIRECTAMENTE
+  if (zone === 'colegio' || zone === 'individual') {
+    window.enterIsoZone(null, zone);
+    return;
+  }
 
-  if (card && title && subtitle && enterBtn) {
-    card.style.display = "flex";
-
-    if (zone === 'colegio') {
-      title.innerHTML = '🏫 IE Barro Blanco';
-      subtitle.innerHTML = '🌾 Huerta Escolar Colectiva • Camas de Siembra';
-      enterBtn.innerHTML = '<i class="fas fa-door-open"></i> Entrar al Cultivo';
-      enterBtn.style.background = 'linear-gradient(180deg, #7fc25c, #2e5b22)';
-    } else if (zone === 'individual') {
-      title.innerHTML = '🏡 Mi Huerta / Rancho';
-      subtitle.innerHTML = '👩‍🌾 Parcela de Entrenamiento y Práctica Individual';
-      enterBtn.innerHTML = '<i class="fas fa-door-open"></i> Entrar a Mi Huerta';
-      enterBtn.style.background = 'linear-gradient(180deg, #ffb300, #b8860b)';
-    } else if (zone === 'locked_compost') {
-      title.innerHTML = '🔒 Compostera Escolar';
-      subtitle.innerHTML = 'Requiere Nivel 5 de experiencia para procesar abonos.';
-      enterBtn.innerHTML = '<i class="fas fa-lock"></i> Bloqueado (Nivel 5)';
-      enterBtn.style.background = '#4a5568';
-    } else if (zone === 'locked_market') {
-      title.innerHTML = '🔒 Mercado Verde';
-      subtitle.innerHTML = 'Requiere Nivel 10 para intercambiar semillas y cosechas.';
-      enterBtn.innerHTML = '<i class="fas fa-lock"></i> Bloqueado (Nivel 10)';
-      enterBtn.style.background = '#4a5568';
-    }
+  // Si está bloqueado (Compostera o Mercado), notificar requerimiento
+  if (zone.startsWith('locked')) {
+    playActionBlocked();
+    const msg = zone === 'locked_compost'
+      ? "🔒 Compostera Escolar: Requiere Nivel 5 de experiencia realizando riegos y cosechas."
+      : "🔒 Mercado Verde: Requiere Nivel 10 para comerciar semillas y cosechas.";
+    alert(msg);
   }
 };
 
@@ -684,6 +938,7 @@ window.confirmEnterSelectedZone = function() {
 };
 
 window.enterIsoZone = function(evt, zone) {
+  if (evt) evt.stopPropagation();
   playClickSound();
 
   if (zone.startsWith('locked')) {
@@ -696,13 +951,16 @@ window.enterIsoZone = function(evt, zone) {
 
   playBuildingEnterSound();
   const viewport = document.getElementById("overworldViewport");
-  if (viewport) viewport.style.filter = "brightness(1.2)";
+  if (viewport) {
+    viewport.style.transition = "filter 0.3s ease";
+    viewport.style.filter = "brightness(1.25)";
+  }
 
   setTimeout(() => {
     if (onSelectZoneCallback) {
       onSelectZoneCallback(zone);
     }
-  }, 350);
+  }, 280);
 };
 
 // Acción directa en 1-tap sobre los bancales del mapa
@@ -718,51 +976,36 @@ window.onMapDirectAction = async function(evt, action, cropId) {
 
   try {
     const rect = evt.currentTarget.getBoundingClientRect();
+    const clickX = rect.left + rect.width / 2;
+    const clickY = rect.top;
 
     if (action === 'riego') {
-      const isRain = confirm("¿Fue un riego por lluvia natural?");
-      await logRiego(cropId, { isRain, user });
       playWatering();
-      spawnFloatingText(rect.left + rect.width / 2, rect.top, "💧 +10 XP • +5 Monedas", "#4fc3f7");
+      spawnFloatingText("💧 +10 XP", clickX, clickY, "#4fc3f7");
+      await logRiego(cropId, "Riego rápido desde el mapa 2.5D", user.displayName || "Estudiante");
       await awardUserGamification(user.uid, 10, 5);
     } else if (action === 'fertilizacion') {
-      const product = prompt("Tipo de abono utilizado:", "Compost orgánico escolar");
-      if (!product) return;
-      await logFertilizacion(cropId, { product, user });
       playFertilizing();
-      spawnFloatingText(rect.left + rect.width / 2, rect.top, "🍃 +15 XP • +10 Monedas", "#81c784");
-      await awardUserGamification(user.uid, 15, 10);
+      spawnFloatingText("🍃 +15 XP", clickX, clickY, "#81c784");
+      await logFertilizacion(cropId, "Abono rápido desde el mapa 2.5D", "Compost escolar", user.displayName || "Estudiante");
+      await awardUserGamification(user.uid, 15, 8);
     } else if (action === 'cosecha') {
-      const qtyStr = prompt("Cantidad cosechada:", "1");
-      if (!qtyStr) return;
-      const result = await logCosecha(cropId, { quantity: Number(qtyStr), isFinalHarvest: true, user });
-
-      if (result.plotUnlocked) {
-        playUnlockPlot();
-        spawnFloatingText(rect.left + rect.width / 2, rect.top, "🔓 ¡BANCAL DESBLOQUEADO! +50 XP", "#ffd54f");
-        await awardUserGamification(user.uid, 50, 25);
-      } else {
-        playHarvest();
-        spawnFloatingText(rect.left + rect.width / 2, rect.top, "🧺 +30 XP • +15 Monedas", "#ffd54f");
-        await awardUserGamification(user.uid, 30, 15);
-      }
+      playHarvest();
+      spawnFloatingText("🧺 +50 XP ¡Cosechado!", clickX, clickY, "#ffd54f");
+      await logCosecha(cropId, 1, "kg", "Cosecha desde el mapa 2.5D", user.displayName || "Estudiante");
+      await awardUserGamification(user.uid, 50, 25);
     }
 
-    if (onRefreshDataCallback) await onRefreshDataCallback();
+    if (onRefreshDataCallback) {
+      setTimeout(onRefreshDataCallback, 600);
+    }
   } catch (err) {
-    console.error("Error en acción directa:", err);
-    alert("Error: " + err.message);
-  }
-};
-
-window.switchHuertaViewMode = function(mode) {
-  if (window.switchHuertaViewModeGlobal) {
-    window.switchHuertaViewModeGlobal(mode);
+    console.error("Error en labor directa del mapa:", err);
   }
 };
 
 // ══════════════════════════════════════════════════════════════════════════
-//  IA AUTÓNOMA DE GRANJERO Y ANIMALES
+//  IA DE RUTINAS DE TRABAJO DEL GRANJERO Y ANIMALES
 // ══════════════════════════════════════════════════════════════════════════
 
 function initFarmerWorkerAI() {
@@ -771,61 +1014,41 @@ function initFarmerWorkerAI() {
   const farmer = document.getElementById("farmerAvatar");
   const bubble = document.getElementById("farmerBubble");
   const taskText = document.getElementById("farmerTaskText");
-  const toolIcon = document.getElementById("farmerToolIcon");
   const spriteWrapper = document.getElementById("farmerSpriteWrapper");
-
-  if (!farmer || !bubble || !taskText || !toolIcon || !spriteWrapper) return;
+  if (!farmer || !bubble || !taskText) return;
 
   const waypoints = [
-    { top: 220, left: 320, tool: "💧", text: "💧 Regando la huerta escolar...", duration: 4500 },
-    { top: 220, left: 780, tool: "🌱", text: "🌱 Revisando el rancho...", duration: 4500 },
-    { top: 500, left: 560, tool: "🧹", text: "🧹 Limpiando el puente del río...", duration: 4500 },
-    { top: 660, left: 320, tool: "🪴", text: "🪴 Volteando el compost...", duration: 4500 }
+    { x: 310, y: 260, text: "🌱 Cuidando los bancales de la Escuela...", tool: "💧" },
+    { x: 600, y: 470, text: "🪵 Cruzando el sendero central...", tool: "🚶" },
+    { x: 790, y: 260, text: "🌻 Sembrando flores en Mi Parcela...", tool: "🪴" },
+    { x: 600, y: 660, text: "🌉 Limpiando las maderas del puente...", tool: "🧹" },
+    { x: 310, y: 680, text: "🍂 Aireando el abono en la compostera...", tool: "🛠️" }
   ];
 
-  let currentIdx = 0;
+  let currentWpIndex = 0;
 
-  function moveToNextWaypoint() {
+  farmerWorkerTimer = setInterval(() => {
     if (cameraState.isEditMode) return;
-    const farmerEl = document.getElementById("farmerAvatar");
-    if (!farmerEl) return;
 
-    const wp = waypoints[currentIdx];
-    currentIdx = (currentIdx + 1) % waypoints.length;
+    currentWpIndex = (currentWpIndex + 1) % waypoints.length;
+    const wp = waypoints[currentWpIndex];
 
-    bubble.style.display = "none";
-    toolIcon.style.display = "none";
-
-    const currentLeft = parseFloat(farmerEl.style.left) || 580;
-    if (wp.left < currentLeft) {
-      spriteWrapper.classList.add("facing-left");
-    } else {
-      spriteWrapper.classList.remove("facing-left");
+    const currentLeft = parseFloat(farmer.style.left) || 480;
+    if (spriteWrapper) {
+      if (wp.x < currentLeft) spriteWrapper.classList.add("facing-left");
+      else spriteWrapper.classList.remove("facing-left");
     }
 
-    farmerEl.style.transition = "top 3.2s linear, left 3.2s linear";
-    farmerEl.style.top = `${wp.top}px`;
-    farmerEl.style.left = `${wp.left}px`;
+    farmer.style.transition = "top 4s cubic-bezier(0.4, 0, 0.2, 1), left 4s cubic-bezier(0.4, 0, 0.2, 1)";
+    farmer.style.top = `${wp.y}px`;
+    farmer.style.left = `${wp.x}px`;
 
     setTimeout(() => {
-      if (!document.getElementById("farmerAvatar") || cameraState.isEditMode) return;
-      taskText.innerText = wp.text;
-      toolIcon.innerText = wp.tool;
+      taskText.innerHTML = wp.text;
       bubble.style.display = "block";
-      toolIcon.style.display = "block";
-
-      playAmbientChirp();
-
-      setTimeout(() => {
-        if (!document.getElementById("farmerAvatar")) return;
-        moveToNextWaypoint();
-      }, wp.duration);
-    }, 3300);
-  }
-
-  setTimeout(() => {
-    moveToNextWaypoint();
-  }, 1500);
+      setTimeout(() => { bubble.style.display = "none"; }, 3500);
+    }, 4000);
+  }, 10000);
 }
 
 function initAnimalWanderingAI() {
@@ -834,39 +1057,51 @@ function initAnimalWanderingAI() {
   const cow = document.getElementById("cowWalker");
   const chicken = document.getElementById("chickenWalker");
 
+  const cowSpots = [
+    { top: "78%", left: "24%" },
+    { top: "82%", left: "30%" },
+    { top: "75%", left: "20%" },
+    { top: "80%", left: "26%" }
+  ];
+
+  const chickenSpots = [
+    { top: "44%", left: "74%" },
+    { top: "40%", left: "78%" },
+    { top: "48%", left: "72%" },
+    { top: "42%", left: "76%" }
+  ];
+
+  let cIndex = 0;
+  let chIndex = 0;
+
   animalTimer = setInterval(() => {
+    if (cameraState.isEditMode) return;
+
+    cIndex = (cIndex + 1) % cowSpots.length;
+    chIndex = (chIndex + 1) % chickenSpots.length;
+
     if (cow) {
-      const randTop = 720 + Math.random() * 60;
-      const randLeft = 200 + Math.random() * 80;
-      cow.style.top = `${randTop}px`;
-      cow.style.left = `${randLeft}px`;
+      cow.style.top = cowSpots[cIndex].top;
+      cow.style.left = cowSpots[cIndex].left;
     }
     if (chicken) {
-      const randTop = 420 + Math.random() * 50;
-      const randLeft = 720 + Math.random() * 70;
-      chicken.style.top = `${randTop}px`;
-      chicken.style.left = `${randLeft}px`;
+      chicken.style.top = chickenSpots[chIndex].top;
+      chicken.style.left = chickenSpots[chIndex].left;
     }
-  }, 6500);
+  }, 7000);
 }
 
-export function spawnFloatingText(x, y, text, color = "#ffd54f") {
+// Generador de Efectos Flotantes de Partículas (+XP)
+export function spawnFloatingText(text, x, y, color = "#ffd54f") {
   const el = document.createElement("div");
-  el.className = "floating-game-text";
-  el.innerText = text;
-  el.style.cssText = `
-    position: fixed;
-    left: ${x}px;
-    top: ${y}px;
-    color: ${color};
-    font-weight: 800;
-    font-size: 1.1rem;
-    pointer-events: none;
-    z-index: 99999;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-    transform: translate(-50%, 0);
-    animation: floatUpGlow 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  `;
+  el.className = "floating-action-text";
+  el.textContent = text;
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  el.style.color = color;
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1200);
+
+  setTimeout(() => {
+    if (el && el.parentNode) el.parentNode.removeChild(el);
+  }, 1400);
 }

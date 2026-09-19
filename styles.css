@@ -7118,16 +7118,16 @@ body[data-theme] {
   will-change: transform;
 }
 
-/* Terreno de Césped Texturizado con Relieve */
+/* Terreno de Césped Texturizado Estilo Top Heroes */
 .iso-terrain-grid {
   position: absolute;
   inset: 0;
-  background-color: #27521e;
+  background-color: #689f38;
   background-image:
-    radial-gradient(circle at 50% 50%, rgba(92, 194, 96, 0.18) 18%, transparent 22%),
-    linear-gradient(rgba(255, 255, 255, 0.04) 2px, transparent 2px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 2px, transparent 2px);
-  background-size: 80px 80px, 40px 40px, 40px 40px;
+    radial-gradient(ellipse at 50% 30%, rgba(139, 195, 74, 0.45) 0%, transparent 65%),
+    radial-gradient(circle at 18% 75%, rgba(85, 139, 47, 0.5) 0%, transparent 45%),
+    radial-gradient(circle at 82% 80%, rgba(51, 105, 30, 0.5) 0%, transparent 50%),
+    radial-gradient(circle at 75% 25%, rgba(156, 204, 101, 0.4) 0%, transparent 40%);
 }
 
 /* Cuadrícula de Colocación en Modo Edición */
@@ -7318,24 +7318,140 @@ body[data-theme] {
   align-items: center;
 }
 
-/* Sprite Isométrico 2.5D Real */
+/* Sprite Isométrico 2.5D Real con Modelos SVG */
 .iso-building-sprite {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 14px 16px rgba(0,0,0,0.7));
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.building-emoji-art {
-  font-size: 5rem;
+.iso-svg-building {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 14px 18px rgba(0,0,0,0.5));
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.iso-building-structure:hover .iso-svg-building {
+  transform: scale(1.06) translateY(-6px);
+  filter: drop-shadow(0 20px 24px rgba(0,0,0,0.65)) drop-shadow(0 0 16px rgba(255, 213, 79, 0.65));
+}
+
+/* Huerta Vallada con Cerca de Madera 2.5D (Estilo Top Heroes) */
+.iso-fenced-garden {
+  position: relative;
+  background: rgba(62, 39, 23, 0.5);
+  border: 3px solid #8d5b36;
+  border-radius: 14px;
+  padding: 6px 8px;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.5), inset 0 2px 6px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 6px;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.iso-fenced-garden:hover {
+  transform: translateY(-3px) scale(1.02);
+  border-color: #ffd54f;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.6), 0 0 14px rgba(255, 213, 79, 0.5);
+}
+
+.fenced-garden-banner {
+  font-family: var(--font-game);
+  font-size: 0.68rem;
+  color: #ffd54f;
+  font-weight: 800;
+  text-shadow: 0 1px 2px #000;
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 4px;
+}
+
+.tap-hint {
+  font-size: 0.62rem;
+  color: #a5d6a7;
+  font-weight: 600;
+}
+
+.fenced-garden-fence-top,
+.fenced-garden-fence-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  line-height: 1;
+  font-size: 0.8rem;
+}
+
+.fence-post {
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+}
+
+.fence-rail {
+  color: #8d5b36;
+  font-weight: 900;
+  letter-spacing: -2px;
+  font-size: 0.75rem;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.8);
+}
+
+.fenced-garden-soil-field {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.iso-crop-bed-cell {
+  width: 48px;
+  height: 34px;
+  background: radial-gradient(ellipse at center, #543419 0%, #301b0c 70%, #1a0e05 100%);
+  border: 2px solid #8d5b36;
+  border-bottom: 4px solid #5a371c;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.7), 0 3px 6px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.iso-crop-bed-cell:hover {
+  transform: translateY(-2px);
+  border-color: #ffd54f;
+}
+
+.bed-sprite-crop {
+  font-size: 1.35rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
   line-height: 1;
 }
 
-.iso-building-structure:hover .iso-building-sprite {
-  transform: scale(1.08) translateY(-4px);
-  filter: drop-shadow(0 18px 22px rgba(0,0,0,0.8)) drop-shadow(0 0 16px rgba(255, 213, 79, 0.7));
+.mini-harvest-bubble {
+  position: absolute;
+  top: -12px;
+  right: -6px;
+  font-size: 0.85rem;
+  background: rgba(0,0,0,0.75);
+  border-radius: 50%;
+  padding: 2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  animation: miniBounce 1s infinite alternate;
+}
+
+@keyframes miniBounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-4px); }
 }
 
 /* Sombra de Contacto Natural en el Césped */
@@ -7559,9 +7675,9 @@ body[data-theme] {
 /* Tarjeta Inferior de Destino Seleccionado */
 .map-selected-poi-card {
   position: absolute;
-  bottom: 12px;
-  left: 12px;
-  right: 12px;
+  bottom: 85px !important;
+  left: 14px;
+  right: 14px;
   background: rgba(15, 24, 12, 0.96);
   border: 2px solid var(--hud-border-gold);
   border-radius: 16px;
@@ -7571,7 +7687,7 @@ body[data-theme] {
   justify-content: space-between;
   gap: 10px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-  z-index: 40;
+  z-index: 10005 !important;
   animation: slideUpCard 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
