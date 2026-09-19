@@ -24,11 +24,11 @@ import {
   awardUserGamification,
   createPracticePlot,
   assignIndividualRealPlot
-} from "./huerta-service.js?v=57";
-import { uploadOrCompressPhoto } from "./image-utils.js?v=57";
-import { renderFarmGame } from "./farm-game.js?v=57";
-import { renderOverworldMap } from "./farm-overworld.js?v=57";
-import { initCelebrationOverlay } from "./celebration-overlay.js?v=57";
+} from "./huerta-service.js?v=58";
+import { uploadOrCompressPhoto } from "./image-utils.js?v=58";
+import { renderFarmGame } from "./farm-game.js?v=58";
+import { renderOverworldMap } from "./farm-overworld.js?v=58";
+import { initCelebrationOverlay } from "./celebration-overlay.js?v=58";
 
 let currentUser = null;
 let userRole = "integrante"; // 'admin', 'lider', 'integrante'

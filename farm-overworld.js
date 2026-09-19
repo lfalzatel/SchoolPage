@@ -135,9 +135,9 @@ export function renderOverworldMap(container, {
 
       <!-- CONTROLES FLOTANTES DE CÁMARA (ZOOM Y MODO MOVER) -->
       <div class="map-hud-controls">
-        <button class="map-ctrl-btn" onclick="window.mapZoomIn()" title="Acercar Cámara">➕</button>
-        <button class="map-ctrl-btn" onclick="window.mapZoomOut()" title="Alejar Cámara">➖</button>
-        <button class="map-ctrl-btn" onclick="window.resetCameraView()" title="Centrar Vista">🎯</button>
+        <button class="map-ctrl-btn btn-zoom-ctrl" onclick="window.mapZoomIn()" title="Acercar Cámara">➕</button>
+        <button class="map-ctrl-btn btn-zoom-ctrl" onclick="window.mapZoomOut()" title="Alejar Cámara">➖</button>
+        <button class="map-ctrl-btn btn-zoom-ctrl" onclick="window.resetCameraView()" title="Centrar Vista">🎯</button>
         <button class="map-ctrl-btn" id="btnToggleEditMode" onclick="window.toggleMapEditMode()" title="Mover / Reubicar Edificios">🏗️</button>
       </div>
 

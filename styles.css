@@ -7618,6 +7618,13 @@ body[data-theme] {
   box-shadow: 0 0 18px #d9a94e;
 }
 
+/* Ocultar botones de zoom en móviles y pantallas táctiles (el zoom se hace con los dedos) */
+@media (max-width: 768px), (pointer: coarse) {
+  .btn-zoom-ctrl {
+    display: none !important;
+  }
+}
+
 /* Barra Superior del Modo Edición */
 .edit-mode-banner {
   position: absolute;

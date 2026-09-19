@@ -18,7 +18,7 @@ import {
   playUnlockPlot,
   playClickSound
 } from "./farm-sounds.js";
-import { spawnFloatingText } from "./farm-overworld.js?v=57";
+import { spawnFloatingText } from "./farm-overworld.js?v=58";
 
 let currentCrops = [];
 let currentPlots = [];
