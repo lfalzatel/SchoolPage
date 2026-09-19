@@ -6349,3 +6349,210 @@ body[data-theme] {
   border-radius: 6px;
   letter-spacing: 0.5px;
 }
+
+/* ── ESCENARIO DE MAPA VISUAL TOP HEROES ── */
+.top-heroes-map-scene {
+  background: radial-gradient(circle at center, #2e7d32 0%, #1b4d24 60%, #0d2812 100%);
+  border: 3px solid rgba(129, 199, 132, 0.4);
+  border-radius: 24px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.8), 0 16px 40px rgba(0,0,0,0.6);
+  min-height: 480px;
+}
+
+.map-sky-overlay {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  top: 10px; left: 16px; right: 16px;
+  pointer-events: none;
+  z-index: 10;
+}
+.map-cloud { font-size: 1.6rem; animation: floatCloud 25s linear infinite alternate; opacity: 0.8; }
+.map-sun { font-size: 1.8rem; filter: drop-shadow(0 0 12px #ffd54f); }
+
+.map-header-hud {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 8px 16px;
+  text-align: center;
+  color: #a5d6a7;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 15;
+}
+.hud-location-title { font-weight: 700; font-size: 0.95rem; color: #fff; display: block; }
+.hud-subtitle { font-size: 0.76rem; color: #cbd5e0; }
+
+.map-terrain-canvas {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background-color: #2d5a27;
+  background-image: 
+    radial-gradient(circle at 20% 30%, #386f31 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, #23471f 0%, transparent 50%),
+    repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 10px, transparent 10px, transparent 20px);
+  border-radius: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+}
+
+.map-paths-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.map-decor {
+  position: absolute;
+  font-size: 1.8rem;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+}
+.tree-1 { top: 6%; left: 42%; }
+.tree-2 { top: 6%; left: 88%; }
+.tree-3 { top: 80%; left: 42%; }
+.tree-4 { top: 80%; left: 88%; }
+.flowers-1 { top: 48%; left: 5%; font-size: 1.2rem; }
+.flowers-2 { top: 48%; left: 90%; font-size: 1.2rem; }
+.fence-left { top: 45%; left: 35%; font-size: 1.4rem; }
+.fence-right { top: 45%; left: 58%; font-size: 1.4rem; }
+
+/* Avatar Caminante del Agricultor */
+.map-farmer-avatar {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.avatar-sprite {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.6));
+}
+.bounce-walk {
+  animation: avatarBounce 0.8s infinite alternate;
+}
+@keyframes avatarBounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-6px); }
+}
+.avatar-nametag {
+  background: rgba(0, 0, 0, 0.7);
+  color: #ffd54f;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+  border: 1px solid #ffd54f;
+  margin-top: -4px;
+}
+
+/* Nodos de Edificios en Coordenadas del Mapa */
+.map-building-node {
+  position: absolute;
+  width: 36%;
+  height: 140px;
+  z-index: 10;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.map-building-node:hover {
+  transform: scale(1.06);
+  z-index: 12;
+}
+
+.building-visual-card {
+  background: rgba(15, 30, 20, 0.85);
+  border: 2px solid #81c784;
+  border-radius: 16px;
+  padding: 10px 8px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+  position: relative;
+  backdrop-filter: blur(4px);
+}
+.school-node .building-visual-card { border-color: #81c784; background: radial-gradient(circle at center, rgba(46,125,50,0.4), rgba(0,0,0,0.7)); }
+.farm-node .building-visual-card { border-color: #ffd54f; background: radial-gradient(circle at center, rgba(255,193,7,0.3), rgba(0,0,0,0.7)); }
+.locked-node .building-visual-card { border-style: dashed; opacity: 0.65; border-color: #718096; }
+
+.node-tag-badge {
+  font-size: 0.62rem;
+  font-weight: 800;
+  background: #2e7d32;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+}
+.farm-tag { background: #d69e2e; color: #000; }
+.lock-tag { background: #4a5568; }
+
+.building-icon-sprite {
+  font-size: 3.2rem;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.7));
+  margin: 2px 0;
+  transition: transform 0.25s ease;
+}
+.map-building-node:hover .building-icon-sprite {
+  transform: scale(1.15) rotate(-3deg);
+}
+
+.node-title-box {
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 8px;
+  width: 100%;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Burbujas Flotantes de Tareas sobre Edificios (Top Heroes style) */
+.map-floating-crate {
+  position: absolute;
+  top: -14px; right: 6px;
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 2px solid #fff;
+  box-shadow: 0 6px 14px rgba(229,62,62,0.8);
+  z-index: 15;
+}
+.pulse-float {
+  animation: crateFloatBounce 1.4s infinite alternate ease-in-out;
+}
+@keyframes crateFloatBounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+.building-pulse-tap {
+  animation: tapPulseAnim 0.35s ease-out;
+}
+@keyframes tapPulseAnim {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
