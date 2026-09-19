@@ -11,7 +11,13 @@
     "ignore": [
       "firebase.json",
       "**/.*",
+      "**/.git/**",
+      "**/.firebase/**",
       "**/node_modules/**",
+      "**/*.mp4",
+      "**/*.mov",
+      "**/*.avi",
+      "**/*.zip",
       "**/*.log",
       "**/*.txt",
       "**/scripts/**",

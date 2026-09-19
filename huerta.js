@@ -68,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
       userRole = "invitado";
       updateAuthUI(null);
       renderUnauthenticatedState();
+      await loadHuertaData();
     }
   });
 
