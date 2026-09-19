@@ -7076,3 +7076,364 @@ body[data-theme] {
   color: var(--hud-text-gold) !important;
   text-shadow: 0 1px 2px #000 !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOTOR DE MAPA ISOMÉTRICO 2.5D TIPO VIDEOJUEGO (TOP HEROES OVERWORLD)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Contenedor Principal del Viewport de Juego */
+.top-heroes-game-viewport {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 3px #5d4037, inset 0 0 0 5px #d9a94e;
+  background: #1b2e15;
+  user-select: none;
+}
+
+/* Escenario del Mundo Isométrico */
+.isometric-world-scene {
+  position: relative;
+  width: 100%;
+  height: 640px;
+  background: linear-gradient(180deg, #2d5a27 0%, #1e461b 40%, #153813 100%);
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+/* Capa de Cielo y Nubes Flotantes */
+.iso-sky-layer {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 90px;
+  pointer-events: none;
+  z-index: 5;
+  background: linear-gradient(180deg, rgba(129, 212, 250, 0.45) 0%, transparent 100%);
+}
+
+.iso-cloud {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.75;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+  animation: cloudDrift 35s linear infinite;
+}
+.cloud-a { top: 12px; left: -10%; animation-duration: 40s; }
+.cloud-b { top: 35px; left: -15%; animation-duration: 55s; animation-delay: 15s; }
+
+@keyframes cloudDrift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(700px); }
+}
+
+.iso-sun-glow {
+  position: absolute;
+  top: 10px; right: 18px;
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 15px #ffe082);
+  animation: sunPulse 4s ease-in-out infinite alternate;
+}
+@keyframes sunPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
+}
+
+/* Aves Volando por el Mapa (Flying Birds) */
+.flying-bird {
+  position: absolute;
+  z-index: 28;
+  font-size: 1.3rem;
+  pointer-events: none;
+  animation: flyAcrossMap 18s linear infinite;
+}
+.flying-bird.bird-1 {
+  top: 15%;
+  left: -10%;
+  animation-duration: 14s;
+  animation-delay: 2s;
+}
+.flying-bird.bird-2 {
+  top: 28%;
+  left: -15%;
+  animation-duration: 17s;
+  animation-delay: 7s;
+}
+@keyframes flyAcrossMap {
+  0% { transform: translate(0, 0) scale(0.9); }
+  50% { transform: translate(350px, 30px) scale(1.1); }
+  100% { transform: translate(750px, -20px) scale(0.85); }
+}
+
+.bird-shadow {
+  position: absolute;
+  bottom: -35px;
+  left: 5px;
+  width: 14px;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+/* Mariposas Revoloteando (Butterflies) */
+.flying-butterfly {
+  position: absolute;
+  z-index: 22;
+  font-size: 1.1rem;
+  pointer-events: none;
+  animation: butterflyFlutter 6s ease-in-out infinite alternate;
+}
+.butterfly-1 { top: 44%; left: 32%; animation-duration: 5s; }
+.butterfly-2 { top: 52%; left: 68%; animation-duration: 7s; }
+
+@keyframes butterflyFlutter {
+  0% { transform: translate(0, 0) rotate(-10deg) scale(0.9); }
+  25% { transform: translate(20px, -15px) rotate(15deg) scale(1.1); }
+  50% { transform: translate(-15px, -30px) rotate(-15deg) scale(0.95); }
+  75% { transform: translate(30px, -10px) rotate(20deg) scale(1.05); }
+  100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+/* Animales Caminando en el Terreno */
+.iso-animal-walker {
+  position: absolute;
+  z-index: 18;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: top 3.5s ease-in-out, left 3.5s ease-in-out;
+}
+.cow-walker { top: 78%; left: 26%; font-size: 1.8rem; }
+.chicken-walker { top: 42%; left: 74%; font-size: 1.2rem; }
+
+.animal-sprite {
+  display: inline-block;
+  animation: animalGraze 3s infinite alternate ease-in-out;
+}
+@keyframes animalGraze {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-3px) rotate(3deg); }
+  100% { transform: translateY(1px) rotate(-2deg); }
+}
+
+/* Plano del Terreno Isométrico con Texturas */
+.iso-terrain-grid {
+  position: absolute;
+  inset: 0;
+  background-color: #234b1e;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(76, 175, 80, 0.15) 15%, transparent 20%),
+    linear-gradient(rgba(255, 255, 255, 0.03) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 2px, transparent 2px);
+  background-size: 60px 60px, 40px 40px, 40px 40px;
+}
+
+/* SVG de Senderos y Río */
+.iso-paths-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+.river-flow {
+  animation: riverAnim 1.8s linear infinite;
+}
+@keyframes riverAnim {
+  from { stroke-dashoffset: 20; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Decoraciones del Mapa (Árboles, Flores, Vallas) */
+.iso-decor {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  z-index: 8;
+}
+.tree-tl { top: 8%; left: 2%; font-size: 2.2rem; }
+.tree-tr { top: 8%; right: 4%; font-size: 2.2rem; }
+.tree-bl { bottom: 6%; left: 4%; font-size: 2.4rem; z-index: 26; }
+.tree-br { bottom: 6%; right: 4%; font-size: 2.4rem; z-index: 26; }
+.flowers-l { top: 42%; left: 6%; font-size: 1.4rem; }
+.flowers-r { top: 76%; right: 8%; font-size: 1.4rem; }
+.fence-l { top: 48%; left: 16%; font-size: 1.3rem; }
+.fence-r { top: 72%; right: 28%; font-size: 1.3rem; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   EDIFICIOS 3D ISOMÉTRICOS SOBRE EL MAPA (CON PINES DE DESTINO TIPO UBER)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.iso-building-structure {
+  position: absolute;
+  width: 42%;
+  max-width: 220px;
+  z-index: 15;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.iso-building-structure:hover {
+  transform: translateY(-4px) scale(1.03);
+}
+
+.iso-building-structure:active {
+  transform: scale(0.97);
+}
+
+/* Pin Flotante de Ubicación en el Mapa (Estilo Uber/Juego) */
+.building-map-pin {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #d9a94e, #b8860b);
+  border: 2px solid #fff;
+  border-radius: 999px;
+  padding: 3px 10px;
+  color: #1a120b;
+  font-family: var(--font-game);
+  font-weight: 800;
+  font-size: 0.7rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  margin-bottom: 4px;
+  animation: pinBounce 1.5s infinite alternate ease-in-out;
+}
+@keyframes pinBounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-5px); }
+}
+
+.building-map-pin.school-pin {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: #fff;
+}
+
+.building-map-pin.farm-pin {
+  background: linear-gradient(135deg, #ffb300, #ff8f00);
+  color: #000;
+}
+
+.building-map-pin.lock-pin {
+  background: linear-gradient(135deg, #718096, #4a5568);
+  color: #fff;
+}
+
+/* Arte y Estructura del Edificio */
+.building-artwork {
+  width: 100%;
+  background: linear-gradient(180deg, rgba(30, 42, 22, 0.94) 0%, rgba(14, 22, 10, 0.98) 100%);
+  border: 3px solid var(--wood-base);
+  border-radius: 18px;
+  padding: 10px 8px 8px 8px;
+  text-align: center;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.15), 0 10px 20px rgba(0,0,0,0.6);
+  position: relative;
+}
+
+/* Sombra de Contacto sobre el Terreno */
+.building-artwork::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 10%;
+  width: 80%;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 50%;
+  filter: blur(4px);
+  z-index: -1;
+}
+
+.school-building .building-artwork {
+  border-color: #81c784;
+}
+
+.farm-building .building-artwork {
+  border-color: #ffd54f;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 0 15px rgba(255, 213, 79, 0.35), 0 10px 20px rgba(0,0,0,0.6);
+}
+
+.locked-building {
+  opacity: 0.72;
+  filter: grayscale(0.6);
+}
+
+.structure-badge {
+  display: inline-block;
+  background: var(--leaf-dark);
+  color: #fff;
+  font-family: var(--font-game);
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--leaf-light);
+  margin-bottom: 4px;
+}
+
+.farm-badge {
+  background: #5d4037;
+  border-color: #ffd54f;
+  color: #ffd54f;
+}
+
+.artwork-sprite {
+  font-size: 2.6rem;
+  margin: 2px 0;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+}
+
+.structure-title-box {
+  font-family: var(--font-game);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Panel Inferior de Inspección de Destino Seleccionado */
+.map-selected-poi-card {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  background: rgba(15, 24, 12, 0.95);
+  border: 2px solid var(--hud-border-gold);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  z-index: 40;
+  animation: slideUpCard 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideUpCard {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.poi-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.poi-title {
+  font-family: var(--font-game);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--hud-text-gold);
+}
+
+.poi-subtitle {
+  font-size: 0.75rem;
+  color: #cbd5e0;
+}

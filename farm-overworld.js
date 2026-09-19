@@ -97,7 +97,7 @@ export function renderOverworldMap(container, {
         </div>
       </div>
 
-      <!-- 3. ESCENARIO VISUAL ISOMÉTRICO EN 2.5D (Grass Landscape) -->
+      <!-- 3. ESCENARIO VISUAL ISOMÉTRICO EN 2.5D (Mapa de Granja) -->
       <div class="isometric-world-scene" id="isometricWorldScene">
         
         <!-- CIELO Y CLIMA ANIMADO -->
@@ -105,11 +105,19 @@ export function renderOverworldMap(container, {
           <div class="iso-cloud cloud-a">☁️</div>
           <div class="iso-cloud cloud-b">☁️</div>
           <div class="iso-sun-glow">☀️</div>
+
+          <!-- Aves Volando con Sombra Proyectada -->
+          <div class="flying-bird bird-1">🕊️<span class="bird-shadow"></span></div>
+          <div class="flying-bird bird-2">🦅<span class="bird-shadow"></span></div>
         </div>
 
         <!-- PLANO ISOMÉTRICO EN 45 GRADOS (Terreno y Senderos) -->
-        <div class="iso-terrain-grid">
+        <div class="iso-terrain-grid" onclick="window.onTerrainClick(event)">
           
+          <!-- Mariposas Revoloteando sobre las Flores -->
+          <div class="flying-butterfly butterfly-1">🦋</div>
+          <div class="flying-butterfly butterfly-2">🦋</div>
+
           <!-- SVG DE CAMINOS Y RÍO DE AGUA ANIMADA -->
           <svg class="iso-paths-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
             <!-- Río lateral animado -->
@@ -132,7 +140,16 @@ export function renderOverworldMap(container, {
           <div class="iso-decor flowers-r">🌼</div>
           <div class="iso-decor fence-l">🪵</div>
           <div class="iso-decor fence-r">🪵</div>
-          <div class="iso-decor cow-anim">🐮</div>
+
+          <!-- ANIMALES CAMINANDO Y PASTANDO EN EL TERRENO -->
+          <div class="iso-animal-walker cow-walker" id="cowWalker">
+            <span class="animal-sprite">🐮</span>
+            <span class="farmer-shadow"></span>
+          </div>
+          <div class="iso-animal-walker chicken-walker" id="chickenWalker">
+            <span class="animal-sprite">🐔</span>
+            <span class="farmer-shadow" style="width: 14px; height: 4px;"></span>
+          </div>
 
           <!-- AGRICULTOR CAMINANTE EN EL SENDEROS (AVATAR TRABAJADOR) -->
           <div class="iso-farmer-avatar" id="farmerAvatar" style="top: 48%; left: 47%;">
@@ -146,14 +163,16 @@ export function renderOverworldMap(container, {
             <span class="farmer-shadow"></span>
           </div>
 
-          <!-- EDIFICIO 1: ESCUELA IE BARRO BLANCO + BANCALES REALES EN LA HIERRA -->
-          <div class="iso-building-structure school-building" style="top: 10%; left: 6%;" onclick="window.enterIsoZone(event, 'colegio', 18, 22)">
+          <!-- EDIFICIO 1: ESCUELA IE BARRO BLANCO + PINES DE MAPA + BANCALES -->
+          <div class="iso-building-structure school-building" style="top: 8%; left: 6%;" onclick="window.selectMapPoi(event, 'colegio', 20, 24)">
+            <div class="building-map-pin school-pin">
+              <i class="fas fa-map-marker-alt"></i> IE BARRO BLANCO
+            </div>
             ${schoolPendingCount > 0 ? `<div class="iso-crate-badge pulse-bounce">🧺 ${schoolPendingCount} pendientes</div>` : ''}
             <div class="building-artwork">
-              <span class="structure-badge">IE BARRO BLANCO</span>
               <div class="artwork-sprite">🏫</div>
               <div class="structure-title-box">
-                <span>🌾 Huerta Escolar Colectiva</span>
+                <span>🌾 Huerta Escolar</span>
               </div>
             </div>
 
@@ -164,13 +183,15 @@ export function renderOverworldMap(container, {
           </div>
 
           <!-- EDIFICIO 2: MI GRANJA / RANCHO DEL ESTUDIANTE -->
-          <div class="iso-building-structure farm-building" style="top: 10%; left: 54%;" onclick="window.enterIsoZone(event, 'individual', 18, 70)">
+          <div class="iso-building-structure farm-building" style="top: 8%; left: 54%;" onclick="window.selectMapPoi(event, 'individual', 20, 70)">
+            <div class="building-map-pin farm-pin">
+              <i class="fas fa-map-marker-alt"></i> MI HUERTA
+            </div>
             ${personalPendingCount > 0 ? `<div class="iso-crate-badge farm-crate pulse-bounce">🪴 ${personalPendingCount} pendientes</div>` : ''}
             <div class="building-artwork farm-art">
-              <span class="structure-badge farm-badge">MI GRANJA</span>
               <div class="artwork-sprite">🏡</div>
               <div class="structure-title-box">
-                <span>👩‍🌾 Rancho & Práctica</span>
+                <span>👩‍🌾 Rancho Individual</span>
               </div>
             </div>
 
@@ -181,32 +202,53 @@ export function renderOverworldMap(container, {
           </div>
 
           <!-- EDIFICIO 3: COMPOSTERA ESCOLAR (Nivel 5) -->
-          <div class="iso-building-structure locked-building" style="top: 62%; left: 6%;" onclick="window.enterIsoZone(event, 'locked_compost', 68, 22)">
+          <div class="iso-building-structure locked-building" style="top: 60%; left: 6%;" onclick="window.selectMapPoi(event, 'locked_compost', 66, 22)">
+            <div class="building-map-pin lock-pin">
+              <i class="fas fa-lock"></i> COMPOSTERA
+            </div>
             <div class="building-artwork dim-art">
               <span class="structure-badge lock-badge">NIVEL 5</span>
               <div class="artwork-sprite dim-sprite">♻️</div>
               <div class="structure-title-box dim-box">
-                <span>🔒 Compostera</span>
+                <span>🔒 Abonos</span>
               </div>
             </div>
           </div>
 
           <!-- EDIFICIO 4: MERCADO VERDE (Nivel 10) -->
-          <div class="iso-building-structure locked-building" style="top: 62%; left: 54%;" onclick="window.enterIsoZone(event, 'locked_market', 68, 70)">
+          <div class="iso-building-structure locked-building" style="top: 60%; left: 54%;" onclick="window.selectMapPoi(event, 'locked_market', 66, 70)">
+            <div class="building-map-pin lock-pin">
+              <i class="fas fa-lock"></i> MERCADO VERDE
+            </div>
             <div class="building-artwork dim-art">
               <span class="structure-badge lock-badge">NIVEL 10</span>
               <div class="artwork-sprite dim-sprite">🧺</div>
               <div class="structure-title-box dim-box">
-                <span>🔒 Mercado Verde</span>
+                <span>🔒 Tienda</span>
               </div>
             </div>
           </div>
 
         </div>
+
+        <!-- TARJETA INFERIOR DE DESTINO SELECCIONADO EN EL MAPA (TIPO UBER/JUEGO) -->
+        <div class="map-selected-poi-card" id="mapSelectedPoiCard" style="display: none;">
+          <div class="poi-info">
+            <span class="poi-title" id="poiCardTitle">🏫 IE Barro Blanco</span>
+            <span class="poi-subtitle" id="poiCardSubtitle">Huerta Escolar Colectiva</span>
+          </div>
+          <button class="game-btn" id="poiCardEnterBtn" onclick="window.confirmEnterSelectedZone()">
+            <i class="fas fa-door-open"></i> Entrar al Cultivo
+          </button>
+        </div>
+
       </div>
     </div>
+  `;
+
   playAmbientChirp();
   initFarmerWorkerAI();
+  initAnimalWanderingAI();
 }
 
 let farmerWorkerTimer = null;
@@ -339,6 +381,117 @@ function renderOnMapPlotBeds(cropsList, plotsList, scope) {
 
   return html;
 }
+
+let selectedPoiZone = 'colegio';
+let animalTimer = null;
+
+function initAnimalWanderingAI() {
+  if (animalTimer) clearInterval(animalTimer);
+
+  const cow = document.getElementById("cowWalker");
+  const chicken = document.getElementById("chickenWalker");
+
+  animalTimer = setInterval(() => {
+    if (cow) {
+      const randTop = 74 + Math.random() * 8;
+      const randLeft = 22 + Math.random() * 12;
+      cow.style.top = `${randTop}%`;
+      cow.style.left = `${randLeft}%`;
+    }
+    if (chicken) {
+      const randTop = 40 + Math.random() * 8;
+      const randLeft = 70 + Math.random() * 10;
+      chicken.style.top = `${randTop}%`;
+      chicken.style.left = `${randLeft}%`;
+    }
+  }, 6500);
+}
+
+// Selección de punto en el mapa (estilo Uber / Juego)
+window.selectMapPoi = function(evt, zone, targetTop, targetLeft) {
+  if (evt) evt.stopPropagation();
+  playClickSound();
+
+  selectedPoiZone = zone;
+
+  // Dirigir al agricultor hacia el punto seleccionado
+  const farmer = document.getElementById("farmerAvatar");
+  const spriteWrapper = document.getElementById("farmerSpriteWrapper");
+  if (farmer && targetTop > 0) {
+    const currentLeft = parseFloat(farmer.style.left) || 47;
+    if (spriteWrapper) {
+      if (targetLeft < currentLeft) spriteWrapper.classList.add("facing-left");
+      else spriteWrapper.classList.remove("facing-left");
+    }
+    farmer.style.transition = "top 1.2s cubic-bezier(0.25, 1, 0.5, 1), left 1.2s cubic-bezier(0.25, 1, 0.5, 1)";
+    farmer.style.top = `${targetTop}%`;
+    farmer.style.left = `${targetLeft}%`;
+  }
+
+  // Actualizar tarjeta inferior tipo Uber/GPS
+  const card = document.getElementById("mapSelectedPoiCard");
+  const title = document.getElementById("poiCardTitle");
+  const subtitle = document.getElementById("poiCardSubtitle");
+  const enterBtn = document.getElementById("poiCardEnterBtn");
+
+  if (card && title && subtitle && enterBtn) {
+    card.style.display = "flex";
+
+    if (zone === 'colegio') {
+      title.innerHTML = '🏫 IE Barro Blanco';
+      subtitle.innerHTML = '🌾 Huerta Escolar Colectiva • Bancales Institucionales';
+      enterBtn.innerHTML = '<i class="fas fa-door-open"></i> Entrar al Cultivo';
+      enterBtn.style.background = 'linear-gradient(180deg, #7fc25c, #2e5b22)';
+    } else if (zone === 'individual') {
+      title.innerHTML = '🏡 Mi Huerta / Rancho';
+      subtitle.innerHTML = '👩‍🌾 Parcela de Entrenamiento y Práctica Individual';
+      enterBtn.innerHTML = '<i class="fas fa-door-open"></i> Entrar a Mi Huerta';
+      enterBtn.style.background = 'linear-gradient(180deg, #ffb300, #b8860b)';
+    } else if (zone === 'locked_compost') {
+      title.innerHTML = '🔒 Compostera Escolar';
+      subtitle.innerHTML = 'Requiere Nivel 5 de experiencia para procesar abonos.';
+      enterBtn.innerHTML = '<i class="fas fa-lock"></i> Bloqueado (Nivel 5)';
+      enterBtn.style.background = '#4a5568';
+    } else if (zone === 'locked_market') {
+      title.innerHTML = '🔒 Mercado Verde';
+      subtitle.innerHTML = 'Requiere Nivel 10 para intercambiar semillas y cosechas.';
+      enterBtn.innerHTML = '<i class="fas fa-lock"></i> Bloqueado (Nivel 10)';
+      enterBtn.style.background = '#4a5568';
+    }
+  }
+};
+
+window.confirmEnterSelectedZone = function() {
+  if (selectedPoiZone.startsWith('locked')) {
+    playActionBlocked();
+    alert("🔒 Este edificio requiere subir de nivel realizando riegos y cosechas en la huerta escolar.");
+    return;
+  }
+  window.enterIsoZone(null, selectedPoiZone, 0, 0);
+};
+
+window.onTerrainClick = function(evt) {
+  const terrain = evt.currentTarget.getBoundingClientRect();
+  const clickX = evt.clientX - terrain.left;
+  const clickY = evt.clientY - terrain.top;
+
+  const pctX = Math.round((clickX / terrain.width) * 100);
+  const pctY = Math.round((clickY / terrain.height) * 100);
+
+  const farmer = document.getElementById("farmerAvatar");
+  const spriteWrapper = document.getElementById("farmerSpriteWrapper");
+  if (farmer) {
+    playClickSound();
+    const currentLeft = parseFloat(farmer.style.left) || 47;
+    if (spriteWrapper) {
+      if (pctX < currentLeft) spriteWrapper.classList.add("facing-left");
+      else spriteWrapper.classList.remove("facing-left");
+    }
+    farmer.style.transition = "top 1.5s ease-out, left 1.5s ease-out";
+    farmer.style.top = `${pctY}%`;
+    farmer.style.left = `${pctX}%`;
+  }
+};
 
 // Guía al personaje caminante y luego ingresa a la zona
 window.enterIsoZone = function(evt, zone, targetTop, targetLeft) {
