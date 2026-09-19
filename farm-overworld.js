@@ -342,6 +342,12 @@ export function renderOverworldMap(container, {
           <div class="dialog-beds-grid" id="dialogBedsGrid">
             <!-- Camas generadas dinámicamente -->
           </div>
+
+          <div class="game-dialog-footer">
+            <button class="btn-back-to-map-dialog" onclick="window.closeBuildingDialog()">
+              <i class="fas fa-map-marked-alt"></i> 🗺️ Volver a Explorar el Mapa
+            </button>
+          </div>
         </div>
       </div>
 
@@ -586,13 +592,17 @@ window.openFarmBuildingModal = function(zone) {
   }
 
   gridEl.innerHTML = html;
+  modal.classList.add("active");
   modal.style.display = "flex";
 };
 
 window.closeBuildingDialog = function() {
   playClickSound();
   const modal = document.getElementById("farmBuildingModal");
-  if (modal) modal.style.display = "none";
+  if (modal) {
+    modal.classList.remove("active");
+    modal.style.display = "none";
+  }
 };
 
 window.quickActivatePracticePlot = async function(slotNumber) {
@@ -1088,11 +1098,16 @@ function setupBuildingDragHandlers() {
     let origLeft = 0;
     let origTop = 0;
     let isDraggingThis = false;
+    let isTapCandidate = false;
 
     const onPointerDown = (e) => {
+      startX = e.clientX;
+      startY = e.clientY;
+      isTapCandidate = true;
+
       if (!cameraState.isEditMode) {
-        const zone = el.getAttribute("data-zone");
-        window.onBuildingClick(zone);
+        // En modo juego normal: NO abrir inmediatamente.
+        // Permitir que el gesto sea panning del mapa si el usuario se mueve.
         return;
       }
 
@@ -1100,14 +1115,17 @@ function setupBuildingDragHandlers() {
       isDraggingThis = true;
       el.classList.add("is-dragging");
 
-      startX = e.clientX;
-      startY = e.clientY;
       origLeft = parseFloat(el.style.left) || 0;
       origTop = parseFloat(el.style.top) || 0;
       el.setPointerCapture(e.pointerId);
     };
 
     const onPointerMove = (e) => {
+      const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
+      if (dist > 8) {
+        isTapCandidate = false; // Se movió más de 8px: es arrastre de cámara, NO un tap
+      }
+
       if (!isDraggingThis || !cameraState.isEditMode) return;
       e.stopPropagation();
 
@@ -1131,17 +1149,34 @@ function setupBuildingDragHandlers() {
     };
 
     const onPointerUp = (e) => {
-      if (!isDraggingThis) return;
-      isDraggingThis = false;
-      el.classList.remove("is-dragging");
-      try { el.releasePointerCapture(e.pointerId); } catch (err) {}
-      playClickSound();
+      if (isDraggingThis) {
+        isDraggingThis = false;
+        el.classList.remove("is-dragging");
+        try { el.releasePointerCapture(e.pointerId); } catch (err) {}
+        playClickSound();
+        return;
+      }
+
+      // Si no estábamos en modo edición y el movimiento fue mínimo (un tap genuino):
+      if (!cameraState.isEditMode && isTapCandidate) {
+        const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
+        if (dist < 8) {
+          const zone = el.getAttribute("data-zone");
+          if (zone) {
+            window.onBuildingClick(zone);
+          }
+        }
+      }
+      isTapCandidate = false;
     };
 
     el.addEventListener("pointerdown", onPointerDown);
     el.addEventListener("pointermove", onPointerMove);
     el.addEventListener("pointerup", onPointerUp);
-    el.addEventListener("pointercancel", onPointerUp);
+    el.addEventListener("pointercancel", () => {
+      isDraggingThis = false;
+      isTapCandidate = false;
+    });
   });
 }
 
@@ -1169,8 +1204,13 @@ window.cancelMapLayout = function() {
 //  SELECCIÓN Y ENTRADA INMEDIATA A LA HUERTA
 // ══════════════════════════════════════════════════════════════════════════
 
+let lastBuildingClickTime = 0;
 window.onBuildingClick = function(zone) {
   if (cameraState.isEditMode) return;
+  const now = Date.now();
+  if (now - lastBuildingClickTime < 450) return;
+  lastBuildingClickTime = now;
+
   playClickSound();
   selectedPoiZone = zone;
 

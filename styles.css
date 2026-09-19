@@ -7814,11 +7814,15 @@ body[data-theme] {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   z-index: 10010;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 14px;
   animation: fadeInModal 0.25s ease-out;
+}
+
+.farm-building-modal-overlay.active {
+  display: flex !important;
 }
 
 @keyframes fadeInModal {
@@ -7829,7 +7833,8 @@ body[data-theme] {
 .farm-building-dialog-box {
   width: 100%;
   max-width: 520px;
-  max-height: 85vh;
+  max-height: 80vh;
+  margin: auto;
   background: linear-gradient(180deg, #2b1a0e 0%, #170d06 100%);
   border: 3px solid #d9a94e;
   border-radius: 20px;
@@ -7838,6 +7843,36 @@ body[data-theme] {
   flex-direction: column;
   overflow: hidden;
   animation: popDialog 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.game-dialog-footer {
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  justify-content: center;
+}
+
+.btn-back-to-map-dialog {
+  background: linear-gradient(180deg, #3d4a36, #222e1c);
+  border: 2px solid #81c784;
+  color: #e8f5e9;
+  font-family: var(--font-game);
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 10px 22px;
+  border-radius: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: transform 0.15s, filter 0.15s;
+}
+
+.btn-back-to-map-dialog:hover, .btn-back-to-map-dialog:active {
+  transform: scale(1.02);
+  filter: brightness(1.15);
 }
 
 @keyframes popDialog {
