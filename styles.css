@@ -6187,12 +6187,15 @@ body[data-theme] {
   justify-content: space-between;
   position: relative;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  border: 4px solid #8d5b36;
+  border-bottom: 8px solid #5a371c;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.5), inset 0 3px 8px rgba(0,0,0,0.7);
 }
 .soil-locked {
   background: linear-gradient(135deg, #2d3748, #1a202c);
-  border-style: dashed;
-  opacity: 0.8;
+  border-color: #4a5568;
+  border-bottom-color: #2d3748;
+  opacity: 0.85;
 }
 .lock-overlay {
   display: flex;
@@ -6208,8 +6211,9 @@ body[data-theme] {
 .lock-tooltip { font-size: 0.75rem; color: #cbd5e0; }
 
 .soil-tilled {
-  background: linear-gradient(135deg, #4a3525, #2d1e13);
-  border-color: #8d6e63;
+  background: radial-gradient(circle at 50% 30%, #543922 0%, #301f11 60%, #1a0e07 100%);
+  border-color: #9c6c42;
+  border-bottom-color: #5d3f23;
 }
 .empty-action-indicator {
   display: flex;
@@ -6224,9 +6228,10 @@ body[data-theme] {
 .empty-action-indicator span { font-size: 0.88rem; font-weight: 600; }
 
 .soil-active {
-  background: linear-gradient(135deg, #3e2723, #1b0000);
-  border-color: #4caf50;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  background: radial-gradient(circle at 50% 30%, #4a2818 0%, #29140b 60%, #150904 100%);
+  border-color: #a07855;
+  border-bottom-color: #5c3e24;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), inset 0 3px 10px rgba(0,0,0,0.8);
 }
 .plot-name-tag {
   font-size: 0.78rem;
@@ -7078,37 +7083,95 @@ body[data-theme] {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   MOTOR DE MAPA ISOMÉTRICO 2.5D TIPO VIDEOJUEGO (TOP HEROES OVERWORLD)
+   MOTOR DE MAPA ISOMÉTRICO 2.5D NAVEGABLE (PAN & ZOOM + EDIFICIOS SIN TARJETAS)
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* Contenedor Principal del Viewport de Juego */
 .top-heroes-game-viewport {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  height: 72vh;
+  min-height: 520px;
+  max-height: 720px;
   margin: 0 auto;
-  border-radius: 24px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 3px #5d4037, inset 0 0 0 5px #d9a94e;
-  background: #1b2e15;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), inset 0 0 0 3px #5d4037, inset 0 0 0 5px #d9a94e;
+  background: #152410;
+  touch-action: none;
   user-select: none;
+  cursor: grab;
 }
 
-/* Escenario del Mundo Isométrico */
-.isometric-world-scene {
-  position: relative;
+.top-heroes-game-viewport.is-panning {
+  cursor: grabbing;
+}
+
+/* Escenario Cámara Navegable (1200 x 1000 px) */
+.world-camera-stage {
+  position: absolute;
+  width: 1200px;
+  height: 1000px;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* Terreno de Césped Texturizado con Relieve */
+.iso-terrain-grid {
+  position: absolute;
+  inset: 0;
+  background-color: #27521e;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(92, 194, 96, 0.18) 18%, transparent 22%),
+    linear-gradient(rgba(255, 255, 255, 0.04) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 2px, transparent 2px);
+  background-size: 80px 80px, 40px 40px, 40px 40px;
+}
+
+/* Cuadrícula de Colocación en Modo Edición */
+.building-placement-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255, 213, 79, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 213, 79, 0.25) 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 4;
+}
+
+.is-edit-mode .building-placement-grid {
+  opacity: 1;
+}
+
+/* SVG de Senderos y Río Caudaloso */
+.iso-paths-svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 640px;
-  background: linear-gradient(180deg, #2d5a27 0%, #1e461b 40%, #153813 100%);
-  overflow: hidden;
-  touch-action: pan-y;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
 }
 
-/* Capa de Cielo y Nubes Flotantes */
+.river-flow {
+  animation: riverAnim 1.8s linear infinite;
+}
+
+@keyframes riverAnim {
+  from { stroke-dashoffset: 20; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Capa de Cielo, Nubes y Sol */
 .iso-sky-layer {
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 90px;
+  height: 120px;
   pointer-events: none;
   z-index: 5;
   background: linear-gradient(180deg, rgba(129, 212, 250, 0.45) 0%, transparent 100%);
@@ -7116,84 +7179,75 @@ body[data-theme] {
 
 .iso-cloud {
   position: absolute;
-  font-size: 2rem;
+  font-size: 2.4rem;
   opacity: 0.75;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
-  animation: cloudDrift 35s linear infinite;
+  animation: cloudDrift 45s linear infinite;
 }
-.cloud-a { top: 12px; left: -10%; animation-duration: 40s; }
-.cloud-b { top: 35px; left: -15%; animation-duration: 55s; animation-delay: 15s; }
+.cloud-a { top: 15px; left: -10%; animation-duration: 45s; }
+.cloud-b { top: 45px; left: -20%; animation-duration: 65s; animation-delay: 18s; }
 
 @keyframes cloudDrift {
   0% { transform: translateX(0); }
-  100% { transform: translateX(700px); }
+  100% { transform: translateX(1400px); }
 }
 
 .iso-sun-glow {
   position: absolute;
-  top: 10px; right: 18px;
-  font-size: 2.2rem;
-  filter: drop-shadow(0 0 15px #ffe082);
+  top: 15px; right: 35px;
+  font-size: 2.8rem;
+  filter: drop-shadow(0 0 20px #ffe082);
   animation: sunPulse 4s ease-in-out infinite alternate;
 }
 @keyframes sunPulse {
   0% { transform: scale(1); }
-  100% { transform: scale(1.1); }
+  100% { transform: scale(1.12); }
 }
 
-/* Aves Volando por el Mapa (Flying Birds) */
+/* Aves Volando por el Mapa */
 .flying-bird {
   position: absolute;
   z-index: 28;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   pointer-events: none;
-  animation: flyAcrossMap 18s linear infinite;
+  animation: flyAcrossMap 22s linear infinite;
 }
-.flying-bird.bird-1 {
-  top: 15%;
-  left: -10%;
-  animation-duration: 14s;
-  animation-delay: 2s;
-}
-.flying-bird.bird-2 {
-  top: 28%;
-  left: -15%;
-  animation-duration: 17s;
-  animation-delay: 7s;
-}
+.flying-bird.bird-1 { top: 18%; left: -10%; animation-duration: 18s; animation-delay: 2s; }
+.flying-bird.bird-2 { top: 35%; left: -15%; animation-duration: 24s; animation-delay: 9s; }
+
 @keyframes flyAcrossMap {
   0% { transform: translate(0, 0) scale(0.9); }
-  50% { transform: translate(350px, 30px) scale(1.1); }
-  100% { transform: translate(750px, -20px) scale(0.85); }
+  50% { transform: translate(600px, 40px) scale(1.15); }
+  100% { transform: translate(1300px, -30px) scale(0.85); }
 }
 
 .bird-shadow {
   position: absolute;
-  bottom: -35px;
-  left: 5px;
-  width: 14px;
-  height: 5px;
+  bottom: -45px;
+  left: 6px;
+  width: 16px;
+  height: 6px;
   background: rgba(0, 0, 0, 0.25);
   border-radius: 50%;
   filter: blur(2px);
 }
 
-/* Mariposas Revoloteando (Butterflies) */
+/* Mariposas Revoloteando */
 .flying-butterfly {
   position: absolute;
   z-index: 22;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   pointer-events: none;
   animation: butterflyFlutter 6s ease-in-out infinite alternate;
 }
-.butterfly-1 { top: 44%; left: 32%; animation-duration: 5s; }
-.butterfly-2 { top: 52%; left: 68%; animation-duration: 7s; }
+.butterfly-1 { top: 40%; left: 35%; animation-duration: 5s; }
+.butterfly-2 { top: 58%; left: 62%; animation-duration: 7s; }
 
 @keyframes butterflyFlutter {
   0% { transform: translate(0, 0) rotate(-10deg) scale(0.9); }
-  25% { transform: translate(20px, -15px) rotate(15deg) scale(1.1); }
-  50% { transform: translate(-15px, -30px) rotate(-15deg) scale(0.95); }
-  75% { transform: translate(30px, -10px) rotate(20deg) scale(1.05); }
+  25% { transform: translate(25px, -20px) rotate(15deg) scale(1.1); }
+  50% { transform: translate(-20px, -35px) rotate(-15deg) scale(0.95); }
+  75% { transform: translate(35px, -15px) rotate(20deg) scale(1.05); }
   100% { transform: translate(0, 0) rotate(0deg) scale(1); }
 }
 
@@ -7206,8 +7260,8 @@ body[data-theme] {
   align-items: center;
   transition: top 3.5s ease-in-out, left 3.5s ease-in-out;
 }
-.cow-walker { top: 78%; left: 26%; font-size: 1.8rem; }
-.chicken-walker { top: 42%; left: 74%; font-size: 1.2rem; }
+.cow-walker { top: 78%; left: 24%; font-size: 2.2rem; }
+.chicken-walker { top: 44%; left: 74%; font-size: 1.4rem; }
 
 .animal-sprite {
   display: inline-block;
@@ -7219,191 +7273,296 @@ body[data-theme] {
   100% { transform: translateY(1px) rotate(-2deg); }
 }
 
-/* Plano del Terreno Isométrico con Texturas */
-.iso-terrain-grid {
-  position: absolute;
-  inset: 0;
-  background-color: #234b1e;
-  background-image:
-    radial-gradient(circle at 50% 50%, rgba(76, 175, 80, 0.15) 15%, transparent 20%),
-    linear-gradient(rgba(255, 255, 255, 0.03) 2px, transparent 2px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 2px, transparent 2px);
-  background-size: 60px 60px, 40px 40px, 40px 40px;
-}
-
-/* SVG de Senderos y Río */
-.iso-paths-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 2;
-}
-.river-flow {
-  animation: riverAnim 1.8s linear infinite;
-}
-@keyframes riverAnim {
-  from { stroke-dashoffset: 20; }
-  to { stroke-dashoffset: 0; }
-}
-
-/* Decoraciones del Mapa (Árboles, Flores, Vallas) */
+/* Decoraciones Naturales del Terreno (Árboles y Flores) */
 .iso-decor {
   position: absolute;
   pointer-events: none;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,0.55));
   z-index: 8;
+  transition: transform 0.3s ease;
 }
-.tree-tl { top: 8%; left: 2%; font-size: 2.2rem; }
-.tree-tr { top: 8%; right: 4%; font-size: 2.2rem; }
-.tree-bl { bottom: 6%; left: 4%; font-size: 2.4rem; z-index: 26; }
-.tree-br { bottom: 6%; right: 4%; font-size: 2.4rem; z-index: 26; }
-.flowers-l { top: 42%; left: 6%; font-size: 1.4rem; }
-.flowers-r { top: 76%; right: 8%; font-size: 1.4rem; }
-.fence-l { top: 48%; left: 16%; font-size: 1.3rem; }
-.fence-r { top: 72%; right: 28%; font-size: 1.3rem; }
+.tree-tl { top: 6%; left: 3%; font-size: 3rem; }
+.tree-tr { top: 6%; right: 6%; font-size: 3rem; }
+.tree-bl { bottom: 6%; left: 5%; font-size: 3.2rem; z-index: 26; }
+.tree-br { bottom: 6%; right: 6%; font-size: 3.2rem; z-index: 26; }
+.tree-mid { top: 48%; left: 2%; font-size: 2.8rem; }
+.flowers-l { top: 42%; left: 14%; font-size: 1.6rem; }
+.flowers-r { top: 76%; right: 12%; font-size: 1.6rem; }
+.fence-l { top: 48%; left: 22%; font-size: 1.5rem; }
+.fence-r { top: 70%; right: 26%; font-size: 1.5rem; }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   EDIFICIOS 3D ISOMÉTRICOS SOBRE EL MAPA (CON PINES DE DESTINO TIPO UBER)
+   EDIFICIOS 2.5D ISOMÉTRICOS INTEGRADOS EN EL MAPA (¡CERO TARJETAS!)
    ══════════════════════════════════════════════════════════════════════════ */
 
 .iso-building-structure {
   position: absolute;
-  width: 42%;
-  max-width: 220px;
   z-index: 15;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  touch-action: none;
+  transition: transform 0.15s ease;
 }
 
-.iso-building-structure:hover {
-  transform: translateY(-4px) scale(1.03);
+/* Quitar totalmente las tarjetas y marcos oscuros */
+.iso-building-structure .building-artwork {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.iso-building-structure:active {
-  transform: scale(0.97);
+/* Sprite Isométrico 2.5D Real */
+.iso-building-sprite {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 14px 16px rgba(0,0,0,0.7));
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-/* Pin Flotante de Ubicación en el Mapa (Estilo Uber/Juego) */
+.building-emoji-art {
+  font-size: 5rem;
+  line-height: 1;
+}
+
+.iso-building-structure:hover .iso-building-sprite {
+  transform: scale(1.08) translateY(-4px);
+  filter: drop-shadow(0 18px 22px rgba(0,0,0,0.8)) drop-shadow(0 0 16px rgba(255, 213, 79, 0.7));
+}
+
+/* Sombra de Contacto Natural en el Césped */
+.building-ground-shadow {
+  width: 100px;
+  height: 30px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.2) 60%, transparent 80%);
+  border-radius: 50%;
+  margin-top: -14px;
+  z-index: -1;
+}
+
+/* Rótulo de Madera Estilo Juego */
+.building-title-plaque {
+  margin-top: 4px;
+  background: linear-gradient(180deg, #8a5a34, #5c3a1e);
+  border: 2px solid #d9a94e;
+  border-radius: 12px;
+  padding: 2px 10px;
+  color: #ffd464;
+  font-family: var(--font-game);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-shadow: 0 1px 2px #000;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+  white-space: nowrap;
+}
+
+/* Pin Flotante de Ubicación */
 .building-map-pin {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: linear-gradient(135deg, #d9a94e, #b8860b);
   border: 2px solid #fff;
   border-radius: 999px;
   padding: 3px 10px;
-  color: #1a120b;
   font-family: var(--font-game);
   font-weight: 800;
   font-size: 0.7rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   animation: pinBounce 1.5s infinite alternate ease-in-out;
 }
 @keyframes pinBounce {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-5px); }
+  100% { transform: translateY(-6px); }
 }
 
-.building-map-pin.school-pin {
-  background: linear-gradient(135deg, #4caf50, #2e7d32);
-  color: #fff;
+.school-pin { background: linear-gradient(135deg, #4caf50, #2e7d32); color: #fff; }
+.farm-pin { background: linear-gradient(135deg, #ffb300, #ff8f00); color: #000; }
+.lock-pin { background: linear-gradient(135deg, #718096, #4a5568); color: #fff; }
+
+/* Bancales Isométricos en el Mapa */
+.iso-plots-cluster {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
 }
 
-.building-map-pin.farm-pin {
-  background: linear-gradient(135deg, #ffb300, #ff8f00);
-  color: #000;
-}
-
-.building-map-pin.lock-pin {
-  background: linear-gradient(135deg, #718096, #4a5568);
-  color: #fff;
-}
-
-/* Arte y Estructura del Edificio */
-.building-artwork {
-  width: 100%;
-  background: linear-gradient(180deg, rgba(30, 42, 22, 0.94) 0%, rgba(14, 22, 10, 0.98) 100%);
-  border: 3px solid var(--wood-base);
-  border-radius: 18px;
-  padding: 10px 8px 8px 8px;
-  text-align: center;
-  box-shadow: inset 0 2px 0 rgba(255,255,255,0.15), 0 10px 20px rgba(0,0,0,0.6);
+.tilled-soil-bed-25d {
+  width: 56px;
+  height: 38px;
+  background: linear-gradient(135deg, #422817 0%, #2b180d 50%, #1a0f08 100%);
+  border: 2px solid #5d4037;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 4px 8px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   position: relative;
+  transition: transform 0.2s, border-color 0.2s;
 }
 
-/* Sombra de Contacto sobre el Terreno */
-.building-artwork::after {
-  content: "";
+.tilled-soil-bed-25d:hover {
+  transform: translateY(-2px);
+  border-color: #ffd54f;
+}
+
+.bed-crop-icon {
+  font-size: 1.4rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.7));
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MODO DE EDICIÓN (MOVER EDIFICIOS 🏗️)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.is-edit-mode .iso-building-structure {
+  cursor: grab;
+  animation: buildingWobble 2s infinite ease-in-out;
+}
+
+.is-edit-mode .iso-building-structure.is-dragging {
+  cursor: grabbing;
+  z-index: 100 !important;
+  opacity: 0.9;
+  transform: scale(1.15) translateY(-10px);
+  filter: drop-shadow(0 25px 30px rgba(0,0,0,0.8)) drop-shadow(0 0 20px #ffd54f);
+}
+
+.is-edit-mode .iso-building-structure::before {
+  content: "🏗️ Arrastrar";
   position: absolute;
-  bottom: -10px;
-  left: 10%;
-  width: 80%;
-  height: 14px;
-  background: rgba(0, 0, 0, 0.55);
-  border-radius: 50%;
-  filter: blur(4px);
-  z-index: -1;
-}
-
-.school-building .building-artwork {
-  border-color: #81c784;
-}
-
-.farm-building .building-artwork {
-  border-color: #ffd54f;
-  box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 0 15px rgba(255, 213, 79, 0.35), 0 10px 20px rgba(0,0,0,0.6);
-}
-
-.locked-building {
-  opacity: 0.72;
-  filter: grayscale(0.6);
-}
-
-.structure-badge {
-  display: inline-block;
-  background: var(--leaf-dark);
-  color: #fff;
+  top: -24px;
+  background: #ffd54f;
+  color: #1a120b;
   font-family: var(--font-game);
-  font-size: 0.62rem;
-  font-weight: 700;
+  font-size: 0.68rem;
+  font-weight: 800;
   padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--leaf-light);
-  margin-bottom: 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  animation: bounceHint 1s infinite alternate ease-in-out;
 }
 
-.farm-badge {
-  background: #5d4037;
-  border-color: #ffd54f;
-  color: #ffd54f;
+@keyframes buildingWobble {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-1.5deg); }
+  75% { transform: rotate(1.5deg); }
+  100% { transform: rotate(0deg); }
 }
 
-.artwork-sprite {
-  font-size: 2.6rem;
-  margin: 2px 0;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+@keyframes bounceHint {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
 }
 
-.structure-title-box {
+/* Controles Flotantes del HUD (Zoom y Modo Mover) */
+.map-hud-controls {
+  position: absolute;
+  top: 60px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 50;
+}
+
+.map-ctrl-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(18, 28, 12, 0.92);
+  border: 2px solid var(--hud-border-gold);
+  color: var(--hud-text-gold);
+  font-size: 1.15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+  transition: transform 0.15s, background 0.2s, box-shadow 0.2s;
+}
+
+.map-ctrl-btn:active {
+  transform: scale(0.92);
+}
+
+.map-ctrl-btn.active-mode {
+  background: #d9a94e;
+  color: #1a120b;
+  border-color: #fff;
+  box-shadow: 0 0 18px #d9a94e;
+}
+
+/* Barra Superior del Modo Edición */
+.edit-mode-banner {
+  position: absolute;
+  top: 60px;
+  left: 12px;
+  right: 64px;
+  background: rgba(18, 28, 12, 0.95);
+  border: 2px solid #ffd54f;
+  border-radius: 14px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 50;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  animation: bannerPop 0.3s ease;
+}
+
+@keyframes bannerPop {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.edit-mode-banner span {
   font-family: var(--font-game);
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: #fff;
+  color: #ffd464;
 }
 
-/* Panel Inferior de Inspección de Destino Seleccionado */
+.btn-save-layout {
+  background: linear-gradient(180deg, #7fc25c, #2e5b22);
+  color: #fff;
+  font-family: var(--font-game);
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: none;
+  border-radius: 10px;
+  padding: 5px 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.btn-cancel-layout {
+  background: #e53e3e;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 5px 8px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  margin-left: 4px;
+}
+
+/* Tarjeta Inferior de Destino Seleccionado */
 .map-selected-poi-card {
   position: absolute;
   bottom: 12px;
   left: 12px;
   right: 12px;
-  background: rgba(15, 24, 12, 0.95);
+  background: rgba(15, 24, 12, 0.96);
   border: 2px solid var(--hud-border-gold);
   border-radius: 16px;
   padding: 12px 14px;
